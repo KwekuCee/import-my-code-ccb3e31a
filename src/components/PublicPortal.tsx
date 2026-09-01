@@ -1,0 +1,1556 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import QRCode from 'qrcode';
+import { motion } from 'motion/react';
+import { Member, Leader, ChurchBranch, ChurchAdminAccount, AttendanceRecord } from '../types';
+import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClassNumber, getFoundationClassLabel } from '../data/constants';
+import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase } from '../lib/supabaseService';
+import { ChurchLogo } from './ChurchLogo';
+
+interface PublicPortalProps {
+  members: Member[];
+  leaders: Leader[];
+  churches: ChurchBranch[];
+  churchAdmins?: ChurchAdminAccount[];
+  serviceTypes?: Array<{ id: string; name: string; active?: boolean }> | string[];
+  onConfirmAttendance: (record: AttendanceRecord) => void;
+  onAddLeader: (leader: Leader) => void;
+  onAddChurchAdmin: (admin: ChurchAdminAccount, branch: ChurchBranch) => void;
+  onLoginSuccess: (userRole?: 'Superadmin' | 'Church Admin', userChurch?: string, adminName?: string, userEmail?: string) => void;
+  onAddMember: (member: Member) => void;
+}
+
+export const PublicPortal: React.FC<PublicPortalProps> = ({
+  members,
+  leaders,
+  churches,
+  churchAdmins = [],
+  serviceTypes = [],
+  onConfirmAttendance,
+  onAddLeader,
+  onAddChurchAdmin,
+  onLoginSuccess,
+  onAddMember,
+}) => {
+  const [activeTab, setActiveTab] = useState<'attendance' | 'leader_reg' | 'admin_signup' | 'login'>('attendance');
+
+  // Dynamically derive effective list of churches from DB and registered admins
+  const effectiveChurches = useMemo(() => {
+    const map = new Map<string, ChurchBranch>();
+
+    // 1. Add database churches
+    (churches || []).forEach(c => {
+      if (c && c.name) map.set(c.name.toLowerCase(), c);
+    });
+
+    // 3. Add any registered Church Admin accounts' churches
+    (churchAdmins || []).forEach(a => {
+      if (a && a.churchName) {
+        const key = a.churchName.toLowerCase();
+        if (!map.has(key)) {
+          map.set(key, {
+            id: `CH-ADM-${a.id || Date.now()}`,
+            name: a.churchName,
+            pastor: a.adminName || 'Pastor in Charge',
+            membersCount: 0,
+            status: 'Healthy',
+            zone: a.zone || 'Zone 1 (Korle Bu)',
+            pcfCount: 0,
+            cellCount: 0,
+            bsctCount: 0
+          });
+        }
+      }
+    });
+
+    return Array.from(map.values());
+  }, [churches, churchAdmins]);
+
+  // Dynamic service types list from props and database
+  const [dbServiceTypes, setDbServiceTypes] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetchServiceTypesFromSupabase().then(types => {
+      if (types && types.length > 0) {
+        setDbServiceTypes(types);
+      }
+    }).catch(() => {});
+  }, []);
+
+  const effectiveServiceTypes = useMemo(() => {
+    const rawList: string[] = [];
+    if (Array.isArray(serviceTypes) && serviceTypes.length > 0) {
+      serviceTypes.forEach(s => {
+        if (typeof s === 'string') rawList.push(s);
+        else if (s && s.name && (s.active !== false)) rawList.push(s.name);
+      });
+    }
+    if (dbServiceTypes.length > 0) {
+      dbServiceTypes.forEach(s => rawList.push(s));
+    }
+    STANDARD_SERVICE_TYPES.forEach(s => rawList.push(s));
+    return Array.from(new Set(rawList.filter(Boolean)));
+  }, [serviceTypes, dbServiceTypes]);
+
+  // --- 1. Self Attendance State ---
+  const [attFullName, setAttFullName] = useState('');
+  const [attEmail, setAttEmail] = useState('');
+  const [attPhone, setAttPhone] = useState('');
+  const [attDob, setAttDob] = useState('');
+  const [attLocation, setAttLocation] = useState('Korle Bu, Accra');
+  const [attOccupation, setAttOccupation] = useState('Student');
+  const [attOtherOccupation, setAttOtherOccupation] = useState('');
+  const [attEducation, setAttEducation] = useState('Tertiary / University');
+  const [attFoundationClass, setAttFoundationClass] = useState('Class 1: The New Creation');
+  const [attInvitedByLeaderId, setAttInvitedByLeaderId] = useState('self_invite');
+  const [attChurch, setAttChurch] = useState(effectiveChurches[0]?.name || '');
+  const [attServiceType, setAttServiceType] = useState('Sunday Service');
+  const [attSearchQuery, setAttSearchQuery] = useState('');
+  const [attSuccessPass, setAttSuccessPass] = useState<AttendanceRecord | null>(null);
+  const [attPassImageDataUrl, setAttPassImageDataUrl] = useState('');
+  const [isGeneratingQr, setIsGeneratingQr] = useState(false);
+
+  // Auto-fill church when leader is chosen
+  const handleInvitedByChange = (leaderId: string) => {
+    setAttInvitedByLeaderId(leaderId);
+    if (leaderId !== 'self_invite') {
+      const foundLeader = leaders.find(l => l.id === leaderId);
+      if (foundLeader && foundLeader.church) {
+        setAttChurch(foundLeader.church);
+      }
+    }
+  };
+
+  // --- 2. Leader Self-Registration State ---
+  const [ldrName, setLdrName] = useState('');
+  const [ldrEmail, setLdrEmail] = useState('');
+  const [ldrPhone, setLdrPhone] = useState('');
+  const [ldrCellName, setLdrCellName] = useState('');
+  const [ldrDob, setLdrDob] = useState('');
+  const [ldrLocation, setLdrLocation] = useState('');
+  const [ldrRole, setLdrRole] = useState<'BSCT' | 'Cell Leader' | 'PCF Leader' | 'Church Coordinator'>('Cell Leader');
+  const [ldrChurch, setLdrChurch] = useState(effectiveChurches[0]?.name || '');
+  const [ldrAuthCode, setLdrAuthCode] = useState('');
+  const [ldrError, setLdrError] = useState('');
+  const [ldrSuccessMsg, setLdrSuccessMsg] = useState('');
+
+  // Keep church selections synced when effectiveChurches updates
+  useEffect(() => {
+    if (effectiveChurches.length > 0) {
+      const attExists = effectiveChurches.some(c => c?.name && attChurch && c.name.toLowerCase() === attChurch.toLowerCase());
+      if (!attExists || !attChurch) {
+        setAttChurch(effectiveChurches[0].name);
+      }
+      const ldrExists = effectiveChurches.some(c => c?.name && ldrChurch && c.name.toLowerCase() === ldrChurch.toLowerCase());
+      if (!ldrExists || !ldrChurch) {
+        setLdrChurch(effectiveChurches[0].name);
+      }
+    }
+  }, [effectiveChurches]);
+
+  // --- 3. Church Admin Sign Up State ---
+  const [admFullName, setAdmFullName] = useState('');
+  const [admRequiredEmail, setAdmRequiredEmail] = useState('');
+  const [admChurchName, setAdmChurchName] = useState('');
+  const [admPastorName, setAdmPastorName] = useState('');
+  const [admPhone, setAdmPhone] = useState('');
+  const [admPassword, setAdmPassword] = useState('');
+  const [admAuthCode, setAdmAuthCode] = useState('');
+  const [admError, setAdmError] = useState('');
+  const [admSuccessMsg, setAdmSuccessMsg] = useState('');
+
+  // --- 4. Admin Sign In State ---
+  const [loginRole, setLoginRole] = useState<'Superadmin' | 'Church Admin'>('Superadmin');
+  const [loginIdentifier, setLoginIdentifier] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetFeedback, setResetFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const handleSendResetEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail.trim()) return;
+    setIsResetting(true);
+    setResetFeedback(null);
+    try {
+      const res = await sendPasswordResetEmail(resetEmail.trim());
+      if (res.success) {
+        setResetFeedback({ type: 'success', message: res.message });
+      } else {
+        setResetFeedback({ type: 'error', message: res.message });
+      }
+    } catch (err: any) {
+      setResetFeedback({ type: 'error', message: err?.message || 'Failed to dispatch reset link.' });
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  // Filtered members for attendance search
+  const cleanAttSearch = (attSearchQuery || '').trim().toLowerCase();
+  const filteredMembers = cleanAttSearch
+    ? members.filter(
+      (m) => {
+        if (!m) return false;
+        const nameStr = (m.fullName || '').toLowerCase();
+        const idStr = (m.id || '').toLowerCase();
+        const phoneStr = m.phone || '';
+        return nameStr.includes(cleanAttSearch) || phoneStr.includes(cleanAttSearch) || idStr.includes(cleanAttSearch);
+      }
+    ).slice(0, 5)
+    : [];
+
+  const generateAndDownloadQrPass = async (member: Member, churchName: string, serviceType: string, timestamp: string) => {
+    try {
+      setIsGeneratingQr(true);
+      const qrContent = JSON.stringify({
+        id: member.id,
+        name: member.fullName,
+        church: churchName,
+        phone: member.phone,
+        service: serviceType
+      });
+
+      const qrDataUrl = await QRCode.toDataURL(qrContent, {
+        width: 300,
+        margin: 1,
+        color: { dark: '#020617', light: '#ffffff' }
+      });
+
+      // Canvas element for Digital Member Pass Badge
+      const canvas = document.createElement('canvas');
+      canvas.width = 600;
+      canvas.height = 780;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) return qrDataUrl;
+
+      // Dark Luxury Gradient Background
+      const grad = ctx.createLinearGradient(0, 0, 0, 780);
+      grad.addColorStop(0, '#090d16');
+      grad.addColorStop(1, '#1e293b');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 600, 780);
+
+      // Gold Outer Frame
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(16, 16, 568, 748);
+
+      // Inner Header
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('CHRIST EMBASSY • GCYC', 300, 60);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 26px sans-serif';
+      ctx.fillText(`${churchName.toUpperCase()}`, 300, 98);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('OFFICIAL DIGITAL ATTENDANCE QR PASS', 300, 122);
+
+      // White QR Container Box
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.roundRect(160, 140, 280, 280, 20);
+      ctx.fill();
+
+      // Draw QR Code Image
+      const img = new Image();
+      img.src = qrDataUrl;
+      await new Promise((resolve) => { img.onload = resolve; });
+      ctx.drawImage(img, 175, 155, 250, 250);
+
+      // Member Details Frame
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.roundRect(40, 440, 520, 250, 16);
+      ctx.fill();
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(40, 440, 520, 250);
+
+      // Details Text
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText(member.fullName, 60, 478);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 14px monospace';
+      ctx.fillText(`MEMBER ID: ${member.id}`, 60, 506);
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '13px sans-serif';
+      ctx.fillText(`Contact: ${member.phone}`, 60, 536);
+      ctx.fillText(`Location: ${member.location || 'N/A'}`, 60, 560);
+      ctx.fillText(`Occupation: ${member.occupation || 'N/A'}`, 60, 584);
+      ctx.fillText(`Education: ${member.education || 'N/A'}`, 60, 608);
+      const foundationDisplay = member.foundationClass > 0 ? getFoundationClassLabel(member.foundationClass) : 'Not Enrolled';
+      ctx.fillText(`Foundation Class: ${foundationDisplay}`, 60, 632);
+      ctx.fillText(`Checked In: ${serviceType} (${timestamp})`, 60, 656);
+
+      // Footer
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#64748b';
+      ctx.font = '12px sans-serif';
+      ctx.fillText('Scan this QR code at usher station every time you attend church', 300, 725);
+
+      const passDataUrl = canvas.toDataURL('image/png');
+
+      // Trigger automatic download
+      const downloadLink = document.createElement('a');
+      downloadLink.href = passDataUrl;
+      downloadLink.download = `CE_Korle_Bu_QR_Pass_${member.id}.png`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+
+      setAttPassImageDataUrl(passDataUrl);
+      setIsGeneratingQr(false);
+      return passDataUrl;
+    } catch (err) {
+      console.error('Error generating QR pass:', err);
+      setIsGeneratingQr(false);
+      return '';
+    }
+  };
+
+  // Handlers
+  const handleSelfAttendanceSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!attFullName.trim() || !attPhone.trim()) {
+      alert('Please fill in your Full Name and Contact Phone Number.');
+      return;
+    }
+
+    // Determine invitedBy name
+    let invitedByName = 'Self-Walkin / Self Invited';
+    if (attInvitedByLeaderId !== 'self_invite') {
+      const foundL = leaders.find((l) => l.id === attInvitedByLeaderId);
+      if (foundL) {
+        invitedByName = foundL.fullName;
+      }
+    }
+
+    // Resolve occupation (support custom occupation if "Other" is selected)
+    const resolvedOccupation = attOccupation === 'Other'
+      ? (attOtherOccupation.trim() || 'Other')
+      : attOccupation;
+
+    const foundationClassNum = parseFoundationClassNumber(attFoundationClass);
+
+    // Check if member already exists by name & phone
+    const normalizedInputName = (attFullName || '').trim().toLowerCase();
+    const normalizedInputPhone = (attPhone || '').trim();
+    let existingMember = members.find(
+      (m) => m && ((m.fullName || '').toLowerCase() === normalizedInputName || (m.phone && m.phone === normalizedInputPhone))
+    );
+
+    if (!existingMember) {
+      existingMember = {
+        id: `CE-${Math.floor(1000 + Math.random() * 9000)}`,
+        fullName: attFullName.trim(),
+        phone: attPhone.trim(),
+        email: attEmail.trim() || undefined,
+        dob: attDob || undefined,
+        role: 'Member',
+        occupation: resolvedOccupation,
+        education: attEducation,
+        location: attLocation,
+        church: attChurch,
+        invitedBy: invitedByName,
+        invitedByLeaderId: attInvitedByLeaderId !== 'self_invite' ? attInvitedByLeaderId : undefined,
+        joinDate: new Date().toISOString().slice(0, 10),
+        initials: (attFullName || 'Member').split(' ').filter(Boolean).map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'MB',
+        serviceCount: 1,
+        foundationClass: foundationClassNum,
+        status: 'General Member',
+      };
+      onAddMember(existingMember);
+    } else {
+      // Update existing member's location, occupation, education, and foundation class
+      existingMember.location = attLocation;
+      existingMember.occupation = resolvedOccupation;
+      existingMember.education = attEducation;
+      existingMember.foundationClass = foundationClassNum;
+    }
+
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const record: AttendanceRecord = {
+      id: `ATT-${Date.now()}`,
+      memberId: existingMember.id,
+      memberName: existingMember.fullName,
+      memberRole: existingMember.role,
+      serviceType: attServiceType,
+      timestamp,
+      date: new Date().toISOString().slice(0, 10),
+      verifiedBy: 'Self Check-In Portal',
+      status: 'Confirmed',
+      church: attChurch,
+      checkInMethod: 'Self Check-In',
+      leaderName: invitedByName || existingMember.invitedBy || 'Direct / Self',
+      pcfName: invitedByName ? `${invitedByName}'s Cell / PCF` : 'General PCF'
+    };
+
+    onConfirmAttendance(record);
+    setAttSuccessPass(record);
+
+    // Auto-generate and download QR pass
+    await generateAndDownloadQrPass(existingMember, attChurch, attServiceType, timestamp);
+  };
+
+  const handleLeaderSelfReg = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLdrError('');
+    setLdrSuccessMsg('');
+
+    // REQUIRED AUTH CODE VALIDATION
+    if (ldrAuthCode.trim().toUpperCase() !== 'YOM26') {
+      setLdrError('Invalid Authentication Code! Please enter a valid security code.');
+      return;
+    }
+
+    if (!ldrName.trim() || !ldrPhone.trim() || !ldrCellName.trim() || !ldrEmail.trim()) {
+      setLdrError('Please complete all required fields including Full Name, Email, Contact, and Cell/PCF Names.');
+      return;
+    }
+
+    const newLeader: Leader = {
+      id: `LDR-${Math.floor(200 + Math.random() * 800)}`,
+      fullName: ldrName.trim(),
+      email: ldrEmail.trim(),
+      contact: ldrPhone.trim(),
+      dob: ldrDob || '1995-01-01',
+      location: ldrLocation || 'Accra',
+      leaderType: ldrRole,
+      cellOrPcfName: ldrCellName.trim(),
+      church: ldrChurch,
+      isAppointed: false,
+      downstreamCount: 0,
+      promotionStatus: 'Confirmed',
+      joinedDate: new Date().toISOString().slice(0, 10),
+      initials: (ldrName || 'Leader').split(' ').filter(Boolean).map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'LD',
+    };
+
+    onAddLeader(newLeader);
+    setLdrSuccessMsg(`Hallelujah! Leader registration successful for ${newLeader.fullName} (${newLeader.leaderType} - ${newLeader.church}).`);
+    setLdrName('');
+    setLdrEmail('');
+    setLdrPhone('');
+    setLdrCellName('');
+    setLdrLocation('');
+    setLdrAuthCode('');
+  };
+
+  const handleAdminSignUp = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAdmError('');
+    setAdmSuccessMsg('');
+
+    // REQUIRED AUTH CODE VALIDATION
+    if (admAuthCode.trim().toUpperCase() !== 'YOM26') {
+      setAdmError('Invalid Authentication Code! Please enter a valid security code.');
+      return;
+    }
+
+    if (
+      !admFullName.trim() ||
+      !admRequiredEmail.trim() ||
+      !admChurchName.trim() ||
+      !admPastorName.trim() ||
+      !admPhone.trim()
+    ) {
+      setAdmError('Please complete all required fields for Church Branch Admin signup.');
+      return;
+    }
+
+    const newBranch: ChurchBranch = {
+      id: `CH-${Date.now().toString().slice(-4)}`,
+      name: admChurchName.trim(),
+      pastor: admPastorName.trim(),
+      membersCount: 0,
+      status: 'Growing',
+      zone: 'Zone 1 (Korle Bu)',
+      pcfCount: 0,
+      cellCount: 0,
+      bsctCount: 0,
+    };
+
+    const newAdmin: ChurchAdminAccount = {
+      id: `ADM-${Math.floor(100 + Math.random() * 900)}`,
+      adminName: admFullName.trim(),
+      adminEmail: admRequiredEmail.trim(),
+      adminPhone: admPhone.trim(),
+      churchName: admChurchName.trim(),
+      zone: 'Zone 1 (Korle Bu)',
+      joinedDate: new Date().toISOString().slice(0, 10),
+      status: 'Active',
+      password: admPassword.trim() || 'CEKBU@2026'
+    };
+
+    onAddChurchAdmin(newAdmin, newBranch);
+    setAdmSuccessMsg(`Church Branch "${newBranch.name}" & Admin Account for "${newAdmin.adminName}" registered successfully! Redirecting to dashboard...`);
+
+    setTimeout(() => {
+      onLoginSuccess('Church Admin', newBranch.name, newAdmin.adminName, newAdmin.adminEmail);
+    }, 1500);
+  };
+
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    setIsLoggingIn(true);
+
+    try {
+      const result = await authenticateUserWithDatabase(
+        loginIdentifier,
+        loginPassword,
+        loginRole,
+        churchAdmins,
+        churches
+      );
+
+      if (!result.success || !result.user) {
+        setLoginError(result.error || 'Authentication failed. Please verify your credentials and try again.');
+        setIsLoggingIn(false);
+        return;
+      }
+
+      onLoginSuccess(
+        result.user.role,
+        result.user.church,
+        result.user.name,
+        result.user.email
+      );
+    } catch (err: any) {
+      setLoginError(err?.message || 'Database connection error during authentication. Please retry.');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-body relative overflow-x-hidden flex flex-col">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+      {/* Top Portal Banner Bar */}
+      <header className="border-b border-slate-200/90 bg-white/95 backdrop-blur-md sticky top-0 z-40 px-4 md:px-8 py-3.5 flex items-center justify-between shadow-2xs">
+        <div className="flex items-center gap-3">
+          <ChurchLogo className="w-10 h-10 rounded-2xl overflow-hidden shadow-md shadow-blue-700/20 shrink-0" alt="GCYC Logo" />
+          <div>
+            <h1 className="font-display font-extrabold text-base md:text-lg text-slate-900 tracking-tight flex items-center gap-2">
+              GCYC Group
+
+            </h1>
+            <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
+              Grace City Youth Church Attendance System
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveTab('login')}
+            className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${activeTab === 'login'
+              ? 'bg-blue-700 text-white shadow-md shadow-blue-700/20'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+              }`}
+          >
+            <span className="material-symbols-outlined text-[16px]">admin_panel_settings</span>
+            <span>Admin Sign In</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 md:py-10 space-y-8">
+        {/* Hero Welcome Header */}
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+
+          <h2 className="font-display text-2xl md:text-4xl font-black text-slate-900 tracking-tight">
+            Welcome to GCYC Group Portal
+          </h2>
+          <p className="text-xs md:text-sm text-slate-600">
+            Platform for member attendance, leader onboarding, and church admin portal registration across all group branches.
+          </p>
+        </div>
+
+        {/* Action Tabs Switcher */}
+        <div className="flex flex-wrap justify-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 max-w-3xl mx-auto shadow-xs">
+          <button
+            onClick={() => {
+              setActiveTab('attendance');
+              setAttSuccessPass(null);
+            }}
+            className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'attendance'
+              ? 'bg-blue-700 text-white shadow-md shadow-blue-700/20'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+              }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
+            <span>Self Attendance</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('leader_reg')}
+            className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'leader_reg'
+              ? 'bg-blue-700 text-white shadow-md shadow-blue-700/20'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+              }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">person_add</span>
+            <span>Self Leader Reg</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('admin_signup')}
+            className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'admin_signup'
+              ? 'bg-blue-700 text-white shadow-md shadow-blue-700/20'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+              }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">church</span>
+            <span>Admin Sign Up</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('login')}
+            className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'login'
+              ? 'bg-blue-700 text-white shadow-md shadow-blue-700/20'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+              }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">lock</span>
+            <span>Admin Login</span>
+          </button>
+        </div>
+
+        {/* TAB 1: SELF ATTENDANCE RECORDING */}
+        {activeTab === 'attendance' && (
+          <div className="max-w-2xl mx-auto bg-white border border-slate-200/90 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+            <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+              <div className="p-2.5 rounded-2xl bg-blue-50 text-blue-700 border border-blue-200">
+                <span className="material-symbols-outlined text-[24px]">fact_check</span>
+              </div>
+              <div>
+                <h3 className="font-display text-lg font-bold text-slate-900">Self Attendance Check-In Station</h3>
+                <p className="text-xs text-slate-500">
+                  Mark your attendance for today's service in your local church branch.
+                </p>
+              </div>
+            </div>
+
+            {attSuccessPass ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-blue-50/50 border border-blue-200 rounded-3xl p-6 text-center space-y-5 shadow-xs"
+              >
+                <div className="w-16 h-16 bg-blue-700 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-blue-700/20">
+                  <span className="material-symbols-outlined text-[36px]">verified</span>
+                </div>
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-900 font-mono text-[11px] font-bold rounded-full border border-blue-300 mb-2">
+                    <span className="material-symbols-outlined text-[14px]">download_done</span>
+                    <span>QR CODE AUTOMATICALLY DOWNLOADED</span>
+                  </div>
+                  <h4 className="font-display font-extrabold text-2xl text-slate-900">
+                    Attendance Confirmed!
+                  </h4>
+                  <p className="text-xs text-slate-600 mt-1">
+                    God bless you for coming to church, <span className="font-bold text-slate-900">{attSuccessPass.memberName}</span>! Your personal Digital Attendance Pass QR Code has been saved to your device.
+                  </p>
+                </div>
+
+                {/* QR Pass Preview Card */}
+                {attPassImageDataUrl && (
+                  <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3 shadow-xs">
+                    <p className="text-[11px] font-mono font-bold text-slate-500 uppercase">Your Digital Member Pass</p>
+                    <img
+                      src={attPassImageDataUrl}
+                      alt="Digital Member QR Pass"
+                      className="max-w-[280px] mx-auto rounded-xl border border-blue-200 shadow-md"
+                    />
+                    <p className="text-[10px] text-slate-500 italic">
+                      Show this QR Code to the usher on your phone or print out every time you attend church for fast scan!
+                    </p>
+                  </div>
+                )}
+
+                <div className="bg-white p-4 rounded-xl border border-slate-200 text-left font-mono text-xs space-y-1.5 shadow-2xs">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Member ID:</span>
+                    <span className="text-blue-700 font-bold">{attSuccessPass.memberId}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Church Branch:</span>
+                    <span className="text-slate-900 font-semibold">{attSuccessPass.church}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Service Program:</span>
+                    <span className="text-slate-900 font-semibold">{attSuccessPass.serviceType}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Check-In Time:</span>
+                    <span className="text-slate-900 font-semibold">{attSuccessPass.timestamp}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={() => {
+                      if (attPassImageDataUrl) {
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = attPassImageDataUrl;
+                        downloadLink.download = `CE_Korle_Bu_QR_Pass_${attSuccessPass.memberId}.png`;
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                        downloadLink.remove();
+                      }
+                    }}
+                    className="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-blue-700/20"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">download</span>
+                    <span>Re-Download QR Pass PNG</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setAttSuccessPass(null);
+                      setAttFullName('');
+                      setAttEmail('');
+                      setAttPhone('');
+                      setAttDob('');
+                      setAttPassImageDataUrl('');
+                      setAttInvitedByLeaderId('self_invite');
+                    }}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 font-bold text-xs py-3 px-5 rounded-xl cursor-pointer"
+                  >
+                    Record Another Attendee
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <form onSubmit={handleSelfAttendanceSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Kwame Mensah"
+                      value={attFullName}
+                      onChange={(e) => setAttFullName(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Contact / Phone *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="+233 24 000 0000"
+                      value={attPhone}
+                      onChange={(e) => setAttPhone(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Email Address (Optional)
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="kwame@example.com"
+                      value={attEmail}
+                      onChange={(e) => setAttEmail(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Date of Birth (DOB)
+                    </label>
+                    <input
+                      type="date"
+                      value={attDob}
+                      onChange={(e) => setAttDob(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-mono transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Location, Occupation, Educational Level, Foundation Class */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Location / Area *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Korle Bu, Mamprobi, Dansoman"
+                      value={attLocation}
+                      onChange={(e) => setAttLocation(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Occupation *
+                    </label>
+                    <select
+                      value={attOccupation}
+                      onChange={(e) => setAttOccupation(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    >
+                      <option value="Student">Student</option>
+                      <option value="Software Developer / Engineer">Software Developer / Engineer</option>
+                      <option value="Nurse / Medical Practitioner">Nurse / Medical Practitioner</option>
+                      <option value="Teacher / Educator">Teacher / Educator</option>
+                      <option value="Trader / Business Owner">Trader / Business Owner</option>
+                      <option value="Banker / Finance">Banker / Finance</option>
+                      <option value="Accountant">Accountant</option>
+                      <option value="Civil Servant">Civil Servant</option>
+                      <option value="Artisan / Craftsman">Artisan / Craftsman</option>
+                      <option value="Other">Other (Specify below)</option>
+                    </select>
+
+                    {attOccupation === 'Other' && (
+                      <div className="mt-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <label className="block font-mono text-[10px] font-bold text-blue-700 uppercase mb-1">
+                          Specify Your Occupation *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Legal Counsel, Architect, Fashion Designer"
+                          value={attOtherOccupation}
+                          onChange={(e) => setAttOtherOccupation(e.target.value)}
+                          className="w-full bg-blue-50/60 border border-blue-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Educational Level *
+                    </label>
+                    <select
+                      value={attEducation}
+                      onChange={(e) => setAttEducation(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    >
+                      <option value="Tertiary / University">Tertiary / University Degree</option>
+                      <option value="High School / SHS">High School / SHS</option>
+                      <option value="Postgraduate / Masters">Postgraduate / Masters / Doctorate</option>
+                      <option value="Professional Certificate">Professional Certificate</option>
+                      <option value="Basic Education / JHS">Basic Education / JHS</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Foundation School Class *
+                    </label>
+                    <select
+                      value={attFoundationClass}
+                      onChange={(e) => setAttFoundationClass(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-blue-700 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    >
+                      <option value="Class 1: The New Creation">Class 1: The New Creation</option>
+                      <option value="Class 2: The Holy Spirit">Class 2: The Holy Spirit</option>
+                      <option value="Class 3: Christian Doctrine">Class 3: Christian Doctrine</option>
+                      <option value="Class 4: Evangelism & Cell Ministry">Class 4: Evangelism & Cell Ministry</option>
+                      <option value="Class 5: Christian Character & Prosperity">Class 5: Christian Character & Prosperity</option>
+                      <option value="Class 6: The Local Assembly & Loveworld">Class 6: The Local Assembly & Loveworld</option>
+                      <option value="Class 7: Introduction to Mobile Technology as a Platform for Advancing the Gospel">Class 7: Introduction to Mobile Technology as a Platform for Advancing the Gospel</option>
+                      <option value="Graduated">Graduated (All 7 Classes Completed)</option>
+                      <option value="Not Enrolled Yet">Not Enrolled Yet</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Leader / Inviter Selection */}
+                  <div>
+                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Who Invited You / Name of Leader? *
+                    </label>
+                    <select
+                      value={attInvitedByLeaderId}
+                      onChange={(e) => handleInvitedByChange(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    >
+                      <option value="self_invite">Self Invited / Walk-In</option>
+                      {leaders.map((ldr) => (
+                        <option key={ldr.id} value={ldr.id}>
+                          {ldr.fullName} ({ldr.leaderType} - {ldr.church})
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-[10px] text-slate-500 mt-1">
+                      Selecting a leader automatically sets your church branch!
+                    </p>
+                  </div>
+
+                  {/* Church Branch Selection */}
+                  <div>
+                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Select Your Church *
+                    </label>
+                    <select
+                      value={attChurch}
+                      onChange={(e) => setAttChurch(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-blue-900 font-bold outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                    >
+                      {effectiveChurches.map((c) => (
+                        <option key={c.id} value={c.name}>
+                          {c.name} ({c.zone})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Service Type Selection */}
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    Service Type *
+                  </label>
+                  <select
+                    value={attServiceType}
+                    onChange={(e) => setAttServiceType(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                  >
+                    {effectiveServiceTypes.map((srv) => (
+                      <option key={srv} value={srv}>
+                        {srv}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isGeneratingQr}
+                  className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-4 rounded-xl transition-all shadow-md shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer mt-4 active:scale-98 disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-[20px]">qr_code_2</span>
+                  <span>{isGeneratingQr ? 'Generating QR Pass...' : 'Confirm Attendance & Download Digital QR Pass'}</span>
+                </button>
+              </form>
+            )}
+          </div>
+        )}
+
+        {/* TAB 2: LEADER SELF-REGISTRATION */}
+        {activeTab === 'leader_reg' && (
+          <div className="max-w-2xl mx-auto bg-white border border-slate-200/90 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="material-symbols-outlined text-[24px]">military_tech</span>
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-bold text-slate-900">Self Leader Registration</h3>
+                  <p className="text-xs text-slate-500">
+                    Register as a BSCT, Cell Leader, PCF Leader, or Church Coordinator.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            {ldrSuccessMsg && (
+              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-xs font-semibold flex items-center gap-2">
+                <span className="material-symbols-outlined text-[20px] text-emerald-600">check_circle</span>
+                <span>{ldrSuccessMsg}</span>
+              </div>
+            )}
+
+            {ldrError && (
+              <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs font-semibold flex items-center gap-2">
+                <span className="material-symbols-outlined text-[20px] text-rose-600">error</span>
+                <span>{ldrError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleLeaderSelfReg} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    Full Names *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Deacon Kwame Asamoah"
+                    value={ldrName}
+                    onChange={(e) => setLdrName(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="kasamoah@cekorlebu.org"
+                    value={ldrEmail}
+                    onChange={(e) => setLdrEmail(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    Contact Phone *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="+233 24 123 4567"
+                    value={ldrPhone}
+                    onChange={(e) => setLdrPhone(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    Cell or PCF Names *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Glorious Cell 1 / Grace PCF"
+                    value={ldrCellName}
+                    onChange={(e) => setLdrCellName(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    Date of Birth (DOB)
+                  </label>
+                  <input
+                    type="date"
+                    value={ldrDob}
+                    onChange={(e) => setLdrDob(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-mono transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Korle Bu, Accra"
+                    value={ldrLocation}
+                    onChange={(e) => setLdrLocation(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    Type of Leader *
+                  </label>
+                  <select
+                    value={ldrRole}
+                    onChange={(e) => setLdrRole(e.target.value as any)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                  >
+                    <option value="BSCT">BSCT (Bible Study Class Teacher)</option>
+                    <option value="Cell Leader">Cell Leader</option>
+                    <option value="PCF Leader">PCF Leader</option>
+                    <option value="Church Coordinator">Church Coordinator</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    Select Your Church *
+                  </label>
+                  <select
+                    value={ldrChurch}
+                    onChange={(e) => setLdrChurch(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                  >
+                    {effectiveChurches.map((c) => (
+                      <option key={c.id} value={c.name}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* AUTH CODE REQUIREMENT - CLEAN EMPTY PLACEHOLDER */}
+              <div className="p-4 bg-blue-50/70 border border-blue-200 rounded-2xl space-y-2">
+                <label className="block font-mono text-[10px] font-black text-blue-800 uppercase tracking-wider">
+                  Authentication Code Required *
+                </label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-blue-700 text-[18px]">
+                    key
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter Authentication Code"
+                    value={ldrAuthCode}
+                    onChange={(e) => setLdrAuthCode(e.target.value)}
+                    className="w-full bg-white border border-blue-300 rounded-xl pl-9 pr-3 py-2.5 text-xs text-blue-950 font-mono font-bold tracking-widest placeholder:text-slate-400 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20"
+                  />
+                </div>
+                <p className="text-[11px] text-slate-600">
+                  Enter your official group authorization code to register as an active leader.
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3.5 rounded-xl transition-all shadow-md shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
+                <span>Submit Official Leader Registration</span>
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* TAB 3: CHURCH ADMIN SIGN UP */}
+        {activeTab === 'admin_signup' && (
+          <div className="max-w-2xl mx-auto bg-white border border-slate-200/90 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-blue-700 text-white font-black">
+                  <span className="material-symbols-outlined text-[24px]">church</span>
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-bold text-slate-900">Admin Signup & Church Registration</h3>
+                  <p className="text-xs text-slate-500">
+                    Register your church branch account on the platform for your members and leaders to join.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            {admSuccessMsg && (
+              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-xs font-semibold flex items-center gap-2">
+                <span className="material-symbols-outlined text-[20px] text-emerald-600">check_circle</span>
+                <span>{admSuccessMsg}</span>
+              </div>
+            )}
+
+            {admError && (
+              <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs font-semibold flex items-center gap-2">
+                <span className="material-symbols-outlined text-[20px] text-rose-600">error</span>
+                <span>{admError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleAdminSignUp} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    1. Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Admin Full Name"
+                    value={admFullName}
+                    onChange={(e) => setAdmFullName(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    2. Email (Required) *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="email@cekorlebu.org"
+                    value={admRequiredEmail}
+                    onChange={(e) => setAdmRequiredEmail(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    3. Church Branch Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. GCYC 2 or CE Achimota"
+                    value={admChurchName}
+                    onChange={(e) => setAdmChurchName(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    4. Pastor or Coordinator's Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Pastor Mark Kwakye"
+                    value={admPastorName}
+                    onChange={(e) => setAdmPastorName(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    5. Admin Phone Number *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="+233 24 555 0000"
+                    value={admPhone}
+                    onChange={(e) => setAdmPhone(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    6. Password *
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    value={admPassword}
+                    onChange={(e) => setAdmPassword(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* 7. AUTHENTICATION CODE - CLEAN EMPTY PLACEHOLDER */}
+              <div className="p-4 bg-blue-50/70 border border-blue-200 rounded-2xl space-y-2">
+                <label className="block font-mono text-[10px] font-black text-blue-800 uppercase tracking-wider">
+                  7. Authentication Code Required *
+                </label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-blue-700 text-[18px]">
+                    shield_lock
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter Authentication Code"
+                    value={admAuthCode}
+                    onChange={(e) => setAdmAuthCode(e.target.value)}
+                    className="w-full bg-white border border-blue-300 rounded-xl pl-9 pr-3 py-2.5 text-xs text-blue-950 font-mono font-bold tracking-widest placeholder:text-slate-400 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20"
+                  />
+                </div>
+                <p className="text-[11px] text-slate-600">
+                  Required security code to provision a church admin account on the platform.
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3.5 rounded-xl transition-all shadow-md shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[18px]">add_business</span>
+                <span>Register Church Account & Create Admin Account</span>
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* TAB 4: ADMIN LOGIN PAGE */}
+        {activeTab === 'login' && (
+          <div className="max-w-md mx-auto bg-white border border-slate-200/90 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+            <div className="text-center space-y-1">
+              <div className="w-12 h-12 rounded-2xl bg-blue-700 text-white font-black text-xl flex items-center justify-center mx-auto mb-2 shadow-md shadow-blue-700/20">
+                KB
+              </div>
+              <h3 className="font-display font-extrabold text-xl text-slate-900">Platform Admin Sign In</h3>
+              <p className="text-xs text-slate-500">Select account level to access dashboard</p>
+            </div>
+
+            {/* Role Switcher: Superadmin vs Church Admin */}
+            <div className="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-2xl border border-slate-200">
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginRole('Superadmin');
+                  setLoginError('');
+                }}
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${loginRole === 'Superadmin'
+                  ? 'bg-blue-700 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+                  }`}
+              >
+                <span className="material-symbols-outlined text-[16px]">shield</span>
+                <span>Group Pastor</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginRole('Church Admin');
+                  setLoginError('');
+                }}
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${loginRole === 'Church Admin'
+                  ? 'bg-blue-700 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+                  }`}
+              >
+                <span className="material-symbols-outlined text-[16px]">church</span>
+                <span>Church Admin</span>
+              </button>
+            </div>
+
+            {/* Real Authentication Error Banner */}
+            {loginError && (
+              <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-800 font-medium flex items-start gap-2.5 animate-fadeIn">
+                <span className="material-symbols-outlined text-rose-600 text-[18px] shrink-0 mt-0.5">
+                  error
+                </span>
+                <div className="flex-1">
+                  <p className="font-bold text-[11px] uppercase tracking-wider text-rose-900">Authentication Failed</p>
+                  <p className="mt-0.5 text-[11px] leading-relaxed">{loginError}</p>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleAdminLogin} className="space-y-4">
+              <div>
+                <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  {loginRole === 'Superadmin' ? 'Group Pastor Email / Username *' : 'Branch Admin Email / Username *'}
+                </label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
+                    person
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    placeholder={loginRole === 'Superadmin' ? 'group.pastor@cekorlebu.org' : 'admin@cekorlebu.org'}
+                    value={loginIdentifier}
+                    onChange={(e) => {
+                      setLoginIdentifier(e.target.value);
+                      setLoginError('');
+                    }}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase">
+                    Password *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setResetEmail(loginIdentifier && loginIdentifier.includes('@') ? loginIdentifier : '');
+                      setResetFeedback(null);
+                      setShowForgotModal(true);
+                    }}
+                    className="text-[11px] text-blue-700 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[13px]">lock_reset</span>
+                    <span>Forgot Password?</span>
+                  </button>
+                </div>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
+                    lock
+                  </span>
+                  <input
+                    type="password"
+                    required
+                    value={loginPassword}
+                    onChange={(e) => {
+                      setLoginPassword(e.target.value);
+                      setLoginError('');
+                    }}
+                    placeholder="Enter account password"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoggingIn}
+                className="w-full font-bold text-xs py-3.5 rounded-xl transition-all shadow-md bg-blue-700 hover:bg-blue-800 text-white shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 active:scale-[0.99]"
+              >
+                {isLoggingIn ? (
+                  <span className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
+                    <span>Validating with Database...</span>
+                  </span>
+                ) : (
+                  <>
+                    <span>Authenticate & Sign In</span>
+                    <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-center text-slate-500 font-mono text-[11px]">
+              <span className="material-symbols-outlined text-emerald-600 text-[16px]">verified_user</span>
+              <span>Direct Database Verification • Supabase PostgreSQL Auth</span>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-500 font-mono flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3">
+        <span>Grace City Youth Church • All Rights Reserved © 2026</span>
+        <span className="hidden sm:inline text-slate-300">•</span>
+        <span>
+          Developed by{' '}
+          <a
+            href="https://primehaven.tech"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-700 hover:text-blue-800 underline font-semibold transition-colors"
+          >
+            Prime Haven
+          </a>
+        </span>
+      </footer>
+
+      {/* Forgot Password Recovery Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full border border-slate-200 shadow-2xl animate-fadeIn">
+            <div className="flex items-center gap-2.5 mb-2">
+              <div className="w-9 h-9 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center shadow-xs">
+                <span className="material-symbols-outlined text-[20px]">lock_reset</span>
+              </div>
+              <div>
+                <h3 className="font-display font-extrabold text-base text-slate-900">Admin Password Recovery</h3>
+                <p className="text-[11px] text-slate-500">Supabase Auth Secure Reset</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 mb-4 leading-relaxed">
+              Enter your registered administrator or pastor email address. A secure one-time password reset link will be dispatched to your inbox.
+            </p>
+
+            {resetFeedback && (
+              <div
+                className={`p-3.5 rounded-2xl text-xs mb-4 flex items-start gap-2.5 ${
+                  resetFeedback.type === 'success'
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                    : 'bg-rose-50 text-rose-800 border border-rose-200'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[18px] shrink-0 mt-0.5">
+                  {resetFeedback.type === 'success' ? 'check_circle' : 'error'}
+                </span>
+                <div className="text-[11px] leading-relaxed font-medium">
+                  {resetFeedback.message}
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSendResetEmail} className="space-y-4">
+              <div>
+                <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  Administrator Email *
+                </label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
+                    mail
+                  </span>
+                  <input
+                    type="email"
+                    required
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    placeholder="e.g. admin@cekorlebu.org"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForgotModal(false);
+                    setResetFeedback(null);
+                  }}
+                  className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs text-slate-600 font-semibold hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isResetting}
+                  className="px-4 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-blue-700/20 cursor-pointer disabled:opacity-60 flex items-center gap-1.5"
+                >
+                  {isResetting && <span className="material-symbols-outlined text-[15px] animate-spin">sync</span>}
+                  <span>{isResetting ? 'Dispatching...' : 'Send Reset Link'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

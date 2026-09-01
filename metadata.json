@@ -1,0 +1,10 @@
+{
+  "name": "GCYC Group - Admin Portal",
+  "description": "Church management portal for attendance tracking, member database, QR check-in, and group level analytics.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

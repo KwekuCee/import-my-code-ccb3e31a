@@ -1,0 +1,466 @@
+import React, { useState } from 'react';
+import { Member, RoleType, ViewType } from '../types';
+
+interface MemberDatabaseProps {
+  members: Member[];
+  user?: {
+    name: string;
+    role: 'Superadmin' | 'Church Admin';
+    church: string;
+  };
+  onNavigate: (view: ViewType) => void;
+  onSelectMemberForCard: (member: Member) => void;
+  onDeleteMember?: (id: string) => void;
+}
+
+export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
+  members,
+  user,
+  onNavigate,
+  onSelectMemberForCard,
+  onDeleteMember
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState<RoleType | 'All'>('All');
+  const [churchFilter, setChurchFilter] = useState<string>('All');
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const isChurchAdmin = user?.role === 'Church Admin';
+  const targetChurch = user?.church || '';
+
+  // Restrict pool to branch members if Church Admin
+  const scopedMembers = isChurchAdmin
+    ? members.filter(m => m.church === targetChurch)
+    : members;
+
+  // Filtering
+  const cleanSearch = (searchTerm || '').trim().toLowerCase();
+  const filtered = scopedMembers.filter(m => {
+    if (!m) return false;
+    const fullName = (m.fullName || '').toLowerCase();
+    const role = (m.role || '').toLowerCase();
+    const phone = m.phone || '';
+    const email = (m.email || '').toLowerCase();
+    const id = (m.id || '').toLowerCase();
+    const location = (m.location || '').toLowerCase();
+    const occupation = (m.occupation || '').toLowerCase();
+
+    const matchesSearch =
+      !cleanSearch ||
+      fullName.includes(cleanSearch) ||
+      role.includes(cleanSearch) ||
+      phone.includes((searchTerm || '').trim()) ||
+      email.includes(cleanSearch) ||
+      id.includes(cleanSearch) ||
+      location.includes(cleanSearch) ||
+      occupation.includes(cleanSearch);
+
+    const matchesRole = roleFilter === 'All' || m.role === roleFilter;
+    const matchesChurch = isChurchAdmin ? true : (churchFilter === 'All' || m.church === churchFilter);
+
+    return matchesSearch && matchesRole && matchesChurch;
+  });
+
+  const totalResults = filtered.length;
+  const totalPages = Math.ceil(totalResults / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedMembers = filtered.slice(startIndex, startIndex + itemsPerPage);
+
+  const handleExportCSV = () => {
+    const headers = ['ID', 'Full Name', 'Role', 'Phone', 'Email', 'Occupation', 'Education', 'Location', 'Church', 'Join Date'];
+    const rows = filtered.map(m => [
+      m.id,
+      `"${m.fullName}"`,
+      m.role,
+      `"${m.phone}"`,
+      m.email || '',
+      `"${m.occupation}"`,
+      `"${m.education}"`,
+      `"${m.location}"`,
+      `"${m.church}"`,
+      m.joinDate
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `CE_Korle_Bu_Members_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6 flex flex-col h-full">
+
+      {/* Header & Main Actions */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 shrink-0">
+        <div>
+          <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full mb-1">
+            <span className="material-symbols-outlined text-[14px]">database</span>
+            {isChurchAdmin ? `${targetChurch} Directory • ${scopedMembers.length} Branch Members` : `Group Directory • ${members.length} Total Records`}
+          </div>
+          <h1 className="font-display text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+            Member Database
+          </h1>
+          <p className="font-body text-xs md:text-sm text-slate-500 mt-1">
+            Filter, manage, export, and inspect digital ID passes for members across Korle Bu group.
+          </p>
+        </div>
+
+        {/* Search, Filter, Export CSV */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Search Box with Real-Time Filtering by Name, Role, Phone */}
+          <div className="relative flex-1 sm:flex-none">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
+              search
+            </span>
+            <input
+              type="text"
+              placeholder="Search by name, role, or phone number..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-9 pr-9 py-2 w-full sm:w-80 bg-white border border-slate-200 rounded-xl font-body text-xs text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition-all placeholder:text-slate-400 font-medium shadow-2xs"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm('');
+                  setCurrentPage(1);
+                }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center text-[12px] cursor-pointer transition-colors"
+                title="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* Filter Toggle */}
+          <div className="relative">
+            <button
+              onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+              className={`flex items-center gap-1.5 px-3 py-2 border rounded-xl bg-white text-xs font-semibold transition-all cursor-pointer ${roleFilter !== 'All' || churchFilter !== 'All'
+                  ? 'border-blue-600 bg-blue-50 text-blue-600'
+                  : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">tune</span>
+              <span>Filter</span>
+              {(roleFilter !== 'All' || churchFilter !== 'All') && (
+                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+              )}
+            </button>
+
+            {showFilterDropdown && (
+              <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 p-4 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                  <h4 className="font-semibold text-xs text-slate-900">Filter Directory</h4>
+                  <button
+                    onClick={() => { setRoleFilter('All'); setChurchFilter('All'); }}
+                    className="text-[11px] text-blue-600 hover:underline font-semibold"
+                  >
+                    Reset All
+                  </button>
+                </div>
+
+                <div>
+                  <label className="block font-mono text-[10px] font-bold uppercase text-slate-400 mb-1">Role Type</label>
+                  <select
+                    value={roleFilter}
+                    onChange={(e) => setRoleFilter(e.target.value as any)}
+                    className="w-full border border-slate-200 rounded-xl p-2 text-xs bg-slate-50 font-medium"
+                  >
+                    <option value="All">All Roles</option>
+                    <option value="Leader">Leader</option>
+                    <option value="Member">Member</option>
+                    <option value="First Timer">First Timer</option>
+                    <option value="Deacon">Deacon</option>
+                    <option value="Visitor">Visitor</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-mono text-[10px] font-bold uppercase text-slate-400 mb-1">Church Branch</label>
+                  <select
+                    value={churchFilter}
+                    onChange={(e) => setChurchFilter(e.target.value)}
+                    className="w-full border border-slate-200 rounded-xl p-2 text-xs bg-slate-50 font-medium"
+                  >
+                    <option value="All">All Churches</option>
+                    <option value="GCYC Main">GCYC Main</option>
+                    <option value="GCYC 1">GCYC 1</option>
+                    <option value="GCYC 2">GCYC 2</option>
+                    <option value="CE Mamprobi">CE Mamprobi</option>
+                    <option value="CE Dansoman">CE Dansoman</option>
+                    <option value="Unassigned">Unassigned</option>
+                  </select>
+                </div>
+
+                <button
+                  onClick={() => setShowFilterDropdown(false)}
+                  className="w-full bg-slate-900 text-white py-2 rounded-xl text-xs font-bold cursor-pointer hover:bg-slate-800 transition-colors"
+                >
+                  Apply Filters
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Export CSV Button */}
+          <button
+            onClick={handleExportCSV}
+            className="flex items-center gap-1.5 px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-xs rounded-xl transition-all cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[18px]">download</span>
+            <span>Export CSV</span>
+          </button>
+
+          {/* Add New Member Button */}
+          <button
+            onClick={() => onNavigate('register')}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 text-white font-bold text-xs rounded-xl hover:bg-slate-800 transition-all cursor-pointer shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[18px]">person_add</span>
+            <span>New Member</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Active Search & Filter Feedback Bar */}
+      {(searchTerm || roleFilter !== 'All' || (!isChurchAdmin && churchFilter !== 'All')) && (
+        <div className="bg-blue-50/70 border border-blue-200/80 rounded-xl px-3.5 py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-blue-900">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="material-symbols-outlined text-[16px] text-blue-700">filter_alt</span>
+            <span className="font-semibold">Real-Time Results:</span>
+            <span className="bg-blue-600 text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded-md">
+              {totalResults} {totalResults === 1 ? 'member' : 'members'} found
+            </span>
+            {searchTerm && (
+              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-[11px] text-blue-950">
+                Search: <strong className="font-semibold text-blue-700">"{searchTerm}"</strong>
+              </span>
+            )}
+            {roleFilter !== 'All' && (
+              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-[11px] text-blue-950">
+                Role: <strong className="font-semibold text-blue-700">{roleFilter}</strong>
+              </span>
+            )}
+            {!isChurchAdmin && churchFilter !== 'All' && (
+              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-[11px] text-blue-950">
+                Church: <strong className="font-semibold text-blue-700">{churchFilter}</strong>
+              </span>
+            )}
+          </div>
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setRoleFilter('All');
+              setChurchFilter('All');
+              setCurrentPage(1);
+            }}
+            className="text-[11px] text-blue-700 hover:text-blue-900 font-bold underline cursor-pointer"
+          >
+            Clear Filters
+          </button>
+        </div>
+      )}
+
+      {/* Table Container */}
+      <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden flex flex-col shadow-2xs flex-1">
+        <div className="overflow-x-auto flex-1">
+          <table className="w-full text-left border-collapse min-w-[900px]">
+            <thead className="bg-slate-50/80 sticky top-0 z-10 border-b border-slate-200">
+              <tr>
+                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Member Details
+                </th>
+                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Contact
+                </th>
+                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Occupation & Edu
+                </th>
+                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Residential Area
+                </th>
+                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Church
+                </th>
+                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">
+                  Action
+                </th>
+              </tr>
+            </thead>
+
+            <tbody className="font-body text-xs divide-y divide-slate-100">
+              {paginatedMembers.length > 0 ? (
+                paginatedMembers.map((member) => (
+                  <tr
+                    key={member.id}
+                    className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
+                    onClick={() => onSelectMemberForCard(member)}
+                  >
+                    {/* Name + Role Badge */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center shrink-0 group-hover:border-blue-300 transition-colors">
+                          {member.initials || (member.fullName ? member.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'MB')}
+                        </div>
+                        <div>
+                          <div className="font-bold text-xs text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-2">
+                            <span>{member.fullName}</span>
+                            <span className="font-mono text-[10px] text-slate-400 font-normal">{member.id}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            {member.role === 'Leader' && (
+                              <span className="bg-amber-100 text-amber-900 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-amber-200">
+                                Leader
+                              </span>
+                            )}
+                            {member.role === 'Deacon' && (
+                              <span className="bg-purple-100 text-purple-900 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-purple-200">
+                                Deacon
+                              </span>
+                            )}
+                            {member.role === 'Pastor' && (
+                              <span className="bg-indigo-100 text-indigo-900 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-indigo-200">
+                                Pastor
+                              </span>
+                            )}
+                            {member.role === 'Member' && (
+                              <span className="bg-emerald-50 text-emerald-800 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-200">
+                                Member
+                              </span>
+                            )}
+                            {member.role === 'Visitor' && (
+                              <span className="bg-slate-100 text-slate-700 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200">
+                                Visitor
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Contact */}
+                    <td className="py-3.5 px-4">
+                      <div className="font-mono font-semibold text-slate-800">{member.phone}</div>
+                      <div className="text-slate-400 mt-0.5">{member.email || '--'}</div>
+                    </td>
+
+                    {/* Occupation & Education */}
+                    <td className="py-3.5 px-4">
+                      <div className="font-semibold text-slate-800">{member.occupation}</div>
+                      <div className="text-slate-400 text-[11px]">{member.education}</div>
+                    </td>
+
+                    {/* Location */}
+                    <td className="py-3.5 px-4 font-medium text-slate-700">
+                      {member.location}
+                    </td>
+
+                    {/* Church Tag */}
+                    <td className="py-3.5 px-4">
+                      {member.church === 'Unassigned' ? (
+                        <span className="text-slate-400 italic">Unassigned</span>
+                      ) : (
+                        <span className="px-2.5 py-1 bg-slate-100 rounded-lg font-medium text-slate-800 border border-slate-200">
+                          {member.church}
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Actions Menu */}
+                    <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => onSelectMemberForCard(member)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                        title="View Digital ID Pass"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">badge</span>
+                        <span>Pass</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="py-16 text-center text-xs text-slate-500">
+                    <div className="max-w-md mx-auto space-y-3">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                        <span className="material-symbols-outlined text-[24px]">search_off</span>
+                      </div>
+                      <p className="font-semibold text-slate-800 text-sm">No members found</p>
+                      <p className="text-slate-500 leading-relaxed text-xs">
+                        {searchTerm ? (
+                          <>
+                            No records match <strong className="text-slate-900">"{searchTerm}"</strong>. Check for typos or search by full name, specific role (e.g. Leader, First Timer), or phone number.
+                          </>
+                        ) : (
+                          'No records match the selected filter criteria.'
+                        )}
+                      </p>
+                      {(searchTerm || roleFilter !== 'All' || (!isChurchAdmin && churchFilter !== 'All')) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSearchTerm('');
+                            setRoleFilter('All');
+                            setChurchFilter('All');
+                            setCurrentPage(1);
+                          }}
+                          className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 cursor-pointer shadow-xs"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">refresh</span>
+                          <span>Reset Search & Filters</span>
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Table Footer / Pagination */}
+        <div className="border-t border-slate-200 px-4 py-3 flex items-center justify-between bg-slate-50 shrink-0">
+          <div className="font-mono text-xs text-slate-500">
+            Showing <span className="font-bold text-slate-900">{totalResults > 0 ? startIndex + 1 : 0}</span> to{' '}
+            <span className="font-bold text-slate-900">{Math.min(startIndex + itemsPerPage, totalResults)}</span> of{' '}
+            <span className="font-bold text-slate-900">{totalResults}</span> entries
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-1.5 border border-slate-200 bg-white rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+            </button>
+            <span className="font-mono text-xs font-bold px-2 text-slate-900">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-1.5 border border-slate-200 bg-white rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  );
+};
