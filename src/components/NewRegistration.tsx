@@ -6,6 +6,7 @@ import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClass
 interface NewRegistrationProps {
   members: Member[];
   leaders?: Leader[];
+  serviceTypes?: Array<{ id: string; name: string; active?: boolean }> | string[];
   onAddMember: (newMember: Member) => void;
   onNavigate: (view: ViewType) => void;
   onSelectMemberForCard: (member: Member) => void;

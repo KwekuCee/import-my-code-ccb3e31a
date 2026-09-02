@@ -30,7 +30,7 @@ export interface ChurchAdminAccount {
   password?: string;
 }
 
-export type RoleType = 'Leader' | 'Member' | 'Visitor' | 'Deacon' | 'First Timer';
+export type RoleType = 'Leader' | 'Member' | 'Visitor' | 'Deacon' | 'First Timer' | 'Pastor';
 
 export type LeaderType = 'BSCT' | 'Cell Leader' | 'PCF Leader' | 'Church Coordinator';
 
@@ -74,6 +74,8 @@ export interface Member {
   foundationClass: number; // 0 to 7
   status: 'First Timer' | 'General Member';
   gender?: 'Male' | 'Female';
+  educationLevel?: string;
+  occupationCategory?: string;
 }
 
 export interface ServiceTypeItem {
@@ -95,7 +97,7 @@ export interface AttendanceRecord {
   verifiedBy: string;
   status: 'Confirmed' | 'Pending';
   church: string;
-  checkInMethod: 'QR Scan' | 'Manual Admin' | 'Self Check-In';
+  checkInMethod: 'QR Scan' | 'Manual Admin' | 'Self Check-In' | 'First Signup';
   leaderName?: string; // Member's assigned leader or PCF leader
   pcfName?: string; // Member's PCF or Cell name
 }
@@ -148,8 +150,12 @@ export interface UserProfile {
   email: string;
   role: 'Superadmin' | 'Church Admin' | 'Leader';
   church: string;
-  avatarUrl: string;
-  isSuperadmin: boolean;
+  avatarUrl?: string;
+  isSuperadmin?: boolean;
+  zone?: string;
+  phone?: string;
+  avatar?: string;
+  id?: string;
 }
 
 export interface AuthSessionUser {
