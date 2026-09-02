@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { supabase as cloudClient } from '@/integrations/supabase/client';
+import { supabase as cloudClient } from '../integrations/supabase/client';
 
 // The backend is managed by Lovable Cloud. The client is generated and
 // configured from environment variables — no manual credentials needed.
