@@ -14,6 +14,8 @@ import {
   Leader,
   PromotionQueueItem,
   ChurchAdminAccount,
+  TopLeader,
+  LeaderType,
   AuthSessionUser
 } from './types';
 
