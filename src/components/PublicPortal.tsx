@@ -3,7 +3,7 @@ import QRCode from 'qrcode';
 import { motion } from 'motion/react';
 import { Member, Leader, ChurchBranch, ChurchAdminAccount, AttendanceRecord } from '../types';
 import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClassNumber, getFoundationClassLabel } from '../data/constants';
-import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase } from '../lib/supabaseService';
+import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin } from '../lib/supabaseService';
 import { ChurchLogo } from './ChurchLogo';
 
 interface PublicPortalProps {
@@ -64,6 +64,32 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
     return Array.from(map.values());
   }, [churches, churchAdmins]);
+
+  // Leader self-registration must only ever offer churches that came from an
+  // admin self-signup (i.e. branches actually run by a registered Church Admin),
+  // not the full DB-seeded church list used elsewhere in this portal.
+  const adminRegisteredChurches = useMemo(() => {
+    const map = new Map<string, ChurchBranch>();
+    (churchAdmins || []).forEach(a => {
+      if (a && a.churchName) {
+        const key = a.churchName.toLowerCase();
+        if (!map.has(key)) {
+          map.set(key, {
+            id: `CH-ADM-${a.id || Date.now()}`,
+            name: a.churchName,
+            pastor: a.adminName || 'Pastor in Charge',
+            membersCount: 0,
+            status: 'Healthy',
+            zone: a.zone || 'Zone 1 (Korle Bu)',
+            pcfCount: 0,
+            cellCount: 0,
+            bsctCount: 0
+          });
+        }
+      }
+    });
+    return Array.from(map.values());
+  }, [churchAdmins]);
 
   // Dynamic service types list from props and database
   const [dbServiceTypes, setDbServiceTypes] = useState<string[]>([]);
@@ -128,7 +154,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const [ldrDob, setLdrDob] = useState('');
   const [ldrLocation, setLdrLocation] = useState('');
   const [ldrRole, setLdrRole] = useState<'BSCT' | 'Cell Leader' | 'PCF Leader' | 'Church Coordinator'>('Cell Leader');
-  const [ldrChurch, setLdrChurch] = useState(effectiveChurches[0]?.name || '');
+  const [ldrChurch, setLdrChurch] = useState(adminRegisteredChurches[0]?.name || '');
   const [ldrAuthCode, setLdrAuthCode] = useState('');
   const [ldrError, setLdrError] = useState('');
   const [ldrSuccessMsg, setLdrSuccessMsg] = useState('');
@@ -140,12 +166,16 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       if (!attExists || !attChurch) {
         setAttChurch(effectiveChurches[0].name);
       }
-      const ldrExists = effectiveChurches.some(c => c?.name && ldrChurch && c.name.toLowerCase() === ldrChurch.toLowerCase());
-      if (!ldrExists || !ldrChurch) {
-        setLdrChurch(effectiveChurches[0].name);
-      }
     }
-  }, [effectiveChurches]);
+    if (adminRegisteredChurches.length > 0) {
+      const ldrExists = adminRegisteredChurches.some(c => c?.name && ldrChurch && c.name.toLowerCase() === ldrChurch.toLowerCase());
+      if (!ldrExists || !ldrChurch) {
+        setLdrChurch(adminRegisteredChurches[0].name);
+      }
+    } else if (ldrChurch) {
+      setLdrChurch('');
+    }
+  }, [effectiveChurches, adminRegisteredChurches]);
 
   // --- 3. Church Admin Sign Up State ---
   const [admFullName, setAdmFullName] = useState('');
@@ -402,7 +432,17 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
     setAttSuccessPass(record);
 
     // Auto-generate and download QR pass
-    await generateAndDownloadQrPass(existingMember, attChurch, attServiceType, timestamp);
+    const passDataUrl = await generateAndDownloadQrPass(existingMember, attChurch, attServiceType, timestamp);
+
+    // Best-effort notify the church admin by email; never block the UI on this.
+    sendAttendanceEmailToChurchAdmin({
+      churchName: attChurch,
+      memberName: existingMember.fullName,
+      memberId: existingMember.id,
+      serviceType: attServiceType,
+      timestamp,
+      qrPassBase64: passDataUrl || undefined,
+    }).catch(() => {});
   };
 
   const handleLeaderSelfReg = (e: React.FormEvent) => {
@@ -1111,8 +1151,12 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     value={ldrChurch}
                     onChange={(e) => setLdrChurch(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    disabled={adminRegisteredChurches.length === 0}
                   >
-                    {effectiveChurches.map((c) => (
+                    {adminRegisteredChurches.length === 0 && (
+                      <option value="">No admin-registered church branches yet</option>
+                    )}
+                    {adminRegisteredChurches.map((c) => (
                       <option key={c.id} value={c.name}>
                         {c.name}
                       </option>

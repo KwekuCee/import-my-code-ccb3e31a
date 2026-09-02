@@ -1409,6 +1409,46 @@ export async function sendPasswordResetEmail(email: string): Promise<{ success: 
 
 
 
+/**
+ * Notifies the church's registered admin by email that a member just self
+ * checked in, via the `send-attendance-email` edge function (Resend-backed).
+ * Best-effort: failures here should never block the attendance flow itself.
+ */
+export async function sendAttendanceEmailToChurchAdmin(params: {
+  churchName: string;
+  memberName: string;
+  memberId: string;
+  serviceType: string;
+  timestamp: string;
+  qrPassBase64?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const client = getSupabase();
+  if (!client) {
+    return { success: false, error: 'Database connection is not initialized.' };
+  }
+
+  try {
+    const { data, error } = await client.functions.invoke('send-attendance-email', {
+      body: params,
+    });
+
+    if (error) {
+      console.warn('send-attendance-email edge function error:', error.message);
+      return { success: false, error: error.message };
+    }
+
+    if (data && data.success === false) {
+      console.warn('send-attendance-email returned failure:', data.error);
+      return { success: false, error: data.error };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    console.error('Error invoking send-attendance-email:', err);
+    return { success: false, error: err?.message || 'Failed to notify church admin by email.' };
+  }
+}
+
 // ============================================================================
 // 8. ANNOUNCEMENTS / BROADCASTS CRUD
 // ============================================================================
