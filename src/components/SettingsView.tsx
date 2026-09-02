@@ -34,7 +34,7 @@ interface SettingsViewProps {
   attendanceRecords?: AttendanceRecord[];
   auditLogs?: AuditLogItem[];
   serviceTypes?: Array<{ id: string; name: string; active?: boolean }> | string[];
-  onUpdateServiceTypes?: (types: string[]) => void;
+  onUpdateServiceTypes?: (types: any) => void;
   onNavigate: (view: ViewType) => void;
   onAddAuditLog?: (log: AuditLogItem) => void;
   onUpdateUser?: (updated: Partial<AuthSessionUser>) => void;

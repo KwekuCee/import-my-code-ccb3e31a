@@ -19,7 +19,7 @@ interface ToastContextValue {
   showWarning: (title: string, message?: string) => void;
   showInfo: (title: string, message?: string) => void;
   showCheckIn: (memberName: string, serviceType?: string) => void;
-  showAnnouncement: (title: string, message?: string) => void;
+  showAnnouncement: (title: string, message?: string, audience?: string) => void;
   removeToast: (id: string) => void;
 }
 
@@ -86,7 +86,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     showToast('checkin', `Check-In Confirmed!`, `${memberName} successfully checked into ${serviceType}.`, 5000);
   }, [showToast]);
 
-  const showAnnouncement = useCallback((title: string, message?: string) => {
+  const showAnnouncement = useCallback((title: string, message?: string, _audience?: string) => {
     showToast('announcement', `📢 ${title}`, message, 7000);
   }, [showToast]);
 
