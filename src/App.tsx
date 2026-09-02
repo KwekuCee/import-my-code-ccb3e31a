@@ -104,13 +104,13 @@ export default function App() {
       .filter((l): l is Leader => Boolean(l && (l.fullName || l.id)))
       .sort((a, b) => (b.downstreamCount || 0) - (a.downstreamCount || 0))
       .slice(0, 5)
-      .map(l => ({
+      .map((l): TopLeader => ({
         id: l.id,
         name: l.fullName || 'Leader',
         initials: l.initials || (l.fullName ? l.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'LD'),
         downstreamCount: l.downstreamCount || 0,
         branch: l.church || '',
-        role: l.leaderType || 'Leader'
+        role: (l.leaderType || 'BSCT') as LeaderType
       }));
   }, [leaders]);
 
