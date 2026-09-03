@@ -31,14 +31,9 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   churches,
   churchAdmins,
   attendanceRecords,
-  serviceTypes = [
-    { id: 'srv-1', name: 'Sunday Service', active: true },
-    { id: 'srv-2', name: 'Midweek Service', active: true },
-    { id: 'srv-3', name: 'Special Service', active: true },
-  ],
   onNavigate,
   onSelectMemberForCard,
-  onUpdateServiceTypes
+
 }) => {
   const isSuperadmin = user.role === 'Superadmin';
   const currentChurchName = user.church || (churches[0]?.name || 'GCYC Main');
