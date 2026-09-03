@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ViewType, TopLeader, Member, Leader, ChurchBranch, ChurchAdminAccount, AttendanceRecord } from '../types';
 import { isBirthdayInCurrentMonth, getBirthdayDayOfMonth, formatBirthdayDisplay } from '../utils/analyticsUtils';
-import { saveServiceTypeToSupabase, deleteServiceTypeFromSupabase } from '../lib/supabaseService';
 
 interface DashboardOverviewProps {
   user: {
@@ -157,7 +156,6 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   };
 
   // --- Superadmin Custom State ---
-  const [newServiceName, setNewServiceName] = useState('');
 
   const [groupAnnouncements, setGroupAnnouncements] = useState<Array<{
     id: string;
@@ -177,25 +175,6 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   const [emailStatusMsg, setEmailStatusMsg] = useState('');
 
   // Handlers
-  const handleAddCustomService = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newServiceName.trim()) return;
-    const name = newServiceName.trim();
-    const newService = { id: `srv-${Date.now()}`, name, active: true };
-    const updated = [...serviceTypes.filter(s => s.name.toLowerCase() !== name.toLowerCase()), newService];
-    onUpdateServiceTypes?.(updated);
-    await saveServiceTypeToSupabase(name);
-    triggerToast(`Created & saved Service Type: "${name}" to database`);
-    setNewServiceName('');
-  };
-
-  const handleDeleteCustomService = async (srv: { id: string; name: string }) => {
-    const updated = serviceTypes.filter(s => s.id !== srv.id);
-    onUpdateServiceTypes?.(updated);
-    await deleteServiceTypeFromSupabase(srv.name);
-    triggerToast(`Removed service type "${srv.name}" from database`);
-  };
-
   const handlePostGroupBroadcast = (e: React.FormEvent) => {
     e.preventDefault();
     if (!broadcastTitle.trim() || !broadcastMessage.trim()) return;
