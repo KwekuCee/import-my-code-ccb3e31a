@@ -67,6 +67,20 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   const midweekToday = todayAttendance.filter(a => a.serviceType === 'Midweek Service').length;
   const specialToday = todayAttendance.filter(a => a.serviceType === 'Special Service').length;
 
+  // --- Attendance grouped per Leader (branch scoped) ---
+  const attendanceByLeader = (() => {
+    const map = new Map<string, { leaderName: string; pcfName: string; total: number; today: number }>();
+    branchAttendance.forEach(att => {
+      const key = (att.leaderName || att.pcfName || 'Direct / No Leader').trim();
+      const entry = map.get(key) || { leaderName: key, pcfName: att.pcfName || '—', total: 0, today: 0 };
+      entry.total += 1;
+      if (!att.date || att.date === new Date().toISOString().slice(0, 10)) entry.today += 1;
+      map.set(key, entry);
+    });
+    return Array.from(map.values()).sort((a, b) => b.total - a.total);
+  })();
+
+
   // This Week's Members: members who recorded attendance for the first time or registered as first timers
   const thisWeekNewMembers = branchMembers.filter(m =>
     m.status === 'First Timer' ||
