@@ -395,58 +395,11 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             </div>
           </div>
 
-          {/* 4. Superadmin Controls: Service Types & Registered Church Admins */}
+          {/* 4. Superadmin Controls: Registered Church Admins */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Service Types Control Center */}
-            <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xs">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div>
-                  <h3 className="font-headline font-bold text-base text-slate-900">
-                    Service Types Control (Group Pastor)
-                  </h3>
-                  <p className="text-xs text-slate-500">Add or manage program service types available across all churches</p>
-                </div>
-                <span className="material-symbols-outlined text-amber-500">tune</span>
-              </div>
-
-              <form onSubmit={handleAddCustomService} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="New Service Type (e.g. Miracle Faith Crusade)"
-                  value={newServiceName}
-                  onChange={(e) => setNewServiceName(e.target.value)}
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-amber-500 font-semibold"
-                />
-                <button
-                  type="submit"
-                  className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs px-4 py-2 rounded-xl cursor-pointer shrink-0"
-                >
-                  Add Program
-                </button>
-              </form>
-
-              <div className="divide-y divide-slate-100 border border-slate-100 rounded-xl max-h-56 overflow-y-auto">
-                {serviceTypes.map((srv) => (
-                  <div key={srv.id} className="p-3 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                    <span className="font-bold text-xs text-slate-800">{srv.name}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-bold">
-                        Active Group-Wide
-                      </span>
-                      <button
-                        onClick={() => handleDeleteCustomService(srv)}
-                        className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer"
-                        title="Take Down Service Type"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">delete</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
             {/* Church Admins Directory Link */}
-            <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xs">
+            <div className="lg:col-span-12 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xs">
+
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
                   <h3 className="font-headline font-bold text-base text-slate-900">
