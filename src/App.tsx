@@ -59,7 +59,6 @@ import { AnalyticsView } from './components/AnalyticsView';
 import { DatabaseSchemaView } from './components/DatabaseSchemaView';
 import { SettingsView } from './components/SettingsView';
 import { useToast } from './context/ToastContext';
-import { INITIAL_CHURCHES } from './data/mockData';
 
 export default function App() {
   const toast = useToast();
