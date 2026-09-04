@@ -545,9 +545,12 @@ export default function App() {
               {currentView === 'leader_registration' && (
                 <LeaderRegistration
                   leaders={leaders}
+                  members={members}
+                  churches={churches}
                   onAddLeader={handleAddLeader}
                   onNavigate={setCurrentView}
                 />
+
               )}
 
               {currentView === 'members' && (

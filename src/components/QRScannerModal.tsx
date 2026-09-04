@@ -55,37 +55,42 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     }
   }, [useRealCamera]);
 
+  const recordAttendance = (member: Member, service: string) => {
+    const record: AttendanceRecord = {
+      id: `att-${Date.now()}`,
+      memberId: member.id,
+      memberName: member.fullName,
+      memberRole: member.role,
+      serviceType: service,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      date: new Date().toISOString().slice(0, 10),
+      verifiedBy: 'QR Scanner Station 1',
+      status: 'Confirmed',
+      church: member.church || 'GCYC Main',
+      checkInMethod: 'QR Scan',
+      leaderName: member.invitedBy,
+    };
+    onConfirmAttendance(record);
+    toast.showCheckIn(member.fullName, service);
+  };
+
   const handleSimulateScan = (memberId: string) => {
     const found = members.find(m => m.id === memberId);
     if (found) {
       setSelectedMember(found);
       setScannerState('success');
-      toast.showInfo('QR Code Scanned', `Matched member: ${found.fullName} (${found.id})`);
+      // Attendance is logged the instant a valid pass is scanned
+      recordAttendance(found, serviceType);
     } else {
       setScannerState('error');
       toast.showError('Invalid QR Code', `Member ID ${memberId} was not found in directory.`);
     }
   };
 
-  const handleConfirmAttendance = () => {
-    if (!selectedMember) return;
-    const record: AttendanceRecord = {
-      id: `att-${Date.now()}`,
-      memberId: selectedMember.id,
-      memberName: selectedMember.fullName,
-      memberRole: selectedMember.role,
-      serviceType: serviceType,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      verifiedBy: 'QR Scanner Station 1',
-      status: 'Confirmed',
-      church: selectedMember.church || 'GCYC Main',
-      checkInMethod: 'QR Scan'
-    };
-
-    onConfirmAttendance(record);
-    toast.showCheckIn(selectedMember.fullName, serviceType);
+  const handleScanNext = () => {
     setScannerState('scanning');
   };
+
 
 
   return (
@@ -214,13 +219,14 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                     check_circle
                   </span>
                   <span className="font-headline font-bold text-sm text-emerald-800">
-                    Member QR Recognized
+                    Attendance Recorded
                   </span>
                 </div>
                 <span className="font-mono text-[10px] bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full font-bold border border-emerald-200">
-                  VERIFIED
+                  LOGGED
                 </span>
               </div>
+
 
               {/* Member Card */}
               <div className="flex items-center gap-3.5 bg-slate-50 p-4 rounded-2xl border border-slate-200">
@@ -237,10 +243,10 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                 </div>
               </div>
 
-              {/* Service Type Selector */}
+              {/* Service Type Selector (applies to next scan) */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="modalServiceType" className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  Target Service
+                  Target Service — logged as {serviceType}
                 </label>
                 <select
                   id="modalServiceType"
@@ -256,12 +262,13 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
               {/* Action Button */}
               <button
-                onClick={handleConfirmAttendance}
+                onClick={handleScanNext}
                 className="w-full mt-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-98 transition-all cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
-                <span>Confirm Attendance Log</span>
+                <span className="material-symbols-outlined text-[18px]">qr_code_scanner</span>
+                <span>Scan Next Member</span>
               </button>
+
 
             </div>
           </div>

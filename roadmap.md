@@ -9,3 +9,7 @@
 - [x] Superadmin service type create/delete persisted to database
 - [x] Leader self-reg dropdown limited to admin-registered churches
 - [x] Admin signup branch name feeds attendance + leader-reg dropdowns
+- [x] Removed dashboard Service Types Control; services come only from Settings
+- [x] QR scan records attendance instantly ("Scan Next Member")
+- [x] Leader registration: member dropdown with autofill + DB-driven church list
+- [x] Admin dashboard shows attendance per leader plus total attendance

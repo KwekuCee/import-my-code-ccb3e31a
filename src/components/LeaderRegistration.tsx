@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
-import { Leader, LeaderType, ViewType } from '../types';
+import { Leader, LeaderType, ViewType, Member } from '../types';
 
 interface LeaderRegistrationProps {
   leaders: Leader[];
+  members?: Member[];
+  churches?: { id: string; name: string }[];
   onAddLeader: (leader: Leader) => void;
   onNavigate: (view: ViewType) => void;
 }
 
 export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
   leaders,
+  members = [],
+  churches = [],
   onAddLeader,
   onNavigate
 }) => {
+  const [selectedMemberId, setSelectedMemberId] = useState('');
+
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [contact, setContact] = useState('');
@@ -26,6 +32,35 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
   const [createdLeader, setCreatedLeader] = useState<Leader | null>(null);
   const [authCode, setAuthCode] = useState('');
   const [authError, setAuthError] = useState('');
+
+  const churchOptions = Array.from(new Set([
+    ...churches.map(c => c.name),
+    ...members.map(m => m.church).filter(Boolean) as string[],
+  ])).sort((a, b) => a.localeCompare(b));
+
+  const sortedMembers = [...members].sort(
+    (a, b) =>
+      (a.church || '').localeCompare(b.church || '') ||
+      (a.fullName || '').localeCompare(b.fullName || '')
+  );
+
+  const handleSelectMember = (memberId: string) => {
+    setSelectedMemberId(memberId);
+    if (!memberId) {
+      setFullName('');
+      return;
+    }
+    const m = members.find(x => x.id === memberId);
+    if (!m) return;
+    setFullName(m.fullName || '');
+    setEmail(m.email || '');
+    setContact(m.phone || '');
+    setDob(m.dob || '');
+    setLocation(m.location || 'Korle Bu');
+    if (m.church) setChurch(m.church);
+  };
+
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,21 +249,38 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
               />
             </div>
 
-            {/* Full Name */}
+            {/* Full Name — selected from member directory */}
             <div>
-              <label htmlFor="leaderFullName" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                Full Name *
+              <label htmlFor="leaderMemberSelect" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                Full Name * {sortedMembers.length > 0 && <span className="text-slate-400 normal-case">(pick from member directory)</span>}
               </label>
-              <input
-                id="leaderFullName"
-                type="text"
-                required
-                value={fullName}
-                onChange={e => setFullName(e.target.value)}
-                placeholder="e.g. Brother Samuel Ofori"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
-              />
+              {sortedMembers.length > 0 ? (
+                <select
+                  id="leaderMemberSelect"
+                  value={selectedMemberId}
+                  onChange={e => handleSelectMember(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                >
+                  <option value="">Select a member to promote…</option>
+                  {sortedMembers.map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.fullName} — {m.church || 'Unassigned'} ({m.id})
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id="leaderFullName"
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={e => setFullName(e.target.value)}
+                  placeholder="e.g. Brother Samuel Ofori"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                />
+              )}
             </div>
+
 
             {/* Contact Phone */}
             <div>
@@ -302,13 +354,12 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
                 onChange={e => setChurch(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
               >
-                <option value="GCYC Main">GCYC Main</option>
-                <option value="GCYC 1">GCYC 1</option>
-                <option value="GCYC 2">GCYC 2</option>
-                <option value="CE Mamprobi">CE Mamprobi</option>
-                <option value="CE Dansoman">CE Dansoman</option>
-                <option value="CE Kaneshie">CE Kaneshie</option>
+                {churchOptions.length === 0 && <option value={church}>{church}</option>}
+                {churchOptions.map(name => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
               </select>
+
             </div>
 
           </div>
