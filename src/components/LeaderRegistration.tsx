@@ -354,13 +354,12 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
                 onChange={e => setChurch(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
               >
-                <option value="GCYC Main">GCYC Main</option>
-                <option value="GCYC 1">GCYC 1</option>
-                <option value="GCYC 2">GCYC 2</option>
-                <option value="CE Mamprobi">CE Mamprobi</option>
-                <option value="CE Dansoman">CE Dansoman</option>
-                <option value="CE Kaneshie">CE Kaneshie</option>
+                {churchOptions.length === 0 && <option value={church}>{church}</option>}
+                {churchOptions.map(name => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
               </select>
+
             </div>
 
           </div>
