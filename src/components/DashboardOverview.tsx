@@ -742,7 +742,53 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             </div>
           </div>
 
+          {/* 4b. Attendance per Leader + Total Attendance */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-4 shadow-2xs">
+            <div className="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
+              <h3 className="font-headline font-bold text-base text-slate-900 flex items-center gap-2">
+                <span className="material-symbols-outlined text-amber-600 text-[20px]">groups_3</span>
+                <span>Attendance Per Leader</span>
+              </h3>
+              <div className="flex gap-2">
+                <span className="font-mono text-[10px] font-bold bg-slate-900 text-white px-3 py-1 rounded-full">
+                  TOTAL ATTENDANCE: {totalAttendance}
+                </span>
+                <span className="font-mono text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full">
+                  TODAY: {todayAttendance.length}
+                </span>
+              </div>
+            </div>
+
+            {attendanceByLeader.length > 0 ? (
+              <div className="space-y-2">
+                {attendanceByLeader.map(row => (
+                  <div key={row.leaderName} className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl p-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-headline font-bold text-xs text-slate-900 truncate">{row.leaderName}</p>
+                      <p className="font-mono text-[10px] text-slate-500 mt-0.5">PCF / Cell: {row.pcfName}</p>
+                      <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-2">
+                        <div
+                          className="bg-amber-500 h-full rounded-full transition-all duration-500"
+                          style={{ width: `${totalAttendance > 0 ? Math.round((row.total / totalAttendance) * 100) : 0}%` }}
+                        />
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-display text-lg font-extrabold text-slate-900 leading-none">{row.total}</p>
+                      <p className="font-mono text-[10px] text-emerald-600 font-bold mt-1">+{row.today} today</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6 font-mono text-[11px] text-slate-400">
+                No attendance recorded yet for {currentChurchName}.
+              </div>
+            )}
+          </div>
+
           {/* 5. Recent Service Attendance Log (First 5 records from First Signup Form or QR Scan) */}
+
           <div className="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-4 shadow-2xs">
             <div className="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
               <div>
