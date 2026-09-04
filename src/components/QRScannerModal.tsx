@@ -243,10 +243,10 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                 </div>
               </div>
 
-              {/* Service Type Selector */}
+              {/* Service Type Selector (applies to next scan) */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="modalServiceType" className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  Target Service
+                  Target Service — logged as {serviceType}
                 </label>
                 <select
                   id="modalServiceType"
@@ -262,12 +262,13 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
               {/* Action Button */}
               <button
-                onClick={handleConfirmAttendance}
+                onClick={handleScanNext}
                 className="w-full mt-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-98 transition-all cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
-                <span>Confirm Attendance Log</span>
+                <span className="material-symbols-outlined text-[18px]">qr_code_scanner</span>
+                <span>Scan Next Member</span>
               </button>
+
 
             </div>
           </div>
