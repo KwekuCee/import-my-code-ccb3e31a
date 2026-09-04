@@ -249,21 +249,38 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
               />
             </div>
 
-            {/* Full Name */}
+            {/* Full Name — selected from member directory */}
             <div>
-              <label htmlFor="leaderFullName" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                Full Name *
+              <label htmlFor="leaderMemberSelect" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                Full Name * {sortedMembers.length > 0 && <span className="text-slate-400 normal-case">(pick from member directory)</span>}
               </label>
-              <input
-                id="leaderFullName"
-                type="text"
-                required
-                value={fullName}
-                onChange={e => setFullName(e.target.value)}
-                placeholder="e.g. Brother Samuel Ofori"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
-              />
+              {sortedMembers.length > 0 ? (
+                <select
+                  id="leaderMemberSelect"
+                  value={selectedMemberId}
+                  onChange={e => handleSelectMember(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                >
+                  <option value="">Select a member to promote…</option>
+                  {sortedMembers.map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.fullName} — {m.church || 'Unassigned'} ({m.id})
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id="leaderFullName"
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={e => setFullName(e.target.value)}
+                  placeholder="e.g. Brother Samuel Ofori"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                />
+              )}
             </div>
+
 
             {/* Contact Phone */}
             <div>
