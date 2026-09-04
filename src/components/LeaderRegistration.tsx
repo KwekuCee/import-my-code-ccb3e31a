@@ -33,6 +33,35 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
   const [authCode, setAuthCode] = useState('');
   const [authError, setAuthError] = useState('');
 
+  const churchOptions = Array.from(new Set([
+    ...churches.map(c => c.name),
+    ...members.map(m => m.church).filter(Boolean) as string[],
+  ])).sort((a, b) => a.localeCompare(b));
+
+  const sortedMembers = [...members].sort(
+    (a, b) =>
+      (a.church || '').localeCompare(b.church || '') ||
+      (a.fullName || '').localeCompare(b.fullName || '')
+  );
+
+  const handleSelectMember = (memberId: string) => {
+    setSelectedMemberId(memberId);
+    if (!memberId) {
+      setFullName('');
+      return;
+    }
+    const m = members.find(x => x.id === memberId);
+    if (!m) return;
+    setFullName(m.fullName || '');
+    setEmail(m.email || '');
+    setContact(m.phone || '');
+    setDob(m.dob || '');
+    setLocation(m.location || 'Korle Bu');
+    if (m.church) setChurch(m.church);
+  };
+
+
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
