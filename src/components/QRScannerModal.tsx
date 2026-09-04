@@ -55,37 +55,42 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     }
   }, [useRealCamera]);
 
+  const recordAttendance = (member: Member, service: string) => {
+    const record: AttendanceRecord = {
+      id: `att-${Date.now()}`,
+      memberId: member.id,
+      memberName: member.fullName,
+      memberRole: member.role,
+      serviceType: service,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      date: new Date().toISOString().slice(0, 10),
+      verifiedBy: 'QR Scanner Station 1',
+      status: 'Confirmed',
+      church: member.church || 'GCYC Main',
+      checkInMethod: 'QR Scan',
+      leaderName: member.invitedBy,
+    };
+    onConfirmAttendance(record);
+    toast.showCheckIn(member.fullName, service);
+  };
+
   const handleSimulateScan = (memberId: string) => {
     const found = members.find(m => m.id === memberId);
     if (found) {
       setSelectedMember(found);
       setScannerState('success');
-      toast.showInfo('QR Code Scanned', `Matched member: ${found.fullName} (${found.id})`);
+      // Attendance is logged the instant a valid pass is scanned
+      recordAttendance(found, serviceType);
     } else {
       setScannerState('error');
       toast.showError('Invalid QR Code', `Member ID ${memberId} was not found in directory.`);
     }
   };
 
-  const handleConfirmAttendance = () => {
-    if (!selectedMember) return;
-    const record: AttendanceRecord = {
-      id: `att-${Date.now()}`,
-      memberId: selectedMember.id,
-      memberName: selectedMember.fullName,
-      memberRole: selectedMember.role,
-      serviceType: serviceType,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      verifiedBy: 'QR Scanner Station 1',
-      status: 'Confirmed',
-      church: selectedMember.church || 'GCYC Main',
-      checkInMethod: 'QR Scan'
-    };
-
-    onConfirmAttendance(record);
-    toast.showCheckIn(selectedMember.fullName, serviceType);
+  const handleScanNext = () => {
     setScannerState('scanning');
   };
+
 
 
   return (
