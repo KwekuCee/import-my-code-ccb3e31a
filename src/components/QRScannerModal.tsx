@@ -219,13 +219,14 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                     check_circle
                   </span>
                   <span className="font-headline font-bold text-sm text-emerald-800">
-                    Member QR Recognized
+                    Attendance Recorded
                   </span>
                 </div>
                 <span className="font-mono text-[10px] bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full font-bold border border-emerald-200">
-                  VERIFIED
+                  LOGGED
                 </span>
               </div>
+
 
               {/* Member Card */}
               <div className="flex items-center gap-3.5 bg-slate-50 p-4 rounded-2xl border border-slate-200">
