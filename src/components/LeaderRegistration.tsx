@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
-import { Leader, LeaderType, ViewType } from '../types';
+import { Leader, LeaderType, ViewType, Member } from '../types';
 
 interface LeaderRegistrationProps {
   leaders: Leader[];
+  members?: Member[];
+  churches?: { id: string; name: string }[];
   onAddLeader: (leader: Leader) => void;
   onNavigate: (view: ViewType) => void;
 }
 
 export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
   leaders,
+  members = [],
+  churches = [],
   onAddLeader,
   onNavigate
 }) => {
+  const [selectedMemberId, setSelectedMemberId] = useState('');
+
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [contact, setContact] = useState('');
