@@ -1465,45 +1465,53 @@ export async function saveAllAdminSettingsToSupabase(settings: {
 /**
  * Dispatches a password recovery email via Supabase Auth
  */
-export async function sendPasswordResetEmail(email: string): Promise<{ success: boolean; message: string }> {
+export async function sendPasswordResetEmail(email: string): Promise<{ success: boolean; message: string; link?: string }> {
   const client = getSupabase();
   if (!client) {
-    return { success: false, message: 'Database connection is not initialized. Please check your Supabase configuration.' };
+    return { success: false, message: 'Cannot reach the system right now. Please try again shortly.' };
   }
-
+  const trimmedEmail = email.trim();
+  if (!trimmedEmail || !trimmedEmail.includes('@')) {
+    return { success: false, message: 'Please provide a valid email address.' };
+  }
   try {
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail || !trimmedEmail.includes('@')) {
-      return { success: false, message: 'Please provide a valid administrator email address.' };
-    }
-
-    const { error } = await client.auth.resetPasswordForEmail(trimmedEmail, {
-      redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined
+    const { data, error } = await client.functions.invoke('password-reset', {
+      body: {
+        action: 'request',
+        email: trimmedEmail,
+        origin: typeof window !== 'undefined' ? window.location.origin : ''
+      }
     });
-
     if (error) {
-      console.warn('Supabase resetPasswordForEmail error:', error.message);
-      return { success: false, message: error.message };
+      return { success: false, message: error.message || 'Could not start the password reset.' };
     }
-
-    // Log the password reset attempt to audit logs for security accountability
-    await saveAuditLogToSupabase({
-      action: `Password reset email dispatched for ${trimmedEmail}`,
-      icon: 'lock_reset',
-      user: trimmedEmail,
-      category: 'Security'
-    });
-
+    const res = data as any;
     return {
-      success: true,
-      message: `A secure password reset link has been dispatched to ${trimmedEmail}. Please check your email inbox to proceed.`
+      success: !!res?.success,
+      message: res?.message || 'Please check your email for the reset link.',
+      link: res?.link
     };
   } catch (err: any) {
-    console.error('Error sending password reset email:', err);
-    return {
-      success: false,
-      message: err?.message || 'Failed to dispatch password recovery link. Please verify database connection.'
-    };
+    return { success: false, message: err?.message || 'Could not start the password reset.' };
+  }
+}
+
+export async function confirmPasswordReset(token: string, password: string): Promise<{ success: boolean; message: string }> {
+  const client = getSupabase();
+  if (!client) {
+    return { success: false, message: 'Cannot reach the system right now. Please try again shortly.' };
+  }
+  try {
+    const { data, error } = await client.functions.invoke('password-reset', {
+      body: { action: 'confirm', token, password }
+    });
+    if (error) {
+      return { success: false, message: error.message || 'Could not change the password.' };
+    }
+    const res = data as any;
+    return { success: !!res?.success, message: res?.message || 'Password updated.' };
+  } catch (err: any) {
+    return { success: false, message: err?.message || 'Could not change the password.' };
   }
 }
 
