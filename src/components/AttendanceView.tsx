@@ -610,9 +610,9 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
               : { key: 'serviceType', label: 'Service Type' }),
             { key: 'date', label: 'Date', type: 'date' },
             { key: 'timestamp', label: 'Check-in Time' },
-            { key: 'church', label: 'Church Branch' },
+            ...(isChurchAdmin ? [] : [{ key: 'church', label: 'Church Branch' }]),
             { key: 'leaderName', label: 'Leader' },
-            { key: 'pcfName', label: 'PCF / Cell' },
+            { key: 'pcfName', label: 'Bible Study Class / Cell / PCF' },
             { key: 'verifiedBy', label: 'Verified By' }
           ]}
           onCancel={() => setEditingRecord(null)}
