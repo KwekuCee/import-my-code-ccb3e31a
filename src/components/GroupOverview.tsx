@@ -163,6 +163,14 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
         </div>
       </div>
 
+      {/* Attendance across the whole group, grouped by PCF, cell and leader */}
+      <HierarchyAttendancePanel
+        members={members}
+        leaders={leaders}
+        attendance={attendanceRecords}
+        showChurchLabel
+      />
+
       {/* 3 Stat Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-sm transition-all">
@@ -241,7 +249,6 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
             </button>
           </div>
 
-          {/* Attendance across the whole group, grouped by PCF, cell and leader */}
           {activeTab === 'branches' ? (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
