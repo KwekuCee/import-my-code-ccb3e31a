@@ -28,6 +28,7 @@ export interface ChurchAdminAccount {
   joinedDate: string;
   status: 'Active' | 'Pending Verification';
   password?: string;
+  photoUrl?: string;
 }
 
 export type RoleType = 'Leader' | 'Member' | 'First Timer';
@@ -51,6 +52,7 @@ export interface Leader {
   promotionStatus: 'None' | 'Flagged' | 'Confirmed';
   joinedDate: string;
   initials: string;
+  photoUrl?: string;
 }
 
 export interface Member {

@@ -573,7 +573,7 @@ export async function fetchChurchAdminsFromSupabase(): Promise<ChurchAdminAccoun
             zone: row.zone || 'Zone 1 (Korle Bu)',
             joinedDate: row.created_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
             status: 'Active',
-            password: 'CEKBU@2026'
+            photoUrl: row.photo_url || undefined
           });
         }
       });
@@ -599,7 +599,7 @@ export async function fetchChurchAdminsFromSupabase(): Promise<ChurchAdminAccoun
             zone: row.zone || existing?.zone || 'Zone 1 (Korle Bu)',
             joinedDate: row.created_at?.slice(0, 10) || existing?.joinedDate || new Date().toISOString().slice(0, 10),
             status: 'Active',
-            password: row.password_hash || existing?.password || 'CEKBU@2026'
+            photoUrl: row.avatar_url || existing?.photoUrl
           });
         }
       });
@@ -615,6 +615,7 @@ export async function fetchChurchAdminsFromSupabase(): Promise<ChurchAdminAccoun
 export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Promise<boolean> {
   const email = (admin.adminEmail || '').trim().toLowerCase();
   const passwordToStore = admin.password?.trim() || 'CEKBU@2026';
+  // Passwords are never cached on the device; the server scrambles them on save.
 
   // 1. Immediately cache in localStorage for instant persistence
   try {
@@ -623,7 +624,7 @@ export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Prom
     const enrichedAdmin: ChurchAdminAccount = {
       ...admin,
       adminEmail: email,
-      password: passwordToStore
+      password: undefined
     };
     localStorage.setItem('cekbu_church_admins', JSON.stringify([enrichedAdmin, ...filtered]));
   } catch (e) {
@@ -658,7 +659,8 @@ export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Prom
       full_name: admin.adminName,
       role: 'Church Admin',
       church_name: admin.churchName,
-      zone: admin.zone || 'Zone 1 (Korle Bu)'
+      zone: admin.zone || 'Zone 1 (Korle Bu)',
+      avatar_url: admin.photoUrl || null
     };
     if (churchId) {
       userPayload.church_id = churchId;
@@ -694,7 +696,9 @@ export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Prom
       admin_email: email,
       admin_phone: admin.adminPhone || '+233 24 000 0000',
       zone: admin.zone || 'Zone 1 (Korle Bu)',
-      role: 'Church Admin'
+      role: 'Church Admin',
+      password: passwordToStore,
+      photo_url: admin.photoUrl || null
     };
 
     const { error: adminErr } = await client.from('church_admin_accounts').upsert(adminPayload, { onConflict: 'id' });
