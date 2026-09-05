@@ -185,7 +185,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="p-2 text-slate-600 hover:text-white hover:bg-slate-100 rounded-xl transition-colors relative cursor-pointer"
+            className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors relative cursor-pointer"
             title="Notifications"
           >
             <span className="material-symbols-outlined text-[20px]">notifications</span>

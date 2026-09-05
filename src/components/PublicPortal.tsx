@@ -576,7 +576,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-white font-body relative overflow-x-hidden flex flex-col">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-body relative overflow-x-hidden flex flex-col">
       {/* Background Decor */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
@@ -985,7 +985,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   <select
                     value={attServiceType}
                     onChange={(e) => setAttServiceType(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
                   >
                     {effectiveServiceTypes.map((srv) => (
                       <option key={srv} value={srv}>
@@ -1052,7 +1052,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     placeholder="e.g. Deacon Kwame Asamoah"
                     value={ldrName}
                     onChange={(e) => setLdrName(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
                   />
                 </div>
 
@@ -1066,7 +1066,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     placeholder="kasamoah@cekorlebu.org"
                     value={ldrEmail}
                     onChange={(e) => setLdrEmail(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
                   />
                 </div>
               </div>
@@ -1082,7 +1082,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     placeholder="+233 24 123 4567"
                     value={ldrPhone}
                     onChange={(e) => setLdrPhone(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
                   />
                 </div>
 
@@ -1096,7 +1096,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     placeholder="e.g. Glorious Cell 1 / Grace PCF"
                     value={ldrCellName}
                     onChange={(e) => setLdrCellName(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
                   />
                 </div>
               </div>
@@ -1110,7 +1110,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     type="date"
                     value={ldrDob}
                     onChange={(e) => setLdrDob(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
                   />
                 </div>
 
@@ -1123,7 +1123,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     placeholder="e.g. Korle Bu, Accra"
                     value={ldrLocation}
                     onChange={(e) => setLdrLocation(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
                   />
                 </div>
               </div>
@@ -1136,7 +1136,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   <select
                     value={ldrRole}
                     onChange={(e) => setLdrRole(e.target.value as any)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
                   >
                     <option value="BSCT">BSCT (Bible Study Class Teacher)</option>
                     <option value="Cell Leader">Cell Leader</option>
@@ -1152,7 +1152,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   <select
                     value={ldrChurch}
                     onChange={(e) => setLdrChurch(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
                     disabled={adminRegisteredChurches.length === 0}
                   >
                     {adminRegisteredChurches.length === 0 && (
@@ -1245,7 +1245,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     placeholder="Admin Full Name"
                     value={admFullName}
                     onChange={(e) => setAdmFullName(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
                   />
                 </div>
 
@@ -1259,7 +1259,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     placeholder="email@cekorlebu.org"
                     value={admRequiredEmail}
                     onChange={(e) => setAdmRequiredEmail(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
                   />
                 </div>
               </div>
@@ -1275,7 +1275,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     placeholder="e.g. GCYC 2 or CE Achimota"
                     value={admChurchName}
                     onChange={(e) => setAdmChurchName(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
                   />
                 </div>
 
@@ -1469,7 +1469,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                       setLoginError('');
                     }}
                     placeholder="Enter account password"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
                   />
                 </div>
               </div>
@@ -1568,7 +1568,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
                     placeholder="e.g. admin@cekorlebu.org"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold"
                   />
                 </div>
               </div>

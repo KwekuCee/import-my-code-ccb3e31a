@@ -820,7 +820,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={pastorName}
                       onChange={(e) => setPastorName(e.target.value)}
                       placeholder="e.g. Group Pastor"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-white outline-none focus:border-blue-600 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -832,7 +832,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={hqEmail}
                       onChange={(e) => setHqEmail(e.target.value)}
                       placeholder="group.pastor@cekorlebu.org"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-white outline-none focus:border-blue-600 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -844,7 +844,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={pastorPhone}
                       onChange={(e) => setPastorPhone(e.target.value)}
                       placeholder="+233 24 123 4567"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-white outline-none focus:border-blue-600 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -856,7 +856,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={hqChurchName}
                       onChange={(e) => setHqChurchName(e.target.value)}
                       placeholder="e.g. GCYC Group HQ"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-white outline-none focus:border-blue-600 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -1040,7 +1040,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 placeholder="Enter new global service name (e.g. Wednesday Communion Service)..."
                 value={newServiceName}
                 onChange={(e) => setNewServiceName(e.target.value)}
-                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-white font-semibold outline-none focus:border-blue-600"
+                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-semibold outline-none focus:border-blue-600"
               />
               <button
                 type="submit"

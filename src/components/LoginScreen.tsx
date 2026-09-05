@@ -80,7 +80,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="admin@cekorlebu.org"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 font-body text-xs font-semibold text-white placeholder:text-slate-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 font-body text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition-all"
               />
             </div>
           </div>
@@ -109,7 +109,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 font-body text-xs text-white placeholder:text-slate-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 font-body text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition-all"
               />
             </div>
           </div>
@@ -186,7 +186,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
                   placeholder="admin@cekorlebu.org"
-                  className="w-full border border-slate-200 bg-slate-50 p-2.5 rounded-xl text-xs text-white font-semibold outline-none focus:border-blue-600 focus:bg-white"
+                  className="w-full border border-slate-200 bg-slate-50 p-2.5 rounded-xl text-xs text-slate-900 font-semibold outline-none focus:border-blue-600 focus:bg-white"
                 />
               </div>
 
