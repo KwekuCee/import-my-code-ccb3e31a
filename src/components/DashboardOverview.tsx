@@ -37,7 +37,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   attendanceRecords,
   onNavigate,
   onSelectMemberForCard,
-
+  serviceTypes = []
 }) => {
   const isSuperadmin = user.role === 'Superadmin';
   const currentChurchName = user.church || churches[0]?.name || 'Unassigned';
@@ -1127,7 +1127,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       <AbsenteesPanel
         members={branchMembers}
         attendanceRecords={attendanceRecords}
-        serviceTypes={(serviceTypes || []).filter(s => s.active !== false).map(s => s.name)}
+        serviceTypes={serviceTypes.filter(st => st.active !== false).map(st => st.name)}
         churchName={isSuperadmin ? undefined : currentChurchName}
         isGroupView={isSuperadmin}
         recordedBy={user?.name}
