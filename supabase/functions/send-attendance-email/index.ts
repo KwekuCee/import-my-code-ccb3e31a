@@ -1,16 +1,9 @@
 // Sends a self-attendance notification email to a church's registered admin.
 // Reads the admin's email from church_admin_accounts (looked up by church name),
-// and sends via Resend. Optionally attaches the member's QR pass PNG.
-//
-// Required secret (set via `supabase secrets set`, never committed):
-//   RESEND_API_KEY
-//
-// Optional secret — set this once you've verified a sending domain in Resend.
-// Until then this falls back to Resend's shared test sender, which only
-// delivers to the email address on the Resend account itself.
-//   RESEND_FROM_EMAIL   (e.g. "GCYC Attendance <attendance@yourdomain.org>")
+// and sends from the connected Gmail account. Optionally attaches the QR pass PNG.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { sendGmail } from '../_shared/gmail.ts';
 
 declare const Deno: { env: { get(key: string): string | undefined } };
 
@@ -34,14 +27,6 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    if (!resendApiKey) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'RESEND_API_KEY is not configured on this project.' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     const body: RequestBody = await req.json();
     const { churchName, memberName, memberId, serviceType, timestamp, qrPassBase64 } = body;
 
@@ -51,6 +36,7 @@ Deno.serve(async (req: Request) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
