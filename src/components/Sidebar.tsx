@@ -89,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               />
             </div>
             <div>
-              <h1 className="font-headline text-base font-bold text-slate-900 tracking-tight leading-tight">
+              <h1 className="font-headline text-base font-bold text-white tracking-tight leading-tight">
                 GCYC
               </h1>
               {isSuperadmin ? (
@@ -119,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <>
               <button
                 onClick={handleExportSystemData}
-                className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-300 text-slate-950 font-bold text-xs py-2 px-3 rounded-xl transition-all shadow-xs active:scale-98 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-2 px-3 rounded-xl transition-all shadow-xs active:scale-98 cursor-pointer"
                 title="Export multi-sheet report with total members per church, attendance per service, and new members per service"
               >
                 <span className="material-symbols-outlined text-[18px]">download</span>

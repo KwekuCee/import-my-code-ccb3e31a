@@ -189,15 +189,15 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left text-xs space-y-2 font-body">
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Service Checked-In:</span>
-              <span className="font-bold text-slate-900">{serviceType}</span>
+              <span className="font-bold text-white">{serviceType}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Phone Contact:</span>
-              <span className="font-bold text-slate-900">{registeredMember.phone}</span>
+              <span className="font-bold text-white">{registeredMember.phone}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Auto-Assigned Church:</span>
-              <span className="font-bold text-slate-900">{registeredMember.church}</span>
+              <span className="font-bold text-white">{registeredMember.church}</span>
             </div>
             <div className="flex justify-between py-1">
               <span className="text-slate-500">Invited By:</span>
@@ -216,7 +216,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
 
             <button
               onClick={() => onSelectMemberForCard(registeredMember)}
-              className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 px-4 rounded-xl font-bold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+              className="flex-1 bg-blue-700 hover:bg-blue-800 text-white py-3 px-4 rounded-xl font-bold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px]">badge</span>
               <span>View Printable Card</span>
@@ -243,7 +243,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
               id="serviceTypeSelect"
               value={serviceType}
               onChange={(e) => setServiceType(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-blue-600 outline-none cursor-pointer"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-white focus:bg-white focus:border-blue-600 outline-none cursor-pointer"
             >
               <option value="Sunday Service">Sunday Service</option>
               <option value="Midweek Service">Midweek Service</option>
@@ -264,7 +264,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="e.g. Samuel Kweku Mensah"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-blue-600 outline-none"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white focus:bg-white focus:border-blue-600 outline-none"
               />
             </div>
 
@@ -279,7 +279,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="e.g. +233 24 123 4567"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-blue-600 outline-none"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white focus:bg-white focus:border-blue-600 outline-none"
               />
             </div>
           </div>
@@ -296,7 +296,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="member@example.com"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-blue-600 outline-none"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white focus:bg-white focus:border-blue-600 outline-none"
               />
             </div>
 

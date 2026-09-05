@@ -185,7 +185,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors relative cursor-pointer"
+            className="p-2 text-slate-600 hover:text-white hover:bg-slate-100 rounded-xl transition-colors relative cursor-pointer"
             title="Notifications"
           >
             <span className="material-symbols-outlined text-[20px]">notifications</span>
@@ -205,7 +205,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
                 {notifications.map(n => (
                   <div key={n.id} className="p-3 hover:bg-slate-50 transition-colors">
                     <div className="flex justify-between items-start">
-                      <p className="font-semibold text-xs text-slate-900">{n.title}</p>
+                      <p className="font-semibold text-xs text-white">{n.title}</p>
                       <span className="text-xs text-slate-400">{n.time}</span>
                     </div>
                     <p className="text-xs text-slate-500 mt-1">{n.desc}</p>

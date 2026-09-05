@@ -80,7 +80,7 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, o
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Special Sunday Service Time Notice"
-              className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 font-semibold"
+              className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 font-semibold"
             />
           </div>
 
@@ -91,7 +91,7 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, o
             <select
               value={targetAudience}
               onChange={e => setTargetAudience(e.target.value)}
-              className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 font-semibold"
+              className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-2.5 text-xs text-white outline-none focus:bg-white focus:border-blue-600 font-semibold"
             >
               <option value="All Members">All Members & Leaders (Group Consolidated)</option>
               <option value="Group Leaders Only">Group Leaders & Deacons Only</option>
@@ -120,7 +120,7 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, o
               value={message}
               onChange={e => setMessage(e.target.value)}
               placeholder="Type your announcement content here..."
-              className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600"
+              className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-xs text-white outline-none focus:bg-white focus:border-blue-600"
             />
           </div>
 

@@ -50,7 +50,7 @@ export const MemberCardModal: React.FC<MemberCardModalProps> = ({ member, onClos
 
           {/* Avatar & Role Badge */}
           <div className="relative inline-block">
-            <div className="w-20 h-20 rounded-2xl bg-blue-700 text-slate-950 font-display font-extrabold text-2xl flex items-center justify-center mx-auto border-4 border-white shadow-lg">
+            <div className="w-20 h-20 rounded-2xl bg-blue-700 text-white font-display font-extrabold text-2xl flex items-center justify-center mx-auto border-4 border-white shadow-lg">
               {memberInitials}
             </div>
             <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-slate-950 text-blue-300 text-[9px] font-bold px-2.5 py-0.5 rounded-full border border-blue-500/30 whitespace-nowrap shadow-xs">

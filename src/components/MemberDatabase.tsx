@@ -202,7 +202,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
             {showFilterDropdown && (
               <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-sm z-50 p-4 space-y-4 animate-in fade-in zoom-in-95 duration-150">
                 <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                  <h4 className="font-semibold text-xs text-slate-900">Filter Directory</h4>
+                  <h4 className="font-semibold text-xs text-white">Filter Directory</h4>
                   <button
                     onClick={() => { setRoleFilter('All'); setChurchFilter('All'); setFoundationFilter('All'); setLeaderFilter('All'); }}
                     className="text-xs text-blue-600 hover:underline font-semibold"

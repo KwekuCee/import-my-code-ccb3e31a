@@ -506,7 +506,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <div className="flex items-center gap-3">
             <button
               onClick={handleSaveSettings}
-              className="bg-blue-500 hover:bg-blue-300 text-slate-950 font-black text-xs py-2.5 px-5 rounded-xl shadow-lg shadow-amber-400/20 transition-all flex items-center gap-2 cursor-pointer shrink-0 active:scale-98"
+              className="bg-blue-700 hover:bg-blue-800 text-white font-black text-xs py-2.5 px-5 rounded-xl shadow-lg  transition-all flex items-center gap-2 cursor-pointer shrink-0 active:scale-98"
             >
               <span className="material-symbols-outlined text-[18px]">save</span>
               <span>Save All Settings</span>
@@ -802,7 +802,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     <span className="material-symbols-outlined text-[26px]">admin_panel_settings</span>
                   </div>
                   <div>
-                    <h3 className="font-headline font-bold text-lg text-slate-900">
+                    <h3 className="font-headline font-bold text-lg text-white">
                       Group Pastor & HQ Account Profile
                     </h3>
                     <p className="text-xs text-slate-500">
@@ -820,7 +820,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={pastorName}
                       onChange={(e) => setPastorName(e.target.value)}
                       placeholder="e.g. Group Pastor"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-white outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -832,7 +832,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={hqEmail}
                       onChange={(e) => setHqEmail(e.target.value)}
                       placeholder="group.pastor@cekorlebu.org"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-white outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -844,7 +844,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={pastorPhone}
                       onChange={(e) => setPastorPhone(e.target.value)}
                       placeholder="+233 24 123 4567"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-white outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -856,7 +856,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={hqChurchName}
                       onChange={(e) => setHqChurchName(e.target.value)}
                       placeholder="e.g. GCYC Group HQ"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-white outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -884,7 +884,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <button
                     type="submit"
                     disabled={isSavingSuperadminProfile}
-                    className="bg-blue-500 hover:bg-blue-300 text-slate-950 font-black text-xs py-3 px-6 rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-98 cursor-pointer disabled:opacity-50"
+                    className="bg-blue-700 hover:bg-blue-800 text-white font-black text-xs py-3 px-6 rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-98 cursor-pointer disabled:opacity-50"
                   >
                     <span className="material-symbols-outlined text-[18px]">
                       {isSavingSuperadminProfile ? 'sync' : 'save'}
@@ -1026,7 +1026,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <div className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-headline font-bold text-base text-slate-900">
+                <h3 className="font-headline font-bold text-base text-white">
                   Global Service Types Manager
                 </h3>
                 <p className="text-xs text-slate-500">Service types saved to Supabase and displayed at the self check-in station</p>
@@ -1040,11 +1040,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 placeholder="Enter new global service name (e.g. Wednesday Communion Service)..."
                 value={newServiceName}
                 onChange={(e) => setNewServiceName(e.target.value)}
-                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-semibold outline-none focus:border-blue-600"
+                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-white font-semibold outline-none focus:border-blue-600"
               />
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-300 text-slate-950 font-extrabold text-xs px-4 py-2 rounded-xl cursor-pointer shrink-0 active:scale-98"
+                className="bg-blue-700 hover:bg-blue-800 text-white font-extrabold text-xs px-4 py-2 rounded-xl cursor-pointer shrink-0 active:scale-98"
               >
                 Add & Save to Database
               </button>
@@ -1055,7 +1055,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <div key={idx} className="p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
                     <span className="material-symbols-outlined text-blue-600 text-[18px]">event_available</span>
-                    <span className="font-bold text-xs text-slate-900">{srv}</span>
+                    <span className="font-bold text-xs text-white">{srv}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs bg-emerald-50 text-emerald-700 font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
@@ -1164,7 +1164,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   />
                   <button
                     onClick={() => triggerToast('Security Gate Code updated successfully')}
-                    className="bg-blue-500 hover:bg-blue-300 text-slate-950 font-black px-4 py-2 rounded-xl cursor-pointer"
+                    className="bg-blue-700 hover:bg-blue-800 text-white font-black px-4 py-2 rounded-xl cursor-pointer"
                   >
                     Update
                   </button>

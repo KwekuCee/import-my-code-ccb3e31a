@@ -427,7 +427,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-2">
-                <p className="font-bold text-xs text-slate-900">Database Backup & Restoration</p>
+                <p className="font-bold text-xs text-white">Database Backup & Restoration</p>
                 <p className="text-xs text-slate-500">Create instant cloud snapshot of members, attendance, and leadership structure.</p>
                 <button
                   onClick={() => triggerToast('Cloud Backup Snapshot created successfully in Supabase!')}
@@ -438,7 +438,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               </div>
 
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-2">
-                <p className="font-bold text-xs text-slate-900">Auth Gate Security Logs</p>
+                <p className="font-bold text-xs text-white">Auth Gate Security Logs</p>
                 <p className="text-xs text-slate-500">Church Admin and Leader registration attempts authenticated with Security Gate Code.</p>
                 <button
                   onClick={() => triggerToast('Security Gate Code verified active & locked')}
@@ -491,7 +491,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <div className="flex flex-wrap items-center gap-3 shrink-0">
                 <button
                   onClick={() => onNavigate('qr_scanner')}
-                  className="flex items-center gap-2 bg-blue-500 hover:bg-blue-300 text-slate-950 font-black text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer"
+                  className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[18px]">qr_code_scanner</span>
                   <span>Launch QR Scanner</span>
@@ -522,12 +522,12 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <span className="material-symbols-outlined text-blue-600 text-[24px] shrink-0 mt-0.5">campaign</span>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold bg-blue-500 text-slate-950 px-2 py-0.5 rounded">
+                  <span className="text-xs font-bold bg-blue-500 text-white px-2 py-0.5 rounded">
                     ANNOUNCEMENT FROM GROUP PASTOR HQ
                   </span>
                   <span className="text-xs text-slate-500">{groupAnnouncements[0].date}</span>
                 </div>
-                <p className="font-bold text-xs text-slate-900">{groupAnnouncements[0].title}</p>
+                <p className="font-bold text-xs text-white">{groupAnnouncements[0].title}</p>
                 <p className="text-xs text-slate-700">{groupAnnouncements[0].body}</p>
               </div>
             </div>
@@ -544,7 +544,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 </div>
               </div>
               <div className="mt-3 flex items-baseline justify-between">
-                <span className="font-display text-3xl font-extrabold text-slate-900">{branchMembers.length}</span>
+                <span className="font-display text-3xl font-extrabold text-white">{branchMembers.length}</span>
                 <span className="inline-flex items-center text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{currentChurchName}</span>
               </div>
               <p className="text-xs text-slate-400 mt-1">Total database registered members</p>
@@ -634,7 +634,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                     <div key={ldr.id} className="pt-2.5 pb-2.5 px-3 rounded-xl bg-slate-50/60 hover:bg-slate-50 border border-slate-100/80 transition-all space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-blue-600 text-slate-950 font-display font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">
+                          <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-display font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">
                             {ldr.initials || (ldr.fullName ? ldr.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'LD')}
                           </div>
                           <div>
@@ -748,7 +748,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           {/* 4b. Attendance per Leader + Total Attendance */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
-              <h3 className="font-headline font-bold text-base text-slate-900 flex items-center gap-2">
+              <h3 className="font-headline font-bold text-base text-white flex items-center gap-2">
                 <span className="material-symbols-outlined text-blue-700 text-[20px]">groups_3</span>
                 <span>Attendance Per Leader</span>
               </h3>
@@ -767,7 +767,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 {attendanceByLeader.map(row => (
                   <div key={row.leaderName} className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl p-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-headline font-bold text-xs text-slate-900 truncate">{row.leaderName}</p>
+                      <p className="font-headline font-bold text-xs text-white truncate">{row.leaderName}</p>
                       <p className="text-xs text-slate-500 mt-0.5">PCF / Cell: {row.pcfName}</p>
                       <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-2">
                         <div
@@ -777,7 +777,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="font-display text-lg font-extrabold text-slate-900 leading-none">{row.total}</p>
+                      <p className="font-display text-lg font-extrabold text-white leading-none">{row.total}</p>
                       <p className="text-xs text-emerald-600 font-bold mt-1">+{row.today} today</p>
                     </div>
                   </div>
@@ -795,7 +795,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-headline font-bold text-base text-slate-900 flex items-center gap-2">
+                <h3 className="font-headline font-bold text-base text-white flex items-center gap-2">
                   <span className="material-symbols-outlined text-blue-600 text-[20px]">fact_check</span>
                   <span>Recent Service Attendance Records</span>
                 </h3>
@@ -1084,14 +1084,14 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                     <div className="grid grid-cols-2 gap-3 text-xs pt-1 text-slate-600">
                       <div className="bg-white p-2.5 rounded-lg border border-blue-100/60 space-y-1">
                         <span className="text-slate-400 block">Foundation School:</span>
-                        <span className="font-bold text-slate-900 text-xs">{foundationEnrolledCount} Enrolled / {foundationGraduatedCount} Graduated</span>
+                        <span className="font-bold text-white text-xs">{foundationEnrolledCount} Enrolled / {foundationGraduatedCount} Graduated</span>
                         <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                           <div className="bg-blue-600 h-full rounded-full" style={{ width: `${totalBranchMembers > 0 ? (foundationGraduatedCount / totalBranchMembers) * 100 : 0}%` }}></div>
                         </div>
                       </div>
                       <div className="bg-white p-2.5 rounded-lg border border-blue-100/60 space-y-1">
                         <span className="text-slate-400 block">First-Timer Follow-up:</span>
-                        <span className="font-bold text-slate-900 text-xs">{thisWeekNewMembers.length} In Active Follow-up</span>
+                        <span className="font-bold text-white text-xs">{thisWeekNewMembers.length} In Active Follow-up</span>
                         <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                           <div className="bg-blue-600 h-full rounded-full" style={{ width: `${totalBranchMembers > 0 ? (thisWeekNewMembers.length / totalBranchMembers) * 100 : 0}%` }}></div>
                         </div>
@@ -1187,7 +1187,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-500 hover:bg-blue-300 text-slate-950 font-black rounded-xl text-xs shadow-sm cursor-pointer"
+                  className="px-5 py-2 bg-blue-700 hover:bg-blue-800 text-white font-black rounded-xl text-xs shadow-sm cursor-pointer"
                 >
                   Post Group Broadcast
                 </button>
@@ -1260,7 +1260,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+                    className="px-5 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
                   >
                     Send Email Broadcast
                   </button>

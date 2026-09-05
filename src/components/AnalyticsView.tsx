@@ -344,7 +344,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
             </p>
             <button
               onClick={() => onNavigate('members')}
-              className="w-full mt-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-sm"
+              className="w-full mt-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-sm"
             >
               View First Timers Follow-Up List
             </button>

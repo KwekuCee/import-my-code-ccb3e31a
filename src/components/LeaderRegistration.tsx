@@ -125,7 +125,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
           <span className="material-symbols-outlined text-[14px]">military_tech</span>
           GCYC Hierarchy Entry
         </div>
-        <h1 className="font-display text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="font-display text-2xl md:text-4xl font-extrabold text-white tracking-tight">
           Leader Official Registration
         </h1>
         <p className="font-body text-xs md:text-sm text-slate-500 mt-1">
@@ -168,16 +168,16 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
             <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
               Leader Profile Active
             </span>
-            <h2 className="font-headline font-bold text-2xl text-slate-900 mt-2">{createdLeader.fullName} Registered!</h2>
+            <h2 className="font-headline font-bold text-2xl text-white mt-2">{createdLeader.fullName} Registered!</h2>
             <p className="text-xs text-slate-500 mt-1">
-              Assigned ID <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">{createdLeader.id}</span> as <strong className="text-slate-900">{createdLeader.leaderType}</strong> for {createdLeader.cellOrPcfName}.
+              Assigned ID <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">{createdLeader.id}</span> as <strong className="text-white">{createdLeader.leaderType}</strong> for {createdLeader.cellOrPcfName}.
             </p>
           </div>
 
           <div className="bg-slate-50 p-4 rounded-2xl text-left text-xs space-y-2 border border-slate-200 font-body">
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Branch Church:</span>
-              <span className="font-bold text-slate-900">{createdLeader.church}</span>
+              <span className="font-bold text-white">{createdLeader.church}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Cell / PCF Name:</span>
@@ -189,7 +189,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
             </div>
             <div className="flex justify-between py-1">
               <span className="text-slate-500">Appointment Method:</span>
-              <span className="font-bold text-slate-900">
+              <span className="font-bold text-white">
                 {createdLeader.isAppointed ? 'Direct Admin Appointment' : 'Standard Growth Hierarchy'}
               </span>
             </div>
