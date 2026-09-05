@@ -248,7 +248,13 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
                     </td>
 
                     <td className="py-3.5 px-4 font-semibold text-slate-800">
-                      {ldr.cellOrPcfName}
+                      {ldr.cellOrPcfName || `${ldr.fullName}'s group`}
+                      {(() => {
+                        const g = getGroupNamesForLeader(ldr.parentLeaderId, leaders);
+                        const parts = [g.cellName, g.pcfName].filter(Boolean);
+                        if (parts.length === 0) return null;
+                        return <div className="text-[11px] font-normal text-slate-500 mt-0.5">in {parts.join(' • ')}</div>;
+                      })()}
                     </td>
 
                     <td className="py-3.5 px-4 text-slate-600">
