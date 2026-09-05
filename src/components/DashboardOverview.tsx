@@ -1152,6 +1152,65 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       )}
 
       {/* ===================================================================== */}
+      {/* FOUNDATION SCHOOL                                                     */}
+      {/* ===================================================================== */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-slate-100 pb-3">
+          <div>
+            <h3 className="font-headline font-bold text-base text-slate-900">Foundation School</h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              How many people are in each class{isSuperadmin ? ' across all churches' : ` in ${currentChurchName}`}
+            </p>
+          </div>
+          <button
+            onClick={() => onNavigate('members')}
+            className="text-xs font-bold text-blue-700 hover:text-blue-800 cursor-pointer"
+          >
+            Open member list
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+            <p className="text-xs text-slate-500">Not enrolled</p>
+            <p className="font-display text-xl font-bold text-slate-900">
+              {branchMembers.filter(m => !(m.foundationClass || 0)).length}
+            </p>
+          </div>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+            <p className="text-xs text-slate-500">Not yet finished</p>
+            <p className="font-display text-xl font-bold text-slate-900">
+              {branchMembers.filter(m => (m.foundationClass || 0) > 0 && (m.foundationClass || 0) < 7).length}
+            </p>
+          </div>
+          <div className="p-3 rounded-xl bg-blue-50 border border-blue-100">
+            <p className="text-xs text-blue-700">Finished all 7</p>
+            <p className="font-display text-xl font-bold text-blue-800">{foundationGraduatedCount}</p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {[1, 2, 3, 4, 5, 6, 7].map(cls => {
+            const count = branchMembers.filter(m => (m.foundationClass || 0) === cls).length;
+            const pct = totalBranchMembers > 0 ? Math.round((count / totalBranchMembers) * 100) : 0;
+            const label = FOUNDATION_SCHOOL_CLASSES.find(c => c.id === cls)?.name || `Class ${cls}`;
+            return (
+              <div key={cls} className="space-y-1">
+                <div className="flex justify-between text-xs text-slate-700">
+                  <span className="font-semibold">Class {cls} — {label}</span>
+                  <span className="text-slate-500">{count}</span>
+                </div>
+                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-600 rounded-full" style={{ width: `${pct}%` }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+
+      {/* ===================================================================== */}
       {/* MODALS                                                                */}
       {/* ===================================================================== */}
 
