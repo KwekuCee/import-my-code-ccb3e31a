@@ -28,6 +28,8 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<RoleType | 'All'>('All');
   const [churchFilter, setChurchFilter] = useState<string>('All');
+  const [foundationFilter, setFoundationFilter] = useState<string>('All');
+  const [leaderFilter, setLeaderFilter] = useState<string>('All');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
@@ -67,8 +69,36 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
     const matchesRole = roleFilter === 'All' || m.role === roleFilter;
     const matchesChurch = isChurchAdmin ? true : (churchFilter === 'All' || m.church === churchFilter);
 
-    return matchesSearch && matchesRole && matchesChurch;
+    const fClass = m.foundationClass || 0;
+    const matchesFoundation =
+      foundationFilter === 'All' ||
+      (foundationFilter === 'none' && fClass === 0) ||
+      (foundationFilter === 'incomplete' && fClass > 0 && fClass < 7) ||
+      (foundationFilter === 'done' && fClass >= 7) ||
+      (/^[1-7]$/.test(foundationFilter) && fClass === Number(foundationFilter));
+
+    const matchesLeader =
+      leaderFilter === 'All' ||
+      (leaderFilter === 'none' && !(m.invitedBy && m.invitedBy !== 'Self-Walkin / Self Invited')) ||
+      m.invitedBy === leaderFilter;
+
+    return matchesSearch && matchesRole && matchesChurch && matchesFoundation && matchesLeader;
   });
+
+  const leaderOptions = Array.from(
+    new Set(
+      scopedMembers
+        .map(m => m.invitedBy)
+        .filter((n): n is string => !!n && n !== 'Self-Walkin / Self Invited' && n !== 'Direct / Self')
+    )
+  ).sort();
+
+  const churchOptions = Array.from(
+    new Set([
+      ...(churches || []).map(c => c?.name).filter((n): n is string => !!n),
+      ...members.map(m => m?.church).filter((n): n is string => !!n)
+    ])
+  ).sort();
 
   const totalResults = filtered.length;
   const totalPages = Math.ceil(totalResults / itemsPerPage) || 1;
@@ -76,7 +106,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
   const paginatedMembers = filtered.slice(startIndex, startIndex + itemsPerPage);
 
   const handleExportCSV = () => {
-    const headers = ['ID', 'Full Name', 'Role', 'Phone', 'Email', 'Occupation', 'Education', 'Location', 'Church', 'Join Date'];
+    const headers = ['ID', 'Full Name', 'Role', 'Phone', 'Email', 'Occupation', 'Education', 'Location', 'Church', 'Foundation Class', 'Leader / Cell', 'Date of Birth', 'Join Date'];
     const rows = filtered.map(m => [
       m.id,
       `"${m.fullName}"`,
@@ -87,6 +117,9 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
       `"${m.education}"`,
       `"${m.location}"`,
       `"${m.church}"`,
+      m.foundationClass || 0,
+      `"${m.invitedBy || ''}"`,
+      m.dob || '',
       m.joinDate
     ]);
 
@@ -154,14 +187,14 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-              className={`flex items-center gap-1.5 px-3 py-2 border rounded-xl bg-white text-xs font-semibold transition-all cursor-pointer ${roleFilter !== 'All' || churchFilter !== 'All'
+              className={`flex items-center gap-1.5 px-3 py-2 border rounded-xl bg-white text-xs font-semibold transition-all cursor-pointer ${roleFilter !== 'All' || churchFilter !== 'All' || foundationFilter !== 'All' || leaderFilter !== 'All'
                   ? 'border-blue-600 bg-blue-50 text-blue-600'
                   : 'border-slate-200 text-slate-700 hover:bg-slate-50'
                 }`}
             >
               <span className="material-symbols-outlined text-[18px]">tune</span>
               <span>Filter</span>
-              {(roleFilter !== 'All' || churchFilter !== 'All') && (
+              {(roleFilter !== 'All' || churchFilter !== 'All' || foundationFilter !== 'All' || leaderFilter !== 'All') && (
                 <span className="w-2 h-2 rounded-full bg-blue-600"></span>
               )}
             </button>
@@ -171,7 +204,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                 <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                   <h4 className="font-semibold text-xs text-slate-900">Filter Directory</h4>
                   <button
-                    onClick={() => { setRoleFilter('All'); setChurchFilter('All'); }}
+                    onClick={() => { setRoleFilter('All'); setChurchFilter('All'); setFoundationFilter('All'); setLeaderFilter('All'); }}
                     className="text-[11px] text-blue-600 hover:underline font-semibold"
                   >
                     Reset All
@@ -202,12 +235,41 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                     className="w-full border border-slate-200 rounded-xl p-2 text-xs bg-slate-50 font-medium"
                   >
                     <option value="All">All Churches</option>
-                    <option value="GCYC Main">GCYC Main</option>
-                    <option value="GCYC 1">GCYC 1</option>
-                    <option value="GCYC 2">GCYC 2</option>
-                    <option value="CE Mamprobi">CE Mamprobi</option>
-                    <option value="CE Dansoman">CE Dansoman</option>
-                    <option value="Unassigned">Unassigned</option>
+                    {churchOptions.map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Foundation School</label>
+                  <select
+                    value={foundationFilter}
+                    onChange={(e) => { setFoundationFilter(e.target.value); setCurrentPage(1); }}
+                    className="w-full border border-slate-200 rounded-xl p-2 text-xs bg-slate-50 font-medium"
+                  >
+                    <option value="All">All members</option>
+                    <option value="none">Not enrolled</option>
+                    <option value="incomplete">Not yet finished</option>
+                    <option value="done">Finished all 7</option>
+                    {[1, 2, 3, 4, 5, 6, 7].map(n => (
+                      <option key={n} value={String(n)}>Class {n}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Leader / Cell</label>
+                  <select
+                    value={leaderFilter}
+                    onChange={(e) => { setLeaderFilter(e.target.value); setCurrentPage(1); }}
+                    className="w-full border border-slate-200 rounded-xl p-2 text-xs bg-slate-50 font-medium"
+                  >
+                    <option value="All">All leaders</option>
+                    <option value="none">No leader yet</option>
+                    {leaderOptions.map(l => (
+                      <option key={l} value={l}>{l}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -242,7 +304,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
       </div>
 
       {/* Active Search & Filter Feedback Bar */}
-      {(searchTerm || roleFilter !== 'All' || (!isChurchAdmin && churchFilter !== 'All')) && (
+      {(searchTerm || roleFilter !== 'All' || foundationFilter !== 'All' || leaderFilter !== 'All' || (!isChurchAdmin && churchFilter !== 'All')) && (
         <div className="bg-blue-50/70 border border-blue-200/80 rounded-xl px-3.5 py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-blue-900">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="material-symbols-outlined text-[16px] text-blue-700">filter_alt</span>
@@ -265,12 +327,29 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                 Church: <strong className="font-semibold text-blue-700">{churchFilter}</strong>
               </span>
             )}
+            {foundationFilter !== 'All' && (
+              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-[11px] text-blue-950">
+                Foundation School: <strong className="font-semibold text-blue-700">{
+                  foundationFilter === 'none' ? 'Not enrolled'
+                    : foundationFilter === 'incomplete' ? 'Not yet finished'
+                      : foundationFilter === 'done' ? 'Finished all 7'
+                        : `Class ${foundationFilter}`
+                }</strong>
+              </span>
+            )}
+            {leaderFilter !== 'All' && (
+              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-[11px] text-blue-950">
+                Leader: <strong className="font-semibold text-blue-700">{leaderFilter === 'none' ? 'No leader yet' : leaderFilter}</strong>
+              </span>
+            )}
           </div>
           <button
             onClick={() => {
               setSearchTerm('');
               setRoleFilter('All');
               setChurchFilter('All');
+              setFoundationFilter('All');
+              setLeaderFilter('All');
               setCurrentPage(1);
             }}
             className="text-[11px] text-blue-700 hover:text-blue-900 font-bold underline cursor-pointer"
@@ -429,7 +508,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                           'No records match the selected filter criteria.'
                         )}
                       </p>
-                      {(searchTerm || roleFilter !== 'All' || (!isChurchAdmin && churchFilter !== 'All')) && (
+                      {(searchTerm || roleFilter !== 'All' || foundationFilter !== 'All' || leaderFilter !== 'All' || (!isChurchAdmin && churchFilter !== 'All')) && (
                         <button
                           type="button"
                           onClick={() => {
