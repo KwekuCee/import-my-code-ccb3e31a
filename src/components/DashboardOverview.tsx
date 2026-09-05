@@ -89,7 +89,6 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   const thisWeekNewMembers = branchMembers.filter(m =>
     m.status === 'First Timer' ||
     m.role === 'First Timer' ||
-    m.role === 'Visitor' ||
     (m.serviceCount !== undefined && m.serviceCount <= 1)
   );
 

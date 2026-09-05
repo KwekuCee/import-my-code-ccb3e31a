@@ -90,8 +90,8 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
   // Calculate stats for selected date
   const totalAttended = filteredRecords.length;
-  const firstTimersCount = filteredRecords.filter(r => r.memberRole === 'First Timer' || r.memberRole === 'Visitor').length;
-  const regularMembersCount = filteredRecords.filter(r => r.memberRole === 'Member' || r.memberRole === 'Leader' || r.memberRole === 'Deacon').length;
+  const firstTimersCount = filteredRecords.filter(r => r.memberRole === 'First Timer').length;
+  const regularMembersCount = filteredRecords.filter(r => r.memberRole === 'Member' || r.memberRole === 'Leader').length;
 
   // Export to Excel / CSV
   const handleExportExcel = () => {
@@ -360,7 +360,6 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                     <td className="py-3.5 px-4">
                       <span className={`inline-block px-2 py-0.5 rounded-md text-xs font-bold ${r.memberRole === 'Leader' ? 'bg-blue-100 text-blue-900 border border-blue-100' :
                           r.memberRole === 'First Timer' ? 'bg-blue-50 text-blue-800 border border-blue-100' :
-                            r.memberRole === 'Deacon' ? 'bg-purple-100 text-purple-900 border border-purple-200' :
                               'bg-emerald-50 text-emerald-800 border border-emerald-200'
                         }`}>
                         {r.memberRole}
