@@ -12,6 +12,7 @@ interface LeaderDirectoryProps {
     church: string;
   };
   onConfirmPromotion: (promotionId: string) => void;
+  onDeclinePromotion?: (promotionId: string) => void;
   onNavigate: (view: ViewType) => void;
   churches?: ChurchBranch[];
   members?: Member[];
@@ -24,6 +25,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
   promotionQueue,
   user,
   onConfirmPromotion,
+  onDeclinePromotion,
   onNavigate,
   churches,
   members = [],
@@ -100,25 +102,27 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
         </button>
       </div>
 
-      {/* Auto-Flagged Promotion Queue Panel */}
-      {promotionQueue.length > 0 && (
+      {/* Promotion requests awaiting the group pastor */}
+      {scopedPromotionQueue.length > 0 && (
         <div className="bg-blue-50 border border-blue-300 rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-blue-900 font-headline font-bold text-sm">
               <span className="material-symbols-outlined text-[20px] text-blue-700 icon-fill">military_tech</span>
-              <span>Ready for promotion ({promotionQueue.length})</span>
+              <span>Promotion requests ({scopedPromotionQueue.length})</span>
             </div>
             <span className="text-xs font-bold bg-blue-100/80 text-blue-900 px-2.5 py-0.5 rounded-full">
-              Action Required by Group Pastor
+              {isChurchAdmin ? 'Waiting for the group pastor' : 'Your approval needed'}
             </span>
           </div>
 
           <p className="text-xs text-blue-800/90 font-body">
-            The growth engine auto-flagged these leaders for promotion because their downstream Bible study classes and cell members exceeded target thresholds.
+            {isChurchAdmin
+              ? 'These people have been put forward for a leader role. Nothing changes until the group pastor approves.'
+              : 'Approve or turn down each request. Only you can grant a leader role.'}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {promotionQueue.map(item => (
+            {scopedPromotionQueue.map(item => (
               <div key={item.id} className="bg-white p-4 rounded-2xl border border-blue-100 shadow-sm space-y-3">
                 <div className="flex justify-between items-start">
                   <div>
@@ -136,13 +140,25 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
 
                 <div className="flex items-center justify-between pt-1">
                   <span className="text-xs text-slate-400">Flagged: {item.flaggedAt}</span>
-                  <button
-                    onClick={() => onConfirmPromotion(item.id)}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all shadow-xs flex items-center gap-1 cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-[14px]">check</span>
-                    <span>Confirm Promotion</span>
-                  </button>
+                  {isChurchAdmin ? (
+                    <span className="text-xs font-bold text-blue-800 bg-blue-50 px-2.5 py-1 rounded-lg">Pending approval</span>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => onDeclinePromotion?.(item.id)}
+                        className="border border-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-slate-50 cursor-pointer"
+                      >
+                        Turn down
+                      </button>
+                      <button
+                        onClick={() => onConfirmPromotion(item.id)}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all shadow-xs flex items-center gap-1 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">check</span>
+                        <span>Approve</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
