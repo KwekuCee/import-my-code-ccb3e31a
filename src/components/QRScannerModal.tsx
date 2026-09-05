@@ -130,9 +130,85 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     }
   };
 
+  // Reads the member ID out of a scanned pass. The passes this app creates hold
+  // a small block of details; plain member IDs and short links also work.
+  const extractMemberId = (raw: string): string | null => {
+    const value = (raw || '').trim();
+    if (!value) return null;
+    try {
+      const parsed = JSON.parse(value);
+      if (parsed && typeof parsed === 'object') {
+        const id = parsed.id || parsed.memberId || parsed.member_id;
+        if (id) return String(id).trim();
+      }
+    } catch {
+      // not a details block — fall through
+    }
+    const urlMatch = value.match(/[?&](?:id|member|memberId)=([^&\s]+)/i);
+    if (urlMatch) return decodeURIComponent(urlMatch[1]).trim();
+    const idMatch = value.match(/\b([A-Za-z]{2,4}-\d{2,6})\b/);
+    if (idMatch) return idMatch[1];
+    if (value.length <= 40 && !value.includes('\n')) return value;
+    return null;
+  };
+
+  const handleScannedValue = useCallback((raw: string) => {
+    const memberId = extractMemberId(raw);
+    if (!memberId) {
+      setScannerState('error');
+      toast.showError('Pass not readable', 'That code does not hold a member ID.');
+      return;
+    }
+    handleSimulateScan(memberId);
+  }, [members, attendance, serviceType, user?.church]);
+
+  handleCodeRef.current = handleScannedValue;
+
+  // Continuously look for a pass in the camera picture while scanning
+  useEffect(() => {
+    if (!useRealCamera || scannerState !== 'scanning') return;
+    let frame = 0;
+    scanLockRef.current = false;
+
+    const tick = () => {
+      const video = videoRef.current;
+      if (video && video.readyState === video.HAVE_ENOUGH_DATA && !scanLockRef.current) {
+        const canvas = canvasRef.current || (canvasRef.current = document.createElement('canvas'));
+        const w = video.videoWidth;
+        const h = video.videoHeight;
+        if (w && h) {
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d', { willReadFrequently: true } as any);
+          if (ctx) {
+            ctx.drawImage(video, 0, 0, w, h);
+            try {
+              const image = ctx.getImageData(0, 0, w, h);
+              const result = jsQR(image.data, image.width, image.height, { inversionAttempts: 'attemptBoth' });
+              if (result && result.data) {
+                scanLockRef.current = true;
+                handleCodeRef.current(result.data);
+                return;
+              }
+            } catch {
+              // ignore a bad frame and try the next one
+            }
+          }
+        }
+      }
+      frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [useRealCamera, scannerState]);
+
   const handleScanNext = () => {
+    scanLockRef.current = false;
     setScannerState('scanning');
   };
+
+
 
 
 
