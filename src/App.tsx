@@ -352,7 +352,7 @@ export default function App() {
 
     const newLog: AuditLogItem = {
       id: `log-${Date.now()}`,
-      action: `Self-registered Church Admin: ${newAdmin.adminName} for ${newAdmin.churchName} (${newAdmin.zone})`,
+      action: `Self-registered Church Admin: ${newAdmin.adminName} for ${newAdmin.churchName}`,
       timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
       icon: 'admin_panel_settings',
       user: 'Public Registration Gate (Security Code Verified)',
