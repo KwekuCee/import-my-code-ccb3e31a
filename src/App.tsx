@@ -22,14 +22,19 @@ import {
 import {
   fetchMembersFromSupabase,
   saveMemberToSupabase,
+  deleteMemberFromSupabase,
   fetchLeadersFromSupabase,
   saveLeaderToSupabase,
+  deleteLeaderFromSupabase,
   fetchAttendanceFromSupabase,
   saveAttendanceToSupabase,
+  deleteAttendanceFromSupabase,
   fetchChurchesFromSupabase,
   saveChurchToSupabase,
+  deleteChurchFromSupabase,
   fetchChurchAdminsFromSupabase,
   saveChurchAdminToSupabase,
+  deleteChurchAdminFromSupabase,
   fetchAuditLogsFromSupabase,
   saveAuditLogToSupabase,
   fetchSuperadminProfileFromSupabase,
@@ -38,6 +43,7 @@ import {
   clearStoredSession,
   signOutFromSupabase
 } from './lib/supabaseService';
+
 
 import { Sidebar } from './components/Sidebar';
 import { TopHeader } from './components/TopHeader';
@@ -379,7 +385,102 @@ export default function App() {
     toast.showSuccess('New Church Branch Created!', `${church.name} added under Pastor ${church.pastor}.`);
   };
 
+  // ---------------------------------------------------------------------------
+  // UPDATE & DELETE HANDLERS (full CRUD across all directories)
+  // ---------------------------------------------------------------------------
+  const pushLog = (action: string, icon: string, category: AuditLogItem['category'], church?: string) => {
+    const newLog: AuditLogItem = {
+      id: `log-${Date.now()}`,
+      action,
+      timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
+      icon,
+      user: user.name || 'Admin',
+      church,
+      category
+    };
+    setAuditLogs(prev => [newLog, ...prev]);
+    saveAuditLogToSupabase(newLog);
+  };
+
+  const handleUpdateMember = (updated: Member) => {
+    setMembers(prev => prev.map(m => (m.id === updated.id ? updated : m)));
+    saveMemberToSupabase(updated);
+    pushLog(`Updated member record: ${updated.fullName} (${updated.id})`, 'edit', 'Member', updated.church);
+    toast.showSuccess('Member Updated', `${updated.fullName}'s details were saved.`);
+  };
+
+  const handleDeleteMember = (memberId: string) => {
+    const target = members.find(m => m.id === memberId);
+    setMembers(prev => prev.filter(m => m.id !== memberId));
+    setAttendanceRecords(prev => prev.filter(r => r.memberId !== memberId));
+    deleteMemberFromSupabase(memberId);
+    pushLog(`Deleted member record: ${target?.fullName || memberId}`, 'person_remove', 'Member', target?.church);
+    toast.showWarning('Member Deleted', `${target?.fullName || memberId} was removed from the database.`);
+  };
+
+  const handleUpdateLeader = (updated: Leader) => {
+    setLeaders(prev => prev.map(l => (l.id === updated.id ? updated : l)));
+    saveLeaderToSupabase(updated);
+    pushLog(`Updated leader record: ${updated.fullName} (${updated.leaderType})`, 'edit', 'Leader', updated.church);
+    toast.showSuccess('Leader Updated', `${updated.fullName}'s details were saved.`);
+  };
+
+  const handleDeleteLeader = (leaderId: string) => {
+    const target = leaders.find(l => l.id === leaderId);
+    setLeaders(prev => prev.filter(l => l.id !== leaderId));
+    setPromotionQueue(prev => prev.filter(p => p.leaderId !== leaderId));
+    deleteLeaderFromSupabase(leaderId);
+    pushLog(`Deleted leader: ${target?.fullName || leaderId}`, 'person_remove', 'Leader', target?.church);
+    toast.showWarning('Leader Deleted', `${target?.fullName || leaderId} was removed from the hierarchy.`);
+  };
+
+  const handleUpdateChurch = (updated: ChurchBranch) => {
+    setChurches(prev => prev.map(c => (c.id === updated.id ? updated : c)));
+    saveChurchToSupabase(updated);
+    pushLog(`Updated church branch: ${updated.name} (${updated.pastor})`, 'edit_location_alt', 'System', updated.name);
+    toast.showSuccess('Branch Updated', `${updated.name} details were saved.`);
+  };
+
+  const handleDeleteChurch = (churchId: string) => {
+    const target = churches.find(c => c.id === churchId);
+    setChurches(prev => prev.filter(c => c.id !== churchId));
+    deleteChurchFromSupabase(churchId);
+    pushLog(`Deleted church branch: ${target?.name || churchId}`, 'domain_disabled', 'System', target?.name);
+    toast.showWarning('Branch Deleted', `${target?.name || churchId} was removed.`);
+  };
+
+  const handleUpdateChurchAdmin = (updated: ChurchAdminAccount) => {
+    setChurchAdmins(prev => prev.map(a => (a.id === updated.id ? updated : a)));
+    saveChurchAdminToSupabase(updated);
+    pushLog(`Updated church admin account: ${updated.adminName} (${updated.churchName})`, 'manage_accounts', 'System', updated.churchName);
+    toast.showSuccess('Admin Updated', `${updated.adminName}'s account was saved.`);
+  };
+
+  const handleDeleteChurchAdmin = (adminId: string) => {
+    const target = churchAdmins.find(a => a.id === adminId);
+    setChurchAdmins(prev => prev.filter(a => a.id !== adminId));
+    if (target?.adminEmail) deleteChurchAdminFromSupabase(target.adminEmail);
+    pushLog(`Deleted church admin account: ${target?.adminName || adminId}`, 'person_off', 'Security', target?.churchName);
+    toast.showWarning('Admin Deleted', `${target?.adminName || adminId} no longer has portal access.`);
+  };
+
+  const handleUpdateAttendance = (updated: AttendanceRecord) => {
+    setAttendanceRecords(prev => prev.map(r => (r.id === updated.id ? updated : r)));
+    saveAttendanceToSupabase(updated);
+    pushLog(`Updated attendance entry for ${updated.memberName} (${updated.serviceType})`, 'edit_calendar', 'Check-in', updated.church);
+    toast.showSuccess('Attendance Updated', `${updated.memberName}'s entry was saved.`);
+  };
+
+  const handleDeleteAttendance = (recordId: string) => {
+    const target = attendanceRecords.find(r => r.id === recordId);
+    setAttendanceRecords(prev => prev.filter(r => r.id !== recordId));
+    deleteAttendanceFromSupabase(recordId);
+    pushLog(`Deleted attendance entry for ${target?.memberName || recordId}`, 'event_busy', 'Check-in', target?.church);
+    toast.showWarning('Attendance Entry Deleted', `${target?.memberName || recordId}'s check-in was removed.`);
+  };
+
   const handleLogout = () => {
+
     clearStoredSession();
     signOutFromSupabase();
     setIsLoggedIn(false);
@@ -522,6 +623,10 @@ export default function App() {
                   onNavigate={setCurrentView}
                   onOpenAnnouncement={() => setShowAnnouncementModal(true)}
                   onAddChurch={handleAddChurch}
+                  onUpdateChurch={handleUpdateChurch}
+                  onDeleteChurch={handleDeleteChurch}
+                  onUpdateChurchAdmin={handleUpdateChurchAdmin}
+                  onDeleteChurchAdmin={handleDeleteChurchAdmin}
                 />
               )}
 
@@ -529,6 +634,8 @@ export default function App() {
                 <ChurchAdminsDirectory
                   churchAdmins={churchAdmins}
                   onNavigate={setCurrentView}
+                  onUpdateChurchAdmin={handleUpdateChurchAdmin}
+                  onDeleteChurchAdmin={handleDeleteChurchAdmin}
                 />
               )}
 
@@ -537,8 +644,11 @@ export default function App() {
                   leaders={leaders}
                   promotionQueue={promotionQueue}
                   user={user}
+                  churches={churches}
                   onConfirmPromotion={handleConfirmPromotion}
                   onNavigate={setCurrentView}
+                  onUpdateLeader={handleUpdateLeader}
+                  onDeleteLeader={handleDeleteLeader}
                 />
               )}
 
@@ -557,8 +667,11 @@ export default function App() {
                 <MemberDatabase
                   members={members}
                   user={user}
+                  churches={churches}
                   onNavigate={setCurrentView}
                   onSelectMemberForCard={setSelectedMemberForCard}
+                  onUpdateMember={handleUpdateMember}
+                  onDeleteMember={handleDeleteMember}
                 />
               )}
 
@@ -577,10 +690,14 @@ export default function App() {
                 <AttendanceView
                   attendanceRecords={attendanceRecords}
                   user={user}
+                  serviceTypes={serviceTypes}
                   onNavigate={setCurrentView}
+                  onUpdateAttendance={handleUpdateAttendance}
+                  onDeleteAttendance={handleDeleteAttendance}
                   onClearTodayAttendance={() => setAttendanceRecords(prev => prev.filter(r => r.date && r.date !== new Date().toISOString().slice(0, 10)))}
                 />
               )}
+
 
               {currentView === 'qr_scanner' && user?.role !== 'Superadmin' && (
                 <QRScannerModal
