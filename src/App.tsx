@@ -721,6 +721,9 @@ export default function App() {
                   attendanceRecords={attendanceRecords}
                   user={user}
                   churches={churches}
+                  members={members}
+                  leaders={leaders}
+                  onConfirmAttendance={handleConfirmAttendance}
                   serviceTypes={serviceTypes}
                   onNavigate={setCurrentView}
                   onUpdateAttendance={handleUpdateAttendance}
