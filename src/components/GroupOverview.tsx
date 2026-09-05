@@ -125,7 +125,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
       {/* Header & Main Actions */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full mb-1">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full mb-1">
             <span className="material-symbols-outlined text-[14px]">account_tree</span>
             GCYC Network Structure
           </div>
@@ -150,7 +150,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
             onClick={onOpenAnnouncement}
             className="bg-slate-900 text-white hover:bg-slate-800 font-bold text-xs py-2.5 px-4 rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-sm"
           >
-            <span className="material-symbols-outlined text-[18px] text-amber-400 icon-fill">campaign</span>
+            <span className="material-symbols-outlined text-[18px] text-blue-500 icon-fill">campaign</span>
             <span>Group Broadcast</span>
           </button>
         </div>
@@ -277,8 +277,8 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                             </span>
                           )}
                           {church.status === 'Review' && (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-900 text-xs font-bold border border-amber-200">
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-900 text-xs font-bold border border-blue-100">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
                               <span>Review</span>
                             </span>
                           )}
@@ -555,8 +555,8 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
             </div>
 
             {/* Security Code */}
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-1">
-              <label className="block text-xs font-black text-amber-900 uppercase">
+            <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl space-y-1">
+              <label className="block text-xs font-black text-blue-900 uppercase">
                 Auth Code Required *
               </label>
               <input
@@ -565,7 +565,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                 value={authCode}
                 onChange={e => setAuthCode(e.target.value)}
                 placeholder="Enter Security Code"
-                className="w-full border border-amber-300 rounded-lg p-2 text-xs bg-white font-bold tracking-wider text-amber-950 outline-none focus:border-amber-500"
+                className="w-full border border-blue-300 rounded-lg p-2 text-xs bg-white font-bold tracking-wider text-blue-900 outline-none focus:border-blue-600"
               />
             </div>
 

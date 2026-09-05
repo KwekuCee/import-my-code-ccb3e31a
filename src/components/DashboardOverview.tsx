@@ -245,8 +245,8 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
       {/* Toast Notification Banner */}
       {toastMsg && (
-        <div className="fixed top-20 right-6 z-50 bg-slate-900 text-amber-300 border border-amber-400/40 px-4 py-3 rounded-2xl shadow-sm flex items-center gap-2 text-xs animate-in fade-in slide-in-from-top-4">
-          <span className="material-symbols-outlined text-amber-400 text-[20px]">notifications_active</span>
+        <div className="fixed top-20 right-6 z-50 bg-slate-900 text-blue-300 border border-blue-500/40 px-4 py-3 rounded-2xl shadow-sm flex items-center gap-2 text-xs animate-in fade-in slide-in-from-top-4">
+          <span className="material-symbols-outlined text-blue-500 text-[20px]">notifications_active</span>
           <span>{toastMsg}</span>
         </div>
       )}
@@ -263,7 +263,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 bg-white/20 text-white text-xs font-extrabold px-3.5 py-1 rounded-full border border-white/30 backdrop-blur-xs">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                  <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
                   SUPERADMIN COMMAND HQ • GCYC GROUP PASTOR
                 </div>
                 <h1 className="font-display text-2xl md:text-3xl font-extrabold tracking-tight text-white">
@@ -291,13 +291,13 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-sm transition-all">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-500 ">Group Total Members</span>
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
                   <span className="material-symbols-outlined text-[20px]">groups</span>
                 </div>
               </div>
               <div className="mt-3 flex items-baseline justify-between">
                 <span className="font-display text-3xl font-extrabold text-slate-900">{members.length}</span>
-                <span className="inline-flex items-center text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">{churches.length} Branches</span>
+                <span className="inline-flex items-center text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">{churches.length} Branches</span>
               </div>
               <p className="text-xs text-slate-400 mt-1">Total registered members across all branches</p>
             </div>
@@ -359,7 +359,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 const chMembers = members.filter(m => m.church === ch.name || m.location === ch.name);
                 const chLeaders = leaders.filter(l => l.church === ch.name);
                 return (
-                  <div key={ch.id} className="border border-slate-200 rounded-2xl p-4 space-y-3 hover:border-amber-400/60 transition-all bg-slate-50/50">
+                  <div key={ch.id} className="border border-slate-200 rounded-2xl p-4 space-y-3 hover:border-blue-500/60 transition-all bg-slate-50/50">
                     <div className="flex justify-between items-start">
                       <div>
                         <h4 className="font-bold text-sm text-slate-900">{ch.name}</h4>
@@ -479,7 +479,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 <h1 className="font-display text-2xl md:text-3xl font-extrabold tracking-tight text-white">
                   Welcome, {user.name}
                 </h1>
-                <p className="text-amber-300 text-xs font-extrabold flex items-center gap-1.5 pt-0.5">
+                <p className="text-blue-300 text-xs font-extrabold flex items-center gap-1.5 pt-0.5">
                   <span className="material-symbols-outlined text-[16px]">person</span>
                   <span>Branch Pastor: {currentBranchPastor}</span>
                 </p>
@@ -491,7 +491,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <div className="flex flex-wrap items-center gap-3 shrink-0">
                 <button
                   onClick={() => onNavigate('qr_scanner')}
-                  className="flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer"
+                  className="flex items-center gap-2 bg-blue-500 hover:bg-blue-300 text-slate-950 font-black text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[18px]">qr_code_scanner</span>
                   <span>Launch QR Scanner</span>
@@ -518,11 +518,11 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
           {/* 2. Group Pastor Broadcast Announcement Banner (Received by Church Admin) */}
           {groupAnnouncements.length > 0 && (
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex items-start gap-3">
-              <span className="material-symbols-outlined text-amber-500 text-[24px] shrink-0 mt-0.5">campaign</span>
+            <div className="bg-blue-600/10 border border-blue-600/30 rounded-2xl p-4 flex items-start gap-3">
+              <span className="material-symbols-outlined text-blue-600 text-[24px] shrink-0 mt-0.5">campaign</span>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold bg-amber-400 text-slate-950 px-2 py-0.5 rounded">
+                  <span className="text-xs font-bold bg-blue-500 text-slate-950 px-2 py-0.5 rounded">
                     ANNOUNCEMENT FROM GROUP PASTOR HQ
                   </span>
                   <span className="text-xs text-slate-500">{groupAnnouncements[0].date}</span>
@@ -577,13 +577,13 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-sm transition-all">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-500 ">This Week's Members</span>
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
                   <span className="material-symbols-outlined text-[20px]">person_add_alt</span>
                 </div>
               </div>
               <div className="mt-3 flex items-baseline justify-between">
                 <span className="font-display text-3xl font-extrabold text-slate-900">+{thisWeekNewMembers.length}</span>
-                <span className="inline-flex items-center text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">1st Time Check-in</span>
+                <span className="inline-flex items-center text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">1st Time Check-in</span>
               </div>
               <p className="text-xs text-slate-400 mt-1">Recorded attendance for the 1st time</p>
             </div>
@@ -615,14 +615,14 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                 <div>
                   <h3 className="font-headline font-bold text-sm text-slate-900 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-amber-600 text-[18px]">badge</span>
+                    <span className="material-symbols-outlined text-blue-700 text-[18px]">badge</span>
                     <span>PCF Leaders Roster ({pcfLeaders.length})</span>
                   </h3>
                   <p className="text-xs text-slate-500">Registered PCF pastoral tier in {currentChurchName}</p>
                 </div>
                 <button
                   onClick={() => onNavigate('leaders')}
-                  className="text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/60 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                  className="text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-100/60 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
                 >
                   Manage PCFs →
                 </button>
@@ -634,17 +634,17 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                     <div key={ldr.id} className="pt-2.5 pb-2.5 px-3 rounded-xl bg-slate-50/60 hover:bg-slate-50 border border-slate-100/80 transition-all space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 font-display font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">
+                          <div className="w-9 h-9 rounded-xl bg-blue-600 text-slate-950 font-display font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">
                             {ldr.initials || (ldr.fullName ? ldr.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'LD')}
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
                               <p className="font-bold text-xs text-slate-900">{ldr.fullName}</p>
-                              <span className="text-[9px] bg-amber-100 text-amber-900 px-1.5 py-0.2 rounded font-extrabold">
+                              <span className="text-[9px] bg-blue-100 text-blue-900 px-1.5 py-0.2 rounded font-extrabold">
                                 {ldr.id}
                               </span>
                             </div>
-                            <p className="text-xs font-semibold text-amber-700">{ldr.cellOrPcfName}</p>
+                            <p className="text-xs font-semibold text-blue-700">{ldr.cellOrPcfName}</p>
                           </div>
                         </div>
                         <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${ldr.isAppointed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-slate-100 text-slate-700'
@@ -749,7 +749,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
               <h3 className="font-headline font-bold text-base text-slate-900 flex items-center gap-2">
-                <span className="material-symbols-outlined text-amber-600 text-[20px]">groups_3</span>
+                <span className="material-symbols-outlined text-blue-700 text-[20px]">groups_3</span>
                 <span>Attendance Per Leader</span>
               </h3>
               <div className="flex gap-2">
@@ -771,7 +771,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                       <p className="text-xs text-slate-500 mt-0.5">PCF / Cell: {row.pcfName}</p>
                       <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-2">
                         <div
-                          className="bg-amber-500 h-full rounded-full transition-all duration-500"
+                          className="bg-blue-600 h-full rounded-full transition-all duration-500"
                           style={{ width: `${totalAttendance > 0 ? Math.round((row.total / totalAttendance) * 100) : 0}%` }}
                         />
                       </div>
@@ -858,7 +858,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                               <span>QR Code Scan</span>
                             </span>
                           ) : isSignupForm ? (
-                            <span className="inline-flex items-center gap-1 text-xs text-amber-800 bg-amber-50 border border-amber-200/60 rounded-md px-2 py-0.5 font-bold">
+                            <span className="inline-flex items-center gap-1 text-xs text-blue-800 bg-blue-50 border border-blue-100/60 rounded-md px-2 py-0.5 font-bold">
                               <span className="material-symbols-outlined text-[13px]">assignment_turned_in</span>
                               <span>First Signup Form</span>
                             </span>
@@ -1007,13 +1007,13 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                       <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5">
                         <div className="flex justify-between text-xs text-slate-700">
                           <span className="flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <span className="w-2 h-2 rounded-full bg-blue-600"></span>
                             Late Arrival (&gt; 8:45 AM)
                           </span>
-                          <span className="font-bold text-amber-600">{latePercent}% ({lateArrivalCount} {lateArrivalCount === 1 ? 'attendee' : 'attendees'})</span>
+                          <span className="font-bold text-blue-700">{latePercent}% ({lateArrivalCount} {lateArrivalCount === 1 ? 'attendee' : 'attendees'})</span>
                         </div>
                         <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                          <div className="bg-amber-500 h-full rounded-full transition-all duration-500" style={{ width: `${latePercent}%` }}></div>
+                          <div className="bg-blue-600 h-full rounded-full transition-all duration-500" style={{ width: `${latePercent}%` }}></div>
                         </div>
                       </div>
                     </div>
@@ -1093,7 +1093,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                         <span className="text-slate-400 block">First-Timer Follow-up:</span>
                         <span className="font-bold text-slate-900 text-xs">{thisWeekNewMembers.length} In Active Follow-up</span>
                         <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                          <div className="bg-amber-500 h-full rounded-full" style={{ width: `${totalBranchMembers > 0 ? (thisWeekNewMembers.length / totalBranchMembers) * 100 : 0}%` }}></div>
+                          <div className="bg-blue-600 h-full rounded-full" style={{ width: `${totalBranchMembers > 0 ? (thisWeekNewMembers.length / totalBranchMembers) * 100 : 0}%` }}></div>
                         </div>
                       </div>
                     </div>
@@ -1159,7 +1159,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                   placeholder="e.g. Mandatory Attendance Audit for Global Communion Service"
                   value={broadcastTitle}
                   onChange={(e) => setBroadcastTitle(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs outline-none focus:border-amber-500 font-semibold"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs outline-none focus:border-blue-600 font-semibold"
                 />
               </div>
 
@@ -1173,7 +1173,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                   placeholder="Enter detailed directives for all 5 Church Admins..."
                   value={broadcastMessage}
                   onChange={(e) => setBroadcastMessage(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs outline-none focus:border-amber-500 font-body"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs outline-none focus:border-blue-600 font-body"
                 />
               </div>
 
@@ -1187,7 +1187,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-xl text-xs shadow-sm cursor-pointer"
+                  className="px-5 py-2 bg-blue-500 hover:bg-blue-300 text-slate-950 font-black rounded-xl text-xs shadow-sm cursor-pointer"
                 >
                   Post Group Broadcast
                 </button>

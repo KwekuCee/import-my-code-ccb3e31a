@@ -35,9 +35,9 @@ export const MemberCardModal: React.FC<MemberCardModalProps> = ({ member, onClos
       >
 
         {/* Header Badge */}
-        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white p-4 px-5 flex justify-between items-center border-b border-slate-800">
+        <div className="bg-blue-700 text-white p-4 px-5 flex justify-between items-center border-b border-slate-800">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-amber-400 text-[20px]">badge</span>
+            <span className="material-symbols-outlined text-blue-500 text-[20px]">badge</span>
             <span className="font-headline font-bold text-xs tracking-wider uppercase text-slate-100">GCYC Member ID</span>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer">
@@ -50,10 +50,10 @@ export const MemberCardModal: React.FC<MemberCardModalProps> = ({ member, onClos
 
           {/* Avatar & Role Badge */}
           <div className="relative inline-block">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 font-display font-extrabold text-2xl flex items-center justify-center mx-auto border-4 border-white shadow-lg">
+            <div className="w-20 h-20 rounded-2xl bg-blue-700 text-slate-950 font-display font-extrabold text-2xl flex items-center justify-center mx-auto border-4 border-white shadow-lg">
               {memberInitials}
             </div>
-            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-slate-950 text-amber-300 text-[9px] font-bold px-2.5 py-0.5 rounded-full border border-amber-400/30 whitespace-nowrap shadow-xs">
+            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-slate-950 text-blue-300 text-[9px] font-bold px-2.5 py-0.5 rounded-full border border-blue-500/30 whitespace-nowrap shadow-xs">
               {member.role || 'Member'}
             </span>
           </div>
@@ -94,7 +94,7 @@ export const MemberCardModal: React.FC<MemberCardModalProps> = ({ member, onClos
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-400 text-xs">FOUNDATION SCHOOL</span>
-              <span className="font-bold text-amber-700 text-xs text-right max-w-[200px]">
+              <span className="font-bold text-blue-700 text-xs text-right max-w-[200px]">
                 {getFoundationClassLabel(member.foundationClass)}
               </span>
             </div>

@@ -176,7 +176,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             className="hidden lg:flex items-center gap-1.5 text-xs font-semibold text-slate-800 bg-slate-100 hover:bg-slate-200/80 px-3 py-1.5 rounded-xl border border-slate-200 transition-colors cursor-pointer"
             title="Send Announcement"
           >
-            <span className="material-symbols-outlined text-[16px] text-amber-600 icon-fill">campaign</span>
+            <span className="material-symbols-outlined text-[16px] text-blue-700 icon-fill">campaign</span>
             <span>Broadcast</span>
           </button>
         )}

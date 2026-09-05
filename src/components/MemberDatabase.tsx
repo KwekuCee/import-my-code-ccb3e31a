@@ -286,7 +286,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
           {/* Export CSV Button */}
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-xs rounded-xl transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-100 font-bold text-xs rounded-xl transition-all cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
             <span>Export CSV</span>
@@ -407,7 +407,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                           </div>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             {member.role === 'Leader' && (
-                              <span className="bg-amber-100 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-md border border-amber-200">
+                              <span className="bg-blue-100 text-blue-900 text-xs font-bold px-2 py-0.5 rounded-md border border-blue-100">
                                 Leader
                               </span>
                             )}

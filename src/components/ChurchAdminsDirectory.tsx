@@ -71,7 +71,7 @@ export const ChurchAdminsDirectory: React.FC<ChurchAdminsDirectoryProps> = ({
         </div>
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
           <p className="text-xs font-bold text-slate-500 ">Pending Verification</p>
-          <p className="font-display text-2xl font-extrabold text-amber-600 mt-2">
+          <p className="font-display text-2xl font-extrabold text-blue-700 mt-2">
             {churchAdmins.filter(a => a.status === 'Pending Verification').length}
           </p>
         </div>
@@ -133,7 +133,7 @@ export const ChurchAdminsDirectory: React.FC<ChurchAdminsDirectoryProps> = ({
                   className={`text-xs font-bold px-2.5 py-1 rounded-full ${
                     admin.status === 'Active'
                       ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                      : 'bg-amber-100 text-amber-700 border border-amber-200'
+                      : 'bg-blue-100 text-blue-700 border border-blue-100'
                   }`}
                 >
                   {admin.status}

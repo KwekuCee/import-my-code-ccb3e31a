@@ -90,7 +90,7 @@ export const DatabaseSchemaView: React.FC<DatabaseSchemaViewProps> = () => {
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
           <h3 className="font-headline font-bold text-lg text-slate-900">Multi-Tenancy Security Model</h3>
           <p className="text-xs text-slate-600 leading-relaxed font-body">
-            Row Level Security (RLS) is enforced directly at the database level using Supabase custom JWT claims (<code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700">church_id</code> and <code className="bg-slate-100 px-1.5 py-0.5 rounded text-amber-700">is_superadmin</code>).
+            Row Level Security (RLS) is enforced directly at the database level using Supabase custom JWT claims (<code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700">church_id</code> and <code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700">is_superadmin</code>).
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -104,7 +104,7 @@ export const DatabaseSchemaView: React.FC<DatabaseSchemaViewProps> = () => {
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
               <h4 className="font-headline font-bold text-sm text-slate-900">Group Pastor Superadmin Privilege</h4>
               <p className="text-xs text-slate-600">
-                The Group Pastor account bypasses single-church filters via <code className="text-amber-700">is_superadmin = true</code> or username <code className="text-amber-700">group.pastor</code>, granting instant access to all network databases, audit trails, and backup logs.
+                The Group Pastor account bypasses single-church filters via <code className="text-blue-700">is_superadmin = true</code> or username <code className="text-blue-700">group.pastor</code>, granting instant access to all network databases, audit trails, and backup logs.
               </p>
             </div>
           </div>

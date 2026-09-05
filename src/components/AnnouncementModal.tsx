@@ -58,9 +58,9 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, o
         className="bg-white/90 backdrop-blur-2xl rounded-2xl max-w-md w-full border border-white/60 shadow-sm overflow-hidden"
       >
 
-        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white p-5 flex justify-between items-center border-b border-slate-800">
+        <div className="bg-blue-700 text-white p-5 flex justify-between items-center border-b border-slate-800">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-amber-400 icon-fill text-[20px]">campaign</span>
+            <span className="material-symbols-outlined text-blue-500 icon-fill text-[20px]">campaign</span>
             <span className="font-headline font-bold text-sm tracking-wide">Group Broadcast Message</span>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">

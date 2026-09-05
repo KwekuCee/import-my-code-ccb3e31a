@@ -194,7 +194,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
         <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-1">
           <p className="text-xs font-bold text-slate-400 ">Gender Balance</p>
           <div className="font-display text-3xl font-extrabold text-slate-900">{maleCount}M : {femaleCount}F</div>
-          <p className="text-xs text-amber-600 font-semibold">Real branch demographic census</p>
+          <p className="text-xs text-blue-700 font-semibold">Real branch demographic census</p>
         </div>
 
         <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-1">
@@ -287,10 +287,10 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-amber-500 icon-fill text-[22px]">cake</span>
+                <span className="material-symbols-outlined text-blue-600 icon-fill text-[22px]">cake</span>
                 <h3 className="font-headline font-bold text-base text-slate-900">Upcoming Birthdays</h3>
               </div>
-              <span className="text-xs bg-amber-50 text-amber-800 font-bold px-2 py-0.5 rounded-full border border-amber-200">
+              <span className="text-xs bg-blue-50 text-blue-800 font-bold px-2 py-0.5 rounded-full border border-blue-100">
                 Celebrations
               </span>
             </div>
@@ -304,7 +304,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                     <div key={m.id} className="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex justify-between items-center">
                       <div>
                         <p className="font-headline font-bold text-xs text-slate-900">{m.fullName}</p>
-                        <p className="text-xs text-amber-800 font-bold mt-0.5">
+                        <p className="text-xs text-blue-800 font-bold mt-0.5">
                           {birthdayLabel} • <span className="text-slate-500 font-normal">{m.church}</span>
                         </p>
                       </div>

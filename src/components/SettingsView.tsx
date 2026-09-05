@@ -478,20 +478,20 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed top-20 right-6 z-50 bg-slate-900 text-amber-300 border border-amber-400/40 px-4 py-3 rounded-2xl shadow-sm flex items-center gap-2 text-xs"
+          className="fixed top-20 right-6 z-50 bg-slate-900 text-blue-300 border border-blue-500/40 px-4 py-3 rounded-2xl shadow-sm flex items-center gap-2 text-xs"
         >
-          <span className="material-symbols-outlined text-amber-400 text-[20px]">check_circle</span>
+          <span className="material-symbols-outlined text-blue-500 text-[20px]">check_circle</span>
           <span>{toastMessage}</span>
         </motion.div>
       )}
 
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-6 md:p-8 rounded-2xl text-white shadow-sm border border-slate-800 relative overflow-hidden backdrop-blur-xl">
-        <div className="absolute right-0 top-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+      <div className="bg-blue-700 p-6 md:p-8 rounded-2xl text-white shadow-sm border border-slate-800 relative overflow-hidden backdrop-blur-xl">
+        <div className="absolute right-0 top-0 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-300 text-xs font-extrabold px-3 py-1 rounded-full border border-amber-500/30">
+            <div className="inline-flex items-center gap-2 bg-blue-600/20 text-blue-300 text-xs font-extrabold px-3 py-1 rounded-full border border-blue-600/30">
               <span className="material-symbols-outlined text-[16px]">settings</span>
               <span>{isSuperadmin ? 'SUPERADMIN HQ CONTROL CENTER' : 'LOCAL BRANCH CONTROL CENTER'}</span>
             </div>
@@ -506,7 +506,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <div className="flex items-center gap-3">
             <button
               onClick={handleSaveSettings}
-              className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs py-2.5 px-5 rounded-xl shadow-lg shadow-amber-400/20 transition-all flex items-center gap-2 cursor-pointer shrink-0 active:scale-98"
+              className="bg-blue-500 hover:bg-blue-300 text-slate-950 font-black text-xs py-2.5 px-5 rounded-xl shadow-lg shadow-amber-400/20 transition-all flex items-center gap-2 cursor-pointer shrink-0 active:scale-98"
             >
               <span className="material-symbols-outlined text-[18px]">save</span>
               <span>Save All Settings</span>
@@ -534,7 +534,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <button
           onClick={() => setActiveTab('profile')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'profile'
-              ? 'bg-slate-900 text-amber-300 shadow-sm'
+              ? 'bg-slate-900 text-blue-300 shadow-sm'
               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
             }`}
         >
@@ -562,7 +562,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <button
             onClick={() => setActiveTab('services')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'services'
-                ? 'bg-slate-900 text-amber-300 shadow-sm'
+                ? 'bg-slate-900 text-blue-300 shadow-sm'
                 : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
               }`}
           >
@@ -574,7 +574,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <button
           onClick={() => setActiveTab('scanner')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'scanner'
-              ? 'bg-slate-900 text-amber-300 shadow-sm'
+              ? 'bg-slate-900 text-blue-300 shadow-sm'
               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
             }`}
         >
@@ -585,7 +585,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <button
           onClick={() => setActiveTab('security')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'security'
-              ? 'bg-slate-900 text-amber-300 shadow-sm'
+              ? 'bg-slate-900 text-blue-300 shadow-sm'
               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
             }`}
         >
@@ -596,7 +596,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <button
           onClick={() => setActiveTab('backup')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'backup'
-              ? 'bg-slate-900 text-amber-300 shadow-sm'
+              ? 'bg-slate-900 text-blue-300 shadow-sm'
               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
             }`}
         >
@@ -633,7 +633,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       : connStatus === 'error'
                         ? 'bg-rose-50 text-rose-800 border-rose-200'
                         : connStatus === 'testing'
-                          ? 'bg-amber-50 text-amber-800 border-amber-200'
+                          ? 'bg-blue-50 text-blue-800 border-blue-100'
                           : 'bg-slate-50 text-slate-700 border-slate-200'
                     }`}>
                     <span className={`w-2 h-2 rounded-full ${connStatus === 'success'
@@ -641,7 +641,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                         : connStatus === 'error'
                           ? 'bg-rose-500'
                           : connStatus === 'testing'
-                            ? 'bg-amber-500 animate-ping'
+                            ? 'bg-blue-600 animate-ping'
                             : 'bg-slate-400'
                       }`} />
                     <span>
@@ -766,8 +766,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 space-y-3 shadow-sm">
                 <div className="flex items-center justify-between text-white border-b border-slate-800 pb-3">
                   <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-amber-400 text-[20px]">database</span>
-                    <h4 className="text-xs font-bold text-amber-400">GCYC Supabase PostgreSQL Schema (DDL)</h4>
+                    <span className="material-symbols-outlined text-blue-500 text-[20px]">database</span>
+                    <h4 className="text-xs font-bold text-blue-500">GCYC Supabase PostgreSQL Schema (DDL)</h4>
                   </div>
                   <button
                     onClick={() => {
@@ -798,7 +798,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               /* SUPERADMIN: Unified Group Pastor & HQ Account Profile (GCYC Group Networks Form removed, Church Name field added) */
               <form onSubmit={handleSaveSuperadminProfile} className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm max-w-3xl">
                 <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold border border-amber-200">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold border border-blue-100">
                     <span className="material-symbols-outlined text-[26px]">admin_panel_settings</span>
                   </div>
                   <div>
@@ -820,7 +820,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={pastorName}
                       onChange={(e) => setPastorName(e.target.value)}
                       placeholder="e.g. Group Pastor"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -832,7 +832,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={hqEmail}
                       onChange={(e) => setHqEmail(e.target.value)}
                       placeholder="group.pastor@cekorlebu.org"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -844,7 +844,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={pastorPhone}
                       onChange={(e) => setPastorPhone(e.target.value)}
                       placeholder="+233 24 123 4567"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -856,7 +856,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       value={hqChurchName}
                       onChange={(e) => setHqChurchName(e.target.value)}
                       placeholder="e.g. GCYC Group HQ"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
@@ -884,7 +884,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <button
                     type="submit"
                     disabled={isSavingSuperadminProfile}
-                    className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs py-3 px-6 rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-98 cursor-pointer disabled:opacity-50"
+                    className="bg-blue-500 hover:bg-blue-300 text-slate-950 font-black text-xs py-3 px-6 rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-98 cursor-pointer disabled:opacity-50"
                   >
                     <span className="material-symbols-outlined text-[18px]">
                       {isSavingSuperadminProfile ? 'sync' : 'save'}
@@ -898,7 +898,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
                   <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
                       <span className="material-symbols-outlined text-[22px]">badge</span>
                     </div>
                     <div>
@@ -919,7 +919,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                         value={adminFullName}
                         onChange={(e) => setAdminFullName(e.target.value)}
                         placeholder="e.g. Bro. Michael Mensah"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-amber-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-blue-600"
                       />
                     </div>
 
@@ -930,7 +930,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                         value={adminEmail}
                         onChange={(e) => setAdminEmail(e.target.value)}
                         placeholder="admin@church.org"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-amber-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-blue-600"
                       />
                     </div>
 
@@ -941,7 +941,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                         value={adminPhone}
                         onChange={(e) => setAdminPhone(e.target.value)}
                         placeholder="+233 24 000 0000"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-amber-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-blue-600"
                       />
                     </div>
 
@@ -978,7 +978,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                         value={branchName}
                         onChange={(e) => setBranchName(e.target.value)}
                         placeholder="e.g. GCYC 1"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-amber-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-blue-600"
                       />
                     </div>
 
@@ -989,7 +989,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                         value={pastorInCharge}
                         onChange={(e) => setPastorInCharge(e.target.value)}
                         placeholder="e.g. Pastor Emmanuel"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-amber-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-blue-600"
                       />
                     </div>
 
@@ -1031,7 +1031,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 </h3>
                 <p className="text-xs text-slate-500">Service types saved to Supabase and displayed at the self check-in station</p>
               </div>
-              <span className="material-symbols-outlined text-amber-500 text-[24px]">tune</span>
+              <span className="material-symbols-outlined text-blue-600 text-[24px]">tune</span>
             </div>
 
             <form onSubmit={handleAddGlobalService} className="flex gap-2 max-w-xl">
@@ -1040,11 +1040,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 placeholder="Enter new global service name (e.g. Wednesday Communion Service)..."
                 value={newServiceName}
                 onChange={(e) => setNewServiceName(e.target.value)}
-                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-semibold outline-none focus:border-amber-500"
+                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-semibold outline-none focus:border-blue-600"
               />
               <button
                 type="submit"
-                className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs px-4 py-2 rounded-xl cursor-pointer shrink-0 active:scale-98"
+                className="bg-blue-500 hover:bg-blue-300 text-slate-950 font-extrabold text-xs px-4 py-2 rounded-xl cursor-pointer shrink-0 active:scale-98"
               >
                 Add & Save to Database
               </button>
@@ -1054,7 +1054,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               {globalServiceList.map((srv, idx) => (
                 <div key={idx} className="p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-amber-500 text-[18px]">event_available</span>
+                    <span className="material-symbols-outlined text-blue-600 text-[18px]">event_available</span>
                     <span className="font-bold text-xs text-slate-900">{srv}</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1095,7 +1095,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   type="checkbox"
                   checked={autoPassDownload}
                   onChange={(e) => setAutoPassDownload(e.target.checked)}
-                  className="w-4 h-4 text-amber-500 rounded cursor-pointer"
+                  className="w-4 h-4 text-blue-600 rounded cursor-pointer"
                 />
               </div>
 
@@ -1108,7 +1108,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   type="checkbox"
                   checked={scannerSound}
                   onChange={(e) => setScannerSound(e.target.checked)}
-                  className="w-4 h-4 text-amber-500 rounded cursor-pointer"
+                  className="w-4 h-4 text-blue-600 rounded cursor-pointer"
                 />
               </div>
 
@@ -1130,7 +1130,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     type="checkbox"
                     checked={autoPromoteFirstTimers}
                     onChange={(e) => setAutoPromoteFirstTimers(e.target.checked)}
-                    className="w-4 h-4 text-amber-500 rounded cursor-pointer"
+                    className="w-4 h-4 text-blue-600 rounded cursor-pointer"
                   />
                 </div>
               </div>
@@ -1143,12 +1143,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <div className="bg-slate-900 text-white rounded-2xl p-6 space-y-4 border border-slate-800 shadow-sm">
             <div className="flex justify-between items-center border-b border-slate-800 pb-3">
               <div>
-                <h3 className="font-headline font-bold text-base text-amber-300">
+                <h3 className="font-headline font-bold text-base text-blue-300">
                   Authentication Gate & Security Credentials
                 </h3>
                 <p className="text-xs text-slate-400">Security Gate Code required for leader and Church Admin signups</p>
               </div>
-              <span className="material-symbols-outlined text-amber-400 text-[24px]">lock</span>
+              <span className="material-symbols-outlined text-blue-500 text-[24px]">lock</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
@@ -1160,11 +1160,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     value={securityCode}
                     onChange={(e) => setSecurityCode(e.target.value.toUpperCase())}
                     placeholder="••••••••"
-                    className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 font-extrabold text-amber-300 tracking-wider text-sm outline-none focus:border-amber-400"
+                    className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 font-extrabold text-blue-300 tracking-wider text-sm outline-none focus:border-blue-500"
                   />
                   <button
                     onClick={() => triggerToast('Security Gate Code updated successfully')}
-                    className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-4 py-2 rounded-xl cursor-pointer"
+                    className="bg-blue-500 hover:bg-blue-300 text-slate-950 font-black px-4 py-2 rounded-xl cursor-pointer"
                   >
                     Update
                   </button>
@@ -1179,7 +1179,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <div className="space-y-1 text-xs text-slate-300">
                   <p className="flex justify-between"><span>• Church Admin Signup Gate:</span> <span className="text-emerald-400">Protected & Verified</span></p>
                   <p className="flex justify-between"><span>• Leader Self-Reg Gate:</span> <span className="text-emerald-400">Protected & Verified</span></p>
-                  <p className="flex justify-between"><span>• Active Auth Sessions:</span> <span className="text-amber-300">Encrypted JWT</span></p>
+                  <p className="flex justify-between"><span>• Active Auth Sessions:</span> <span className="text-blue-300">Encrypted JWT</span></p>
                 </div>
               </div>
             </div>
@@ -1318,7 +1318,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
                   <button
                     onClick={handleExportAuditCSV}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-xs rounded-xl transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-100 font-bold text-xs rounded-xl transition-all cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-[16px]">download</span>
                     <span>Export Audit CSV</span>
@@ -1532,7 +1532,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               {/* JSON Snapshot Backup Card */}
               <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
                 <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-                  <span className="material-symbols-outlined text-amber-500">inventory_2</span>
+                  <span className="material-symbols-outlined text-blue-600">inventory_2</span>
                   <span>Full System JSON Backup Snapshot</span>
                 </div>
                 <p className="text-xs text-slate-500">
@@ -1549,7 +1549,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     downloadAnchor.remove();
                     triggerToast('Exported backup snapshot JSON!');
                   }}
-                  className="bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs px-4 py-2.5 rounded-xl cursor-pointer active:scale-98"
+                  className="bg-slate-900 hover:bg-slate-800 text-blue-300 font-bold text-xs px-4 py-2.5 rounded-xl cursor-pointer active:scale-98"
                 >
                   Download JSON Backup
                 </button>

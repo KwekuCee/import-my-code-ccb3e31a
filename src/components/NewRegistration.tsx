@@ -201,7 +201,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
             </div>
             <div className="flex justify-between py-1">
               <span className="text-slate-500">Invited By:</span>
-              <span className="font-bold text-amber-700">{registeredMember.invitedBy}</span>
+              <span className="font-bold text-blue-700">{registeredMember.invitedBy}</span>
             </div>
           </div>
 
@@ -515,12 +515,12 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
                         className="p-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between border-b border-slate-100 last:border-none"
                       >
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-900 font-bold text-xs flex items-center justify-center">
+                          <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-900 font-bold text-xs flex items-center justify-center">
                             {ldr.initials || (ldr.fullName ? ldr.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'LD')}
                           </div>
                           <div>
                             <p className="text-xs font-bold text-slate-900">{ldr.fullName}</p>
-                            <p className="text-xs text-amber-700">{ldr.leaderType} • {ldr.cellOrPcfName}</p>
+                            <p className="text-xs text-blue-700">{ldr.leaderType} • {ldr.cellOrPcfName}</p>
                           </div>
                         </div>
                         <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">
@@ -537,7 +537,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
           {/* Authentication Code Gate */}
           <div className="p-4 bg-slate-900 text-white rounded-2xl space-y-2">
             <div className="flex justify-between items-center">
-              <label className="block text-xs font-bold text-amber-400 ">
+              <label className="block text-xs font-bold text-blue-500 ">
                 Authentication Code Required *
               </label>
               <span className="text-xs text-slate-400">Security Protected</span>
@@ -548,7 +548,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
               value={authCode}
               onChange={e => setAuthCode(e.target.value)}
               placeholder="Enter Security Code"
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-amber-300 font-bold tracking-widest outline-none focus:border-amber-400"
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-blue-300 font-bold tracking-widest outline-none focus:border-blue-500"
             />
             {authError && (
               <p className="text-xs text-rose-400 font-semibold">{authError}</p>

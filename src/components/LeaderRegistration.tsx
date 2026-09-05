@@ -121,7 +121,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
 
       {/* Header */}
       <div>
-        <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full mb-1 border border-amber-200">
+        <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full mb-1 border border-blue-100">
           <span className="material-symbols-outlined text-[14px]">military_tech</span>
           GCYC Hierarchy Entry
         </div>
@@ -134,26 +134,26 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
       </div>
 
       {/* Structural Hierarchy Guide Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-5 md:p-6 shadow-lg border border-slate-800 space-y-3">
-        <div className="flex items-center gap-2 text-amber-400 font-headline font-bold text-sm">
+      <div className="bg-blue-700 text-white rounded-2xl p-5 md:p-6 shadow-lg border border-slate-800 space-y-3">
+        <div className="flex items-center gap-2 text-blue-500 font-headline font-bold text-sm">
           <span className="material-symbols-outlined text-[20px]">account_tree</span>
           <span>Church Growth Hierarchy Pipeline</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
           <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-            <p className="text-amber-400 font-bold">1. BSCT</p>
+            <p className="text-blue-500 font-bold">1. BSCT</p>
             <p className="text-xs text-slate-400 mt-0.5">Graduate Foundation + 5 Converts</p>
           </div>
           <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-            <p className="text-amber-400 font-bold">2. Cell Leader</p>
+            <p className="text-blue-500 font-bold">2. Cell Leader</p>
             <p className="text-xs text-slate-400 mt-0.5">5 BSCTs (25 Members)</p>
           </div>
           <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-            <p className="text-amber-400 font-bold">3. PCF Leader</p>
+            <p className="text-blue-500 font-bold">3. PCF Leader</p>
             <p className="text-xs text-slate-400 mt-0.5">160+ Members Network</p>
           </div>
           <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-            <p className="text-amber-400 font-bold">4. Coordinator</p>
+            <p className="text-blue-500 font-bold">4. Coordinator</p>
             <p className="text-xs text-slate-400 mt-0.5">Supervises PCFs & Cells</p>
           </div>
         </div>
@@ -181,7 +181,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
             </div>
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Cell / PCF Name:</span>
-              <span className="font-bold text-amber-700">{createdLeader.cellOrPcfName}</span>
+              <span className="font-bold text-blue-700">{createdLeader.cellOrPcfName}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Contact:</span>
@@ -385,19 +385,19 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
           </div>
 
           {/* Appointed Leader Option */}
-          <div className="bg-amber-50/60 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
+          <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-4 flex items-start gap-3">
             <input
               id="isAppointed"
               type="checkbox"
               checked={isAppointed}
               onChange={e => setIsAppointed(e.target.checked)}
-              className="mt-0.5 w-4 h-4 text-amber-600 rounded cursor-pointer"
+              className="mt-0.5 w-4 h-4 text-blue-700 rounded cursor-pointer"
             />
             <div>
-              <label htmlFor="isAppointed" className="font-bold text-xs text-amber-900 cursor-pointer">
+              <label htmlFor="isAppointed" className="font-bold text-xs text-blue-900 cursor-pointer">
                 Appointed Directly (Bypassed Standard Growth Cycle)
               </label>
-              <p className="text-xs text-amber-700/80 mt-0.5">
+              <p className="text-xs text-blue-700/80 mt-0.5">
                 Check this option if the leader was appointed by church leadership without transitioning through BSCT -&gt; Cell -&gt; PCF promotion thresholds.
               </p>
             </div>
@@ -406,7 +406,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
           {/* Authentication Code Gate */}
           <div className="p-4 bg-slate-900 text-white rounded-2xl space-y-2">
             <div className="flex justify-between items-center">
-              <label className="block text-xs font-bold text-amber-400 ">
+              <label className="block text-xs font-bold text-blue-500 ">
                 Authentication Code Required *
               </label>
               <span className="text-xs text-slate-400">Security Protected</span>
@@ -417,7 +417,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
               value={authCode}
               onChange={e => setAuthCode(e.target.value)}
               placeholder="Enter Security Code"
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-amber-300 font-bold tracking-widest outline-none focus:border-amber-400"
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-blue-300 font-bold tracking-widest outline-none focus:border-blue-500"
             />
             {authError && (
               <p className="text-xs text-rose-400 font-semibold">{authError}</p>

@@ -178,7 +178,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
           <button
             onClick={handleExportExcel}
-            className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+            className="bg-blue-600 hover:bg-blue-500 text-slate-950 font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
           >
             <span className="material-symbols-outlined text-[18px]">file_download</span>
             <span>Export Excel</span>
@@ -201,9 +201,9 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
         <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
           <div>
             <p className="text-xs font-bold text-slate-400 uppercase">First Timers / Converts</p>
-            <p className="font-display text-2xl font-extrabold text-amber-600 mt-0.5">{firstTimersCount}</p>
+            <p className="font-display text-2xl font-extrabold text-blue-700 mt-0.5">{firstTimersCount}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
             <span className="material-symbols-outlined text-[20px]">person_add</span>
           </div>
         </div>
@@ -358,8 +358,8 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
                     {/* Role */}
                     <td className="py-3.5 px-4">
-                      <span className={`inline-block px-2 py-0.5 rounded-md text-xs font-bold ${r.memberRole === 'Leader' ? 'bg-amber-100 text-amber-900 border border-amber-200' :
-                          r.memberRole === 'First Timer' ? 'bg-amber-50 text-amber-800 border border-amber-200' :
+                      <span className={`inline-block px-2 py-0.5 rounded-md text-xs font-bold ${r.memberRole === 'Leader' ? 'bg-blue-100 text-blue-900 border border-blue-100' :
+                          r.memberRole === 'First Timer' ? 'bg-blue-50 text-blue-800 border border-blue-100' :
                             r.memberRole === 'Deacon' ? 'bg-purple-100 text-purple-900 border border-purple-200' :
                               'bg-emerald-50 text-emerald-800 border border-emerald-200'
                         }`}>

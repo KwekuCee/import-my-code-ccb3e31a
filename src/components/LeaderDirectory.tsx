@@ -101,30 +101,30 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
 
       {/* Auto-Flagged Promotion Queue Panel */}
       {promotionQueue.length > 0 && (
-        <div className="bg-gradient-to-r from-amber-500/10 via-amber-50 to-white border border-amber-300 rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
+        <div className="bg-blue-50 border border-blue-300 rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-amber-900 font-headline font-bold text-sm">
-              <span className="material-symbols-outlined text-[20px] text-amber-600 icon-fill">military_tech</span>
+            <div className="flex items-center gap-2 text-blue-900 font-headline font-bold text-sm">
+              <span className="material-symbols-outlined text-[20px] text-blue-700 icon-fill">military_tech</span>
               <span>Ready for promotion ({promotionQueue.length})</span>
             </div>
-            <span className="text-xs font-bold bg-amber-200/80 text-amber-900 px-2.5 py-0.5 rounded-full">
+            <span className="text-xs font-bold bg-blue-100/80 text-blue-900 px-2.5 py-0.5 rounded-full">
               Action Required by Group Pastor
             </span>
           </div>
 
-          <p className="text-xs text-amber-800/90 font-body">
+          <p className="text-xs text-blue-800/90 font-body">
             The growth engine auto-flagged these leaders for promotion because their downstream Bible study classes and cell members exceeded target thresholds.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {promotionQueue.map(item => (
-              <div key={item.id} className="bg-white p-4 rounded-2xl border border-amber-200 shadow-sm space-y-3">
+              <div key={item.id} className="bg-white p-4 rounded-2xl border border-blue-100 shadow-sm space-y-3">
                 <div className="flex justify-between items-start">
                   <div>
                     <h4 className="font-headline font-bold text-sm text-slate-900">{item.leaderName}</h4>
                     <p className="text-xs text-slate-500">{item.church}</p>
                   </div>
-                  <span className="bg-amber-100 text-amber-900 font-bold text-xs px-2 py-0.5 rounded-md">
+                  <span className="bg-blue-100 text-blue-900 font-bold text-xs px-2 py-0.5 rounded-md">
                     {item.currentRole} ➔ {item.targetRole}
                   </span>
                 </div>
@@ -221,7 +221,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
                   <tr key={ldr.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3.5 px-4 font-bold text-slate-900">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-900 font-display font-extrabold text-xs flex items-center justify-center border border-amber-200 shrink-0">
+                        <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-900 font-display font-extrabold text-xs flex items-center justify-center border border-blue-100 shrink-0">
                           {ldr.initials || (ldr.fullName ? ldr.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'LD')}
                         </div>
                         <div>
@@ -237,7 +237,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
                         ${ldr.leaderType === 'Church Coordinator' ? 'bg-purple-50 text-purple-800 border-purple-200' : ''}
                         ${ldr.leaderType === 'PCF Leader' ? 'bg-blue-50 text-blue-800 border-blue-200' : ''}
                         ${ldr.leaderType === 'Cell Leader' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : ''}
-                        ${ldr.leaderType === 'BSCT' ? 'bg-amber-50 text-amber-800 border-amber-200' : ''}
+                        ${ldr.leaderType === 'BSCT' ? 'bg-blue-50 text-blue-800 border-blue-100' : ''}
                       `}>
                         {ldr.leaderType}
                       </span>
