@@ -584,9 +584,11 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
             { key: 'occupation', label: 'Occupation' },
             { key: 'education', label: 'Education' },
             { key: 'location', label: 'Location' },
-            (churches && churches.length > 0
-              ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
-              : { key: 'church', label: 'Church Branch' }),
+            ...(isChurchAdmin
+              ? []
+              : [(churches && churches.length > 0
+                ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
+                : { key: 'church', label: 'Church Branch' })]),
             ...(leaders && leaders.length > 0
               ? [{
                   key: 'invitedBy',
