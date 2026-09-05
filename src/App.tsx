@@ -66,6 +66,7 @@ import { AnalyticsView } from './components/AnalyticsView';
 import { DatabaseSchemaView } from './components/DatabaseSchemaView';
 import { SettingsView } from './components/SettingsView';
 import { useToast } from './context/ToastContext';
+import { getGroupNamesForLeader, findLeaderByName } from './utils/analyticsUtils';
 
 export default function App() {
   const toast = useToast();
