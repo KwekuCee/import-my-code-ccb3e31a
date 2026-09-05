@@ -257,12 +257,24 @@ export default function App() {
 
   const handleConfirmAttendance = (record: AttendanceRecord) => {
     const today = new Date().toISOString().slice(0, 10);
+    const memberForRecord = members.find(
+      m => m && (m.id === record.memberId || (m.fullName || '').toLowerCase() === (record.memberName || '').toLowerCase())
+    );
+    const recordLeader = memberForRecord?.invitedByLeaderId
+      ? leaders.find(l => l.id === memberForRecord.invitedByLeaderId)
+      : findLeaderByName(record.leaderName || memberForRecord?.invitedBy, leaders);
+    const groups = getGroupNamesForLeader(recordLeader?.id, leaders);
+    const groupLabel = [groups.className, groups.cellName, groups.pcfName].filter(Boolean).join(' • ');
+
     const enrichedRecord: AttendanceRecord = {
       ...record,
       date: record.date || today,
+      leaderName: record.leaderName || recordLeader?.fullName || memberForRecord?.invitedBy,
+      pcfName: record.pcfName || groupLabel || 'General PCF',
     };
 
     saveAttendanceToSupabase(enrichedRecord);
+
 
     // Ensure member exists/is saved in that church's member database
     setMembers(prev => {
