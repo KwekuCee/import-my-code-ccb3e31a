@@ -1465,45 +1465,53 @@ export async function saveAllAdminSettingsToSupabase(settings: {
 /**
  * Dispatches a password recovery email via Supabase Auth
  */
-export async function sendPasswordResetEmail(email: string): Promise<{ success: boolean; message: string }> {
+export async function sendPasswordResetEmail(email: string): Promise<{ success: boolean; message: string; link?: string }> {
   const client = getSupabase();
   if (!client) {
-    return { success: false, message: 'Database connection is not initialized. Please check your Supabase configuration.' };
+    return { success: false, message: 'Cannot reach the system right now. Please try again shortly.' };
   }
-
+  const trimmedEmail = email.trim();
+  if (!trimmedEmail || !trimmedEmail.includes('@')) {
+    return { success: false, message: 'Please provide a valid email address.' };
+  }
   try {
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail || !trimmedEmail.includes('@')) {
-      return { success: false, message: 'Please provide a valid administrator email address.' };
-    }
-
-    const { error } = await client.auth.resetPasswordForEmail(trimmedEmail, {
-      redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined
+    const { data, error } = await client.functions.invoke('password-reset', {
+      body: {
+        action: 'request',
+        email: trimmedEmail,
+        origin: typeof window !== 'undefined' ? window.location.origin : ''
+      }
     });
-
     if (error) {
-      console.warn('Supabase resetPasswordForEmail error:', error.message);
-      return { success: false, message: error.message };
+      return { success: false, message: error.message || 'Could not start the password reset.' };
     }
-
-    // Log the password reset attempt to audit logs for security accountability
-    await saveAuditLogToSupabase({
-      action: `Password reset email dispatched for ${trimmedEmail}`,
-      icon: 'lock_reset',
-      user: trimmedEmail,
-      category: 'Security'
-    });
-
+    const res = data as any;
     return {
-      success: true,
-      message: `A secure password reset link has been dispatched to ${trimmedEmail}. Please check your email inbox to proceed.`
+      success: !!res?.success,
+      message: res?.message || 'Please check your email for the reset link.',
+      link: res?.link
     };
   } catch (err: any) {
-    console.error('Error sending password reset email:', err);
-    return {
-      success: false,
-      message: err?.message || 'Failed to dispatch password recovery link. Please verify database connection.'
-    };
+    return { success: false, message: err?.message || 'Could not start the password reset.' };
+  }
+}
+
+export async function confirmPasswordReset(token: string, password: string): Promise<{ success: boolean; message: string }> {
+  const client = getSupabase();
+  if (!client) {
+    return { success: false, message: 'Cannot reach the system right now. Please try again shortly.' };
+  }
+  try {
+    const { data, error } = await client.functions.invoke('password-reset', {
+      body: { action: 'confirm', token, password }
+    });
+    if (error) {
+      return { success: false, message: error.message || 'Could not change the password.' };
+    }
+    const res = data as any;
+    return { success: !!res?.success, message: res?.message || 'Password updated.' };
+  } catch (err: any) {
+    return { success: false, message: err?.message || 'Could not change the password.' };
   }
 }
 
@@ -1658,5 +1666,125 @@ export async function pushAllLocalDataToSupabase(
       },
       error: err?.message || 'Failed to sync with Supabase tables.'
     };
+  }
+}
+
+// ---------- Member photos (optional profile picture) ----------
+// The bucket is private, so we store the object path on the member row and
+// mint short-lived signed URLs when a photo needs to be shown.
+export async function uploadMemberPhoto(memberId: string, file: File): Promise<string | null> {
+  const client = getSupabase();
+  if (!client) return null;
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `${memberId}/${Date.now()}.${ext}`;
+    const { error } = await client.storage.from('member-photos').upload(path, file, {
+      upsert: true,
+      contentType: file.type || undefined
+    });
+    if (error) {
+      console.warn('uploadMemberPhoto error:', error.message);
+      return null;
+    }
+    return path;
+  } catch (err) {
+    console.error('Error in uploadMemberPhoto:', err);
+    return null;
+  }
+}
+
+const signedPhotoCache = new Map<string, string>();
+export async function getMemberPhotoUrl(path?: string): Promise<string | null> {
+  if (!path) return null;
+  if (path.startsWith('http') || path.startsWith('data:')) return path;
+  if (signedPhotoCache.has(path)) return signedPhotoCache.get(path)!;
+  const client = getSupabase();
+  if (!client) return null;
+  try {
+    const { data } = await client.storage.from('member-photos').createSignedUrl(path, 60 * 60);
+    const url = (data as any)?.signedUrl || null;
+    if (url) signedPhotoCache.set(path, url);
+    return url;
+  } catch {
+    return null;
+  }
+}
+
+// ---------- Absentees & follow-up ----------
+export interface AbsenceRecord {
+  id: string;
+  memberId: string;
+  memberName: string;
+  church: string;
+  serviceType: string;
+  serviceDate: string;
+  reason?: string;
+  note?: string;
+  recordedBy?: string;
+}
+
+export async function fetchAbsenceRecords(): Promise<AbsenceRecord[]> {
+  const client = getSupabase();
+  if (!client) return [];
+  try {
+    const { data, error } = await client
+      .from('absence_records')
+      .select('*')
+      .order('service_date', { ascending: false });
+    if (error) {
+      console.warn('fetchAbsenceRecords error:', error.message);
+      return [];
+    }
+    return (data || []).map((row: any) => ({
+      id: row.id,
+      memberId: row.member_id,
+      memberName: row.member_name,
+      church: row.church_name || 'Unassigned',
+      serviceType: row.service_type,
+      serviceDate: row.service_date,
+      reason: row.reason || undefined,
+      note: row.note || undefined,
+      recordedBy: row.recorded_by || undefined
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export async function saveAbsenceFollowUp(entry: {
+  memberId: string;
+  memberName: string;
+  church: string;
+  serviceType: string;
+  serviceDate: string;
+  reason: string;
+  note?: string;
+  recordedBy?: string;
+}): Promise<boolean> {
+  const client = getSupabase();
+  if (!client) return false;
+  try {
+    const payload = {
+      member_id: entry.memberId,
+      member_name: entry.memberName,
+      church_id: await resolveChurchId(entry.church),
+      church_name: entry.church,
+      service_type: entry.serviceType,
+      service_date: entry.serviceDate,
+      reason: entry.reason,
+      note: entry.note || null,
+      recorded_by: entry.recordedBy || null
+    };
+    const { error } = await client
+      .from('absence_records')
+      .upsert(payload, { onConflict: 'member_id,service_type,service_date' });
+    if (error) {
+      console.warn('saveAbsenceFollowUp error:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error in saveAbsenceFollowUp:', err);
+    return false;
   }
 }

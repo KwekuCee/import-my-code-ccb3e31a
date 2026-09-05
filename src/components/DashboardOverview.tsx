@@ -3,6 +3,7 @@ import { ViewType, TopLeader, Member, Leader, ChurchBranch, ChurchAdminAccount, 
 import { isBirthdayInCurrentMonth, getBirthdayDayOfMonth } from '../utils/analyticsUtils';
 import { BirthdaysPanel } from './BirthdaysPanel';
 import { ClassGroupsPanel } from './ClassGroupsPanel';
+import { AbsenteesPanel } from './AbsenteesPanel';
 
 
 interface DashboardOverviewProps {
@@ -36,7 +37,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   attendanceRecords,
   onNavigate,
   onSelectMemberForCard,
-
+  serviceTypes = []
 }) => {
   const isSuperadmin = user.role === 'Superadmin';
   const currentChurchName = user.church || churches[0]?.name || 'Unassigned';
@@ -1121,6 +1122,15 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
         leaders={branchLeaders}
         scopeLabel={isSuperadmin ? 'all churches' : currentChurchName}
         onOpenMemberList={() => onNavigate('members')}
+      />
+
+      <AbsenteesPanel
+        members={branchMembers}
+        attendanceRecords={attendanceRecords}
+        serviceTypes={serviceTypes.filter(st => st.active !== false).map(st => st.name)}
+        churchName={isSuperadmin ? undefined : currentChurchName}
+        isGroupView={isSuperadmin}
+        recordedBy={user?.name}
       />
 
 

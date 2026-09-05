@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ViewType, Member, AttendanceRecord, ChurchBranch, ChurchAdminAccount } from '../types';
 import { exportMultiSheetExcel, exportMultiSectionCSV } from '../utils/exportUtils';
+import { SupportChat } from './SupportChat';
 
 interface SidebarProps {
   currentView: ViewType;
@@ -32,6 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile
 }) => {
   const logoUrl = '/church-logo.png';
+  const [showSupportChat, setShowSupportChat] = useState(false);
 
   const isSuperadmin = user?.role === 'Superadmin';
 
@@ -188,7 +190,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Footer Links */}
         <div className="p-3 border-t border-slate-100 space-y-1">
           <button
-            onClick={() => { alert('GCYC Admin Support:\nPhone: +233 24 000 9999\nEmail: support@cekorlebu.org'); }}
+            onClick={() => setShowSupportChat(true)}
             className="w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">contact_support</span>
@@ -216,6 +218,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
       </aside>
+
+      {showSupportChat && <SupportChat onClose={() => setShowSupportChat(false)} />}
     </>
   );
 };

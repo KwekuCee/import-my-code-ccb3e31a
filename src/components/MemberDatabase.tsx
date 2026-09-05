@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Member, RoleType, ViewType, ChurchBranch } from '../types';
+import { Member, RoleType, ViewType, ChurchBranch, Leader } from '../types';
+import { MemberPhoto } from './MemberPhoto';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
 interface MemberDatabaseProps {
@@ -14,6 +15,7 @@ interface MemberDatabaseProps {
   onDeleteMember?: (id: string) => void;
   onUpdateMember?: (member: Member) => void;
   churches?: ChurchBranch[];
+  leaders?: Leader[];
 }
 
 export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
@@ -23,7 +25,8 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
   onSelectMemberForCard,
   onDeleteMember,
   onUpdateMember,
-  churches
+  churches,
+  leaders = []
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<RoleType | 'All'>('All');
@@ -375,6 +378,9 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                   Occupation & Edu
                 </th>
                 <th className="py-3.5 px-4 text-xs font-bold text-slate-400 ">
+                  Gender & Status
+                </th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 ">
                   Residential Area
                 </th>
                 <th className="py-3.5 px-4 text-xs font-bold text-slate-400 ">
@@ -397,9 +403,11 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                     {/* Name + Role Badge */}
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center shrink-0 group-hover:border-blue-300 transition-colors">
-                          {member.initials || (member.fullName ? member.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'MB')}
-                        </div>
+                        <MemberPhoto
+                          photoUrl={member.photoUrl}
+                          size={36}
+                          initials={member.initials || (member.fullName ? member.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'MB')}
+                        />
                         <div>
                           <div className="font-bold text-xs text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-2">
                             <span>{member.fullName}</span>
@@ -446,6 +454,12 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                     <td className="py-3.5 px-4">
                       <div className="font-semibold text-slate-800">{member.occupation}</div>
                       <div className="text-slate-400 text-xs">{member.education}</div>
+                    </td>
+
+                    {/* Gender & marital status */}
+                    <td className="py-3.5 px-4">
+                      <div className="font-semibold text-slate-800">{member.gender || '—'}</div>
+                      <div className="text-slate-400 text-xs">{member.maritalStatus || '—'}</div>
                     </td>
 
                     {/* Location */}
@@ -575,18 +589,42 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
             { key: 'dob', label: 'Date of Birth', type: 'date' },
             { key: 'role', label: 'Role', type: 'select', options: ['Member', 'Leader', 'Visitor', 'Deacon', 'First Timer', 'Pastor'] },
             { key: 'gender', label: 'Gender', type: 'select', options: ['Male', 'Female'] },
+            { key: 'maritalStatus', label: 'Marital Status', type: 'select', options: ['Single', 'Married', 'Engaged', 'Divorced', 'Widowed'] },
             { key: 'occupation', label: 'Occupation' },
             { key: 'education', label: 'Education' },
             { key: 'location', label: 'Location' },
             (churches && churches.length > 0
               ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
               : { key: 'church', label: 'Church Branch' }),
+            ...(leaders && leaders.length > 0
+              ? [{
+                  key: 'invitedBy',
+                  label: 'Assigned Leader',
+                  type: 'select' as const,
+                  options: ['Self-Walkin / Self Invited', ...leaders.map(l => `${l.fullName} — ${l.church || 'Unassigned'}`)]
+                }]
+              : []),
             { key: 'serviceCount', label: 'Service Count', type: 'number' },
             { key: 'foundationClass', label: 'Foundation Class', type: 'number' }
           ]}
           onCancel={() => setEditingMember(null)}
           onSave={(vals) => {
-            onUpdateMember?.({ ...editingMember, ...vals } as Member);
+            const next = { ...editingMember, ...vals } as Member;
+            // Turn the "Name — Church" choice back into a real leader link
+            const chosen = String((vals as any).invitedBy || '');
+            if (chosen === 'Self-Walkin / Self Invited') {
+              next.invitedBy = 'Self-Walkin / Self Invited';
+              next.invitedByLeaderId = undefined;
+            } else if (chosen) {
+              const cleanName = chosen.split(' — ')[0].trim();
+              const match = (leaders || []).find(l => `${l.fullName} — ${l.church || 'Unassigned'}` === chosen)
+                || (leaders || []).find(l => l.fullName === cleanName);
+              next.invitedBy = cleanName;
+              next.invitedByLeaderId = match?.id;
+              // Moving a member to a leader also moves them to that leader's church
+              if (match?.church && !(vals as any).church) next.church = match.church;
+            }
+            onUpdateMember?.(next);
             setEditingMember(null);
           }}
         />
