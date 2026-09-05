@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import jsQR from 'jsqr';
 import { Member, AttendanceRecord, ViewType } from '../types';
 import { useToast } from '../context/ToastContext';
+
 
 interface QRScannerModalProps {
   members: Member[];
