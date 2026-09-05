@@ -102,7 +102,9 @@ export async function fetchMembersFromSupabase(): Promise<Member[] | null> {
       status: row.status || 'First Timer',
       invitedBy: row.invited_by_name || 'Self Check-In',
       invitedByLeaderId: row.invited_by_leader_id || undefined,
-      gender: row.gender || 'Male'
+      gender: row.gender || 'Male',
+      maritalStatus: row.marital_status || undefined,
+      photoUrl: row.photo_url || undefined
 
     }));
   } catch (err) {
@@ -154,6 +156,9 @@ export async function saveMemberToSupabase(member: Member): Promise<boolean> {
       service_count: member.serviceCount,
       foundation_class: member.foundationClass,
       status: member.status,
+      gender: member.gender || null,
+      marital_status: member.maritalStatus || null,
+      photo_url: member.photoUrl || null,
       join_date: member.joinDate
     };
 
