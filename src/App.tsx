@@ -529,6 +529,23 @@ export default function App() {
   };
 
   // Render Public Portal if not logged in or viewing public views
+  // Password reset link landing page
+  const resetToken = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('reset_token')
+    : null;
+  if (resetToken) {
+    return (
+      <ResetPasswordScreen
+        token={resetToken}
+        onDone={() => {
+          window.history.replaceState({}, '', window.location.pathname);
+          window.location.reload();
+        }}
+      />
+    );
+  }
+
+  // Render Public Portal if not logged in or viewing public views
   if (!isLoggedIn) {
     return (
       <PublicPortal
