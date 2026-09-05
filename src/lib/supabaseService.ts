@@ -101,7 +101,9 @@ export async function fetchMembersFromSupabase(): Promise<Member[] | null> {
       foundationClass: row.foundation_class || 0,
       status: row.status || 'First Timer',
       invitedBy: row.invited_by_name || 'Self Check-In',
+      invitedByLeaderId: row.invited_by_leader_id || undefined,
       gender: row.gender || 'Male'
+
     }));
   } catch (err) {
     console.error('Error in fetchMembersFromSupabase:', err);
