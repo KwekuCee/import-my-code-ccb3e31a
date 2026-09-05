@@ -41,8 +41,12 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [serviceType, setServiceType] = useState(serviceOptions[0]);
   const [flashlightOn, setFlashlightOn] = useState(false);
-  const [useRealCamera, setUseRealCamera] = useState(false);
+  const [useRealCamera, setUseRealCamera] = useState(true);
+  const [cameraError, setCameraError] = useState('');
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const scanLockRef = useRef(false);
+  const handleCodeRef = useRef<(value: string) => void>(() => { });
 
   useEffect(() => {
     if (!serviceOptions.includes(serviceType)) {
@@ -52,26 +56,31 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
   const bgImageUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAiyCmtx-XHebXJST5E1hExdoWCfkgB34IaY-mKBw36293DZ6MIwhbnexnGkUqdlqAaNKZudX4bT2zO3x95HvA-lTaU15gsuAMZV2jZZsFMFrfQui0ziSX_Xq-qFRxnT-29EqDgNZ-a99tcqQH2nGsrH--n68U7Ndv-C3YH7gI22HeUbpQeFNlmO6MqYpPNO377VPx8sE_d-iyvVmQqOkQ4R_Yh8tljgZHrf6dVgucORLA2AJzEiJby7c5Jl8SG4n76cJ_XEGpCt7o';
 
-  // Toggle webcam if user clicks camera mode
+  // Camera stream on/off
   useEffect(() => {
+    let activeStream: MediaStream | null = null;
     if (useRealCamera) {
       navigator.mediaDevices?.getUserMedia({ video: { facingMode: 'environment' } })
         .then((stream) => {
+          activeStream = stream;
+          setCameraError('');
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
+            videoRef.current.play().catch(() => { });
           }
         })
-        .catch((err) => {
-          console.warn('Camera access error or rejected:', err);
+        .catch(() => {
+          setCameraError('Camera is blocked or unavailable. Allow camera access, or find the member by name below.');
           setUseRealCamera(false);
         });
-    } else {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
     }
+    return () => {
+      const stream = activeStream || (videoRef.current?.srcObject as MediaStream | null);
+      stream?.getTracks().forEach(track => track.stop());
+      if (videoRef.current) videoRef.current.srcObject = null;
+    };
   }, [useRealCamera]);
+
 
   const today = new Date().toISOString().slice(0, 10);
 
