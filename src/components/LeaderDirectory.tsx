@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Leader, LeaderType, PromotionQueueItem, ViewType, ChurchBranch, Member } from '../types';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
+import { getGroupNamesForLeader } from '../utils/analyticsUtils';
 
 interface LeaderDirectoryProps {
   leaders: Leader[];
