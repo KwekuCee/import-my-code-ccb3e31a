@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { ChurchBranch, AuditLogItem, ViewType, ChurchAdminAccount } from '../types';
+import { ChurchBranch, AuditLogItem, ViewType, ChurchAdminAccount, Member, Leader, AttendanceRecord } from '../types';
+import { HierarchyAttendancePanel } from './HierarchyAttendancePanel';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
 interface GroupOverviewProps {
   churches: ChurchBranch[];
   churchAdmins: ChurchAdminAccount[];
   auditLogs: AuditLogItem[];
+  members?: Member[];
+  leaders?: Leader[];
+  attendanceRecords?: AttendanceRecord[];
   onNavigate: (view: ViewType) => void;
   onOpenAnnouncement: () => void;
   onAddChurch: (church: ChurchBranch, admin?: ChurchAdminAccount) => void;
@@ -19,6 +23,9 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
   churches,
   churchAdmins,
   auditLogs,
+  members = [],
+  leaders = [],
+  attendanceRecords = [],
   onNavigate,
   onOpenAnnouncement,
   onAddChurch,
@@ -234,6 +241,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
             </button>
           </div>
 
+          {/* Attendance across the whole group, grouped by PCF, cell and leader */}
           {activeTab === 'branches' ? (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
