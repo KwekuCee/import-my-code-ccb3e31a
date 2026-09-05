@@ -2,24 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, AuthSessionUser, ChurchBranch, ViewType, AuditLogItem, Member, Leader, AttendanceRecord, ChurchAdminAccount } from '../types';
 import {
-  isCloud databaseConfigured,
-  saveCloud databaseCredentials,
-  getCloud database,
-  testCloud databaseConnection,
+  isSupabaseConfigured,
+  saveSupabaseCredentials,
+  getSupabase,
+  testSupabaseConnection,
   SUPABASE_DEFAULT_URL,
   SUPABASE_DEFAULT_ANON_KEY
 } from '../lib/supabase';
 import {
-  pushAllLocalDataToCloud database,
-  saveChurchToCloud database,
-  saveChurchAdminToCloud database,
-  fetchAuditLogsFromCloud database,
-  saveSuperadminProfileToCloud database,
-  fetchSuperadminProfileFromCloud database,
-  saveAllAdminSettingsToCloud database,
-  saveServiceTypeToCloud database,
-  deleteServiceTypeFromCloud database,
-  fetchServiceTypesFromCloud database,
+  pushAllLocalDataToSupabase,
+  saveChurchToSupabase,
+  saveChurchAdminToSupabase,
+  fetchAuditLogsFromSupabase,
+  saveSuperadminProfileToSupabase,
+  fetchSuperadminProfileFromSupabase,
+  saveAllAdminSettingsToSupabase,
+  saveServiceTypeToSupabase,
+  deleteServiceTypeFromSupabase,
+  fetchServiceTypesFromSupabase,
   saveStoredSession
 } from '../lib/supabaseService';
 import { exportMultiSheetExcel, exportMultiSectionCSV } from '../utils/exportUtils';
@@ -90,10 +90,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const handleRefreshAuditLogs = async () => {
     setIsLoadingLogs(true);
     try {
-      const live = await fetchAuditLogsFromCloud database(10);
+      const live = await fetchAuditLogsFromSupabase(10);
       if (live && live.length > 0) {
         setCurrentLogs(live.slice(0, 10));
-        triggerToast(`Retrieved ${live.length} live actions from Cloud database audit trail (capped at 10)`);
+        triggerToast(`Retrieved ${live.length} live actions from Supabase audit trail (capped at 10)`);
       } else {
         triggerToast('No remote audit logs recorded yet.');
       }
@@ -104,11 +104,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     }
   };
 
-  // Cloud database Credentials State
-  const [supabaseUrlInput, setCloud databaseUrlInput] = useState(
+  // Supabase Credentials State
+  const [supabaseUrlInput, setSupabaseUrlInput] = useState(
     localStorage.getItem('cekbu_supabase_url') || import.meta.env.VITE_SUPABASE_URL || SUPABASE_DEFAULT_URL
   );
-  const [supabaseKeyInput, setCloud databaseKeyInput] = useState(
+  const [supabaseKeyInput, setSupabaseKeyInput] = useState(
     localStorage.getItem('cekbu_supabase_key') || import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_DEFAULT_ANON_KEY
   );
   const [connStatus, setConnStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
@@ -160,10 +160,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [autoPromoteFirstTimers, setAutoPromoteFirstTimers] = useState(true);
   const [promotionServicesCount, setPromotionServicesCount] = useState(3);
 
-  // Load Superadmin Profile from Cloud database on mount
+  // Load Superadmin Profile from Supabase on mount
   useEffect(() => {
     if (isSuperadmin) {
-      fetchSuperadminProfileFromCloud database().then(prof => {
+      fetchSuperadminProfileFromSupabase().then(prof => {
         if (prof) {
           if (prof.name) setPastorName(prof.name);
           if (prof.email) setHqEmail(prof.email);
@@ -177,7 +177,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   // Load service types on mount
   useEffect(() => {
-    fetchServiceTypesFromCloud database().then(types => {
+    fetchServiceTypesFromSupabase().then(types => {
       if (types && types.length > 0) {
         setGlobalServiceList(types);
       }
@@ -216,7 +216,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     const cleanZone = hqZone.trim();
 
     try {
-      await saveSuperadminProfileToCloud database({
+      await saveSuperadminProfileToSupabase({
         name: cleanName,
         email: cleanEmail,
         phone: cleanPhone,
@@ -255,7 +255,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         category: 'System'
       });
 
-      triggerToast('HQ & Group Profile saved and updated in Cloud database!');
+      triggerToast('HQ & Group Profile saved and updated in Supabase!');
     } catch (err: any) {
       console.error('Error saving Superadmin profile:', err);
       triggerToast('Saved profile locally!');
@@ -275,7 +275,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           pastor: pastorInCharge.trim(),
           zone: adminZone.trim(),
         };
-        await saveChurchToCloud database(updatedChurch);
+        await saveChurchToSupabase(updatedChurch);
       }
 
       if (matchingAdmin) {
@@ -287,7 +287,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           churchName: branchName.trim(),
           zone: adminZone.trim(),
         };
-        await saveChurchAdminToCloud database(updatedAdmin);
+        await saveChurchAdminToSupabase(updatedAdmin);
       }
 
       onAddAuditLog?.({
@@ -316,33 +316,33 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   const runConnectionTest = async () => {
     setConnStatus('testing');
-    setConnMessage('Testing connection to Cloud database...');
-    const result = await testCloud databaseConnection();
+    setConnMessage('Testing connection to Supabase...');
+    const result = await testSupabaseConnection();
     setConnLatency(result.latencyMs);
     setConnMessage(result.message);
     setConnStatus(result.success ? 'success' : 'error');
   };
 
-  const handleTestAndSaveCloud database = async (e: React.FormEvent) => {
+  const handleTestAndSaveSupabase = async (e: React.FormEvent) => {
     e.preventDefault();
     setConnStatus('testing');
     setConnMessage('');
 
     if (!supabaseUrlInput.trim() || !supabaseKeyInput.trim()) {
       setConnStatus('error');
-      setConnMessage('Please fill in both Cloud database URL and Anon Key.');
+      setConnMessage('Please fill in both Supabase URL and Anon Key.');
       return;
     }
 
     try {
-      saveCloud databaseCredentials(supabaseUrlInput.trim(), supabaseKeyInput.trim());
-      const result = await testCloud databaseConnection();
+      saveSupabaseCredentials(supabaseUrlInput.trim(), supabaseKeyInput.trim());
+      const result = await testSupabaseConnection();
       setConnLatency(result.latencyMs);
       setConnMessage(result.message);
       setConnStatus(result.success ? 'success' : 'error');
 
       if (result.success) {
-        triggerToast('Saved & connected to Cloud database!');
+        triggerToast('Saved & connected to Supabase!');
         onAddAuditLog?.({
           id: `LOG-${Date.now()}`,
           action: 'Connected and synchronized with live database',
@@ -354,7 +354,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       }
     } catch (err: any) {
       setConnStatus('error');
-      setConnMessage(err?.message || 'Failed to connect to Cloud database project.');
+      setConnMessage(err?.message || 'Failed to connect to Supabase project.');
     }
   };
 
@@ -362,7 +362,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     setIsPushingData(true);
     setPushResult(null);
 
-    const res = await pushAllLocalDataToCloud database(
+    const res = await pushAllLocalDataToSupabase(
       churches,
       churchAdmins,
       leaders,
@@ -372,7 +372,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
     setIsPushingData(false);
     if (res.success) {
-      const summary = `Successfully pushed ${res.pushedCount.members} members, ${res.pushedCount.leaders} leaders, ${res.pushedCount.churches} churches, ${res.pushedCount.attendance} attendance records to Cloud database!`;
+      const summary = `Successfully pushed ${res.pushedCount.members} members, ${res.pushedCount.leaders} leaders, ${res.pushedCount.churches} churches, ${res.pushedCount.attendance} attendance records to Supabase!`;
       setPushResult(summary);
       triggerToast(summary);
       onAddAuditLog?.({
@@ -384,7 +384,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         category: 'System'
       });
     } else {
-      setPushResult(`Push error: ${res.error || 'Failed to sync with Cloud database tables'}`);
+      setPushResult(`Push error: ${res.error || 'Failed to sync with Supabase tables'}`);
     }
   };
 
@@ -397,13 +397,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     setNewServiceName('');
     
     // Save to database
-    await saveServiceTypeToCloud database(name);
+    await saveServiceTypeToSupabase(name);
     onUpdateServiceTypes?.(updated);
     
     triggerToast(`Added & saved Global Service Program: "${name}"`);
     onAddAuditLog?.({
       id: `LOG-${Date.now()}`,
-      action: `Added global service type "${name}" to Cloud database database`,
+      action: `Added global service type "${name}" to Supabase database`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       icon: 'tune',
       user: user.name,
@@ -414,7 +414,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const handleRemoveGlobalService = async (service: string) => {
     const updated = globalServiceList.filter(s => s !== service);
     setGlobalServiceList(updated);
-    await deleteServiceTypeFromCloud database(service);
+    await deleteServiceTypeFromSupabase(service);
     onUpdateServiceTypes?.(updated);
     triggerToast(`Removed service type "${service}" from database`);
   };
@@ -427,7 +427,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       const cleanChurchName = hqChurchName.trim();
       const cleanZone = hqZone.trim();
 
-      await saveSuperadminProfileToCloud database({
+      await saveSuperadminProfileToSupabase({
         name: cleanName,
         email: cleanEmail,
         phone: cleanPhone,
@@ -443,7 +443,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         phone: cleanPhone
       });
 
-      await saveAllAdminSettingsToCloud database({
+      await saveAllAdminSettingsToSupabase({
         securityCode,
         hqEmail: cleanEmail,
         autoBackupEnabled,
@@ -457,7 +457,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     triggerToast('All system settings saved to database successfully!');
     onAddAuditLog?.({
       id: `LOG-${Date.now()}`,
-      action: `Saved ${user.role} system configurations & service programs to Cloud database`,
+      action: `Saved ${user.role} system configurations & service programs to Supabase`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       icon: 'settings',
       user: pastorName.trim() || user.name,
@@ -496,7 +496,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <span>{isSuperadmin ? 'SUPERADMIN HQ CONTROL CENTER' : 'LOCAL BRANCH CONTROL CENTER'}</span>
             </div>
             <h1 className="font-display text-2xl md:text-3xl font-extrabold tracking-tight text-white">
-              {isSuperadmin ? 'Superadmin System & Cloud database Hub' : `${branchName} Branch Settings`}
+              {isSuperadmin ? 'Superadmin System & Supabase Hub' : `${branchName} Branch Settings`}
             </h1>
             <p className="text-slate-300 text-xs md:text-sm font-body">
               Configure live database connection, cloud synchronizations, service schedules, and access credentials.
@@ -619,7 +619,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   </div>
                   <div>
                     <h3 className="font-headline font-bold text-lg text-slate-900">
-                      Cloud database Cloud Database Connection
+                      Supabase Cloud Database Connection
                     </h3>
                     <p className="text-xs text-slate-500">
                       Direct connection credentials for real-time PostgreSQL database synchronization
@@ -671,15 +671,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 </div>
               )}
 
-              <form onSubmit={handleTestAndSaveCloud database} className="space-y-4">
+              <form onSubmit={handleTestAndSaveSupabase} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Cloud database Project URL (HTTPS)
+                    Supabase Project URL (HTTPS)
                   </label>
                   <input
                     type="url"
                     value={supabaseUrlInput}
-                    onChange={(e) => setCloud databaseUrlInput(e.target.value)}
+                    onChange={(e) => setSupabaseUrlInput(e.target.value)}
                     placeholder="https://your-project.supabase.co"
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all"
                   />
@@ -687,12 +687,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Cloud database Anon Public API Key
+                    Supabase Anon Public API Key
                   </label>
                   <input
                     type="password"
                     value={supabaseKeyInput}
-                    onChange={(e) => setCloud databaseKeyInput(e.target.value)}
+                    onChange={(e) => setSupabaseKeyInput(e.target.value)}
                     placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all"
                   />
@@ -737,7 +737,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <div className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-sm text-slate-900">Push Full Dataset to Cloud database</h4>
+                  <h4 className="font-bold text-sm text-slate-900">Push Full Dataset to Supabase</h4>
                   <p className="text-xs text-slate-500">
                     Synchronizes all current local records (members, leaders, churches, attendance) into your live live database tables.
                   </p>
@@ -750,7 +750,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <span className={`material-symbols-outlined text-[18px] ${isPushingData ? 'animate-spin' : ''}`}>
                     {isPushingData ? 'sync' : 'cloud_upload'}
                   </span>
-                  <span>{isPushingData ? 'Pushing Data...' : 'Push All Data to Cloud database'}</span>
+                  <span>{isPushingData ? 'Pushing Data...' : 'Push All Data to Supabase'}</span>
                 </button>
               </div>
 
@@ -889,7 +889,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     <span className="material-symbols-outlined text-[18px]">
                       {isSavingSuperadminProfile ? 'sync' : 'save'}
                     </span>
-                    <span>{isSavingSuperadminProfile ? 'Saving to Cloud database...' : 'Save HQ & Group Profile to Cloud database'}</span>
+                    <span>{isSavingSuperadminProfile ? 'Saving to Supabase...' : 'Save HQ & Group Profile to Supabase'}</span>
                   </button>
                 </div>
               </form>
@@ -1029,7 +1029,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <h3 className="font-headline font-bold text-base text-white">
                   Global Service Types Manager
                 </h3>
-                <p className="text-xs text-slate-500">Service types saved to Cloud database and displayed at the self check-in station</p>
+                <p className="text-xs text-slate-500">Service types saved to Supabase and displayed at the self check-in station</p>
               </div>
               <span className="material-symbols-outlined text-blue-600 text-[24px]">tune</span>
             </div>
@@ -1308,7 +1308,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     onClick={handleRefreshAuditLogs}
                     disabled={isLoadingLogs}
                     className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl transition-all cursor-pointer disabled:opacity-60"
-                    title="Fetch live records directly from Cloud database database"
+                    title="Fetch live records directly from Supabase database"
                   >
                     <span className={`material-symbols-outlined text-[16px] ${isLoadingLogs ? 'animate-spin' : ''}`}>
                       sync

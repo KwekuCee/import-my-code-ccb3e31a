@@ -3,7 +3,7 @@ import QRCode from 'qrcode';
 import { motion } from 'motion/react';
 import { Member, Leader, ChurchBranch, ChurchAdminAccount, AttendanceRecord } from '../types';
 import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClassNumber, getFoundationClassLabel } from '../data/constants';
-import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromCloud database, sendAttendanceEmailToChurchAdmin } from '../lib/supabaseService';
+import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin } from '../lib/supabaseService';
 import { ChurchLogo } from './ChurchLogo';
 
 interface PublicPortalProps {
@@ -95,7 +95,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const [dbServiceTypes, setDbServiceTypes] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchServiceTypesFromCloud database().then(types => {
+    fetchServiceTypesFromSupabase().then(types => {
       if (types && types.length > 0) {
         setDbServiceTypes(types);
       }
@@ -1528,7 +1528,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
               </div>
               <div>
                 <h3 className="font-display font-extrabold text-base text-slate-900">Admin Password Recovery</h3>
-                <p className="text-xs text-slate-500">Cloud database Auth Secure Reset</p>
+                <p className="text-xs text-slate-500">Supabase Auth Secure Reset</p>
               </div>
             </div>
 
