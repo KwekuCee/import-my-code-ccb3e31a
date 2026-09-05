@@ -362,10 +362,12 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
             { key: 'contact', label: 'Contact', type: 'tel' },
             { key: 'dob', label: 'Date of Birth', type: 'date' },
             { key: 'location', label: 'Location' },
-            { key: 'cellOrPcfName', label: 'Cell / PCF' },
-            (churches && churches.length > 0
-              ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
-              : { key: 'church', label: 'Church Branch' }),
+            { key: 'cellOrPcfName', label: 'Bible Study Class / Cell / PCF Name' },
+            ...(isChurchAdmin
+              ? []
+              : [(churches && churches.length > 0
+                ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
+                : { key: 'church', label: 'Church Branch' })]),
             { key: 'leaderType', label: 'Leader Type', type: 'select', options: ['BSCT', 'Cell Leader', 'PCF Leader', 'Church Coordinator'] }
           ]}
           onCancel={() => setEditingLeader(null)}
