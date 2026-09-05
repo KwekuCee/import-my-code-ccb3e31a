@@ -109,6 +109,25 @@ export async function fetchMembersFromSupabase(): Promise<Member[] | null> {
   }
 }
 
+// Resolves a church branch name to its database id so records route to the right branch.
+const churchIdCache = new Map<string, string | null>();
+export async function resolveChurchId(churchName?: string): Promise<string | null> {
+  const name = (churchName || '').trim();
+  if (!name) return null;
+  const key = name.toLowerCase();
+  if (churchIdCache.has(key)) return churchIdCache.get(key) || null;
+  const client = getSupabase();
+  if (!client) return null;
+  try {
+    const { data } = await client.from('churches').select('id').ilike('name', name).maybeSingle();
+    const id = (data as any)?.id || null;
+    churchIdCache.set(key, id);
+    return id;
+  } catch {
+    return null;
+  }
+}
+
 export async function saveMemberToSupabase(member: Member): Promise<boolean> {
   const client = getSupabase();
   if (!client) return false;
@@ -124,6 +143,7 @@ export async function saveMemberToSupabase(member: Member): Promise<boolean> {
       occupation: member.occupation,
       education_level: member.education,
       location: member.location,
+      church_id: await resolveChurchId(member.church),
       church_name: member.church,
       invited_by_name: member.invitedBy,
       service_count: member.serviceCount,
@@ -209,15 +229,7 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(leader.id || '');
 
     // Route the leader to the church branch they belong to
-    let churchId: string | null = null;
-    if (leader.church) {
-      const { data: churchRow } = await client
-        .from('churches')
-        .select('id')
-        .ilike('name', leader.church)
-        .maybeSingle();
-      churchId = (churchRow as any)?.id || null;
-    }
+    const churchId = await resolveChurchId(leader.church);
 
     const payload: any = {
       full_name: leader.fullName,
@@ -325,6 +337,7 @@ export async function saveAttendanceToSupabase(record: AttendanceRecord): Promis
       member_name: record.memberName,
       member_role: record.memberRole,
       service_type: record.serviceType,
+      church_id: await resolveChurchId(record.church),
       church_name: record.church,
       check_in_method: record.checkInMethod,
       verified_by: record.verifiedBy,
