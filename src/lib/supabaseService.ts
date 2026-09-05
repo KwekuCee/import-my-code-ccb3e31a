@@ -146,6 +146,9 @@ export async function saveMemberToSupabase(member: Member): Promise<boolean> {
       church_id: await resolveChurchId(member.church),
       church_name: member.church,
       invited_by_name: member.invitedBy,
+      invited_by_leader_id: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test((member as any).invitedByLeaderId || '')
+        ? (member as any).invitedByLeaderId
+        : null,
       service_count: member.serviceCount,
       foundation_class: member.foundationClass,
       status: member.status,
