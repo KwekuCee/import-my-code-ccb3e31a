@@ -177,16 +177,22 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
             <option value="BSCT">BSCTs</option>
           </select>
 
-          <select
-            value={selectedChurch}
-            onChange={e => setSelectedChurch(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-blue-600 cursor-pointer"
-          >
-            <option value="All">All Churches</option>
-            {(churches || []).map(c => (
-              <option key={c.id} value={c.name}>{c.name}</option>
-            ))}
-          </select>
+          {isChurchAdmin ? (
+            <div className="bg-slate-100 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700">
+              {targetChurch}
+            </div>
+          ) : (
+            <select
+              value={selectedChurch}
+              onChange={e => setSelectedChurch(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-blue-600 cursor-pointer"
+            >
+              <option value="All">All Churches</option>
+              {(churches || []).map(c => (
+                <option key={c.id} value={c.name}>{c.name}</option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
