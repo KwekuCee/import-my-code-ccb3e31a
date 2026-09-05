@@ -1701,3 +1701,82 @@ export async function getMemberPhotoUrl(path?: string): Promise<string | null> {
     return null;
   }
 }
+
+// ---------- Absentees & follow-up ----------
+export interface AbsenceRecord {
+  id: string;
+  memberId: string;
+  memberName: string;
+  church: string;
+  serviceType: string;
+  serviceDate: string;
+  reason?: string;
+  note?: string;
+  recordedBy?: string;
+}
+
+export async function fetchAbsenceRecords(): Promise<AbsenceRecord[]> {
+  const client = getSupabase();
+  if (!client) return [];
+  try {
+    const { data, error } = await client
+      .from('absence_records')
+      .select('*')
+      .order('service_date', { ascending: false });
+    if (error) {
+      console.warn('fetchAbsenceRecords error:', error.message);
+      return [];
+    }
+    return (data || []).map((row: any) => ({
+      id: row.id,
+      memberId: row.member_id,
+      memberName: row.member_name,
+      church: row.church_name || 'Unassigned',
+      serviceType: row.service_type,
+      serviceDate: row.service_date,
+      reason: row.reason || undefined,
+      note: row.note || undefined,
+      recordedBy: row.recorded_by || undefined
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export async function saveAbsenceFollowUp(entry: {
+  memberId: string;
+  memberName: string;
+  church: string;
+  serviceType: string;
+  serviceDate: string;
+  reason: string;
+  note?: string;
+  recordedBy?: string;
+}): Promise<boolean> {
+  const client = getSupabase();
+  if (!client) return false;
+  try {
+    const payload = {
+      member_id: entry.memberId,
+      member_name: entry.memberName,
+      church_id: await resolveChurchId(entry.church),
+      church_name: entry.church,
+      service_type: entry.serviceType,
+      service_date: entry.serviceDate,
+      reason: entry.reason,
+      note: entry.note || null,
+      recorded_by: entry.recordedBy || null
+    };
+    const { error } = await client
+      .from('absence_records')
+      .upsert(payload, { onConflict: 'member_id,service_type,service_date' });
+    if (error) {
+      console.warn('saveAbsenceFollowUp error:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error in saveAbsenceFollowUp:', err);
+    return false;
+  }
+}
