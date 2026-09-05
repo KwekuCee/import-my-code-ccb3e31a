@@ -50,7 +50,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
     attendance: 'Attendance Logs',
     reports: 'Growth Analytics',
     analytics: 'Demographics & Analytics',
-    database_schema: 'Supabase DB Schema',
+    database_schema: 'Cloud database DB Schema',
     qr_scanner: 'QR Check-In Station',
     register: 'Member Check-In',
     church_admins_directory: 'Church Branch Administrators',

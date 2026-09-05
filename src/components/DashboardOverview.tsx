@@ -420,7 +420,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 <h3 className="font-headline font-bold text-base text-blue-900">
                   Superadmin System Security & Backup Controls
                 </h3>
-                <p className="text-xs text-slate-500">Manage data backups, audit logs, and Supabase synchronization</p>
+                <p className="text-xs text-slate-500">Manage data backups, audit logs, and Cloud database synchronization</p>
               </div>
               <span className="material-symbols-outlined text-blue-700">security</span>
             </div>
@@ -430,7 +430,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 <p className="font-bold text-xs text-white">Database Backup & Restoration</p>
                 <p className="text-xs text-slate-500">Create instant cloud snapshot of members, attendance, and leadership structure.</p>
                 <button
-                  onClick={() => triggerToast('Cloud Backup Snapshot created successfully in Supabase!')}
+                  onClick={() => triggerToast('Cloud Backup Snapshot created successfully in Cloud database!')}
                   className="bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-xs"
                 >
                   Trigger Instant Backup
@@ -748,7 +748,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           {/* 4b. Attendance per Leader + Total Attendance */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
-              <h3 className="font-headline font-bold text-base text-white flex items-center gap-2">
+              <h3 className="font-headline font-bold text-base text-slate-900 flex items-center gap-2">
                 <span className="material-symbols-outlined text-blue-700 text-[20px]">groups_3</span>
                 <span>Attendance Per Leader</span>
               </h3>
@@ -767,7 +767,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 {attendanceByLeader.map(row => (
                   <div key={row.leaderName} className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl p-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-headline font-bold text-xs text-white truncate">{row.leaderName}</p>
+                      <p className="font-headline font-bold text-xs text-slate-900 truncate">{row.leaderName}</p>
                       <p className="text-xs text-slate-500 mt-0.5">PCF / Cell: {row.pcfName}</p>
                       <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-2">
                         <div
@@ -777,7 +777,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="font-display text-lg font-extrabold text-white leading-none">{row.total}</p>
+                      <p className="font-display text-lg font-extrabold text-slate-900 leading-none">{row.total}</p>
                       <p className="text-xs text-emerald-600 font-bold mt-1">+{row.today} today</p>
                     </div>
                   </div>
@@ -795,7 +795,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-headline font-bold text-base text-white flex items-center gap-2">
+                <h3 className="font-headline font-bold text-base text-slate-900 flex items-center gap-2">
                   <span className="material-symbols-outlined text-blue-600 text-[20px]">fact_check</span>
                   <span>Recent Service Attendance Records</span>
                 </h3>

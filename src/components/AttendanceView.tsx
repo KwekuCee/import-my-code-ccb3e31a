@@ -158,7 +158,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             {isChurchAdmin ? `${targetChurch} Service Station` : 'Group Network Service Station'}
           </div>
-          <h1 className="font-display text-2xl md:text-4xl font-extrabold text-white tracking-tight">
+          <h1 className="font-display text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
             Service Attendance Log
           </h1>
           <p className="font-body text-xs md:text-sm text-slate-500 mt-1">
@@ -191,7 +191,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
         <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
           <div>
             <p className="text-xs font-bold text-slate-400 uppercase">Verified Attendees ({selectedDate})</p>
-            <p className="font-display text-2xl font-extrabold text-white mt-0.5">{totalAttended}</p>
+            <p className="font-display text-2xl font-extrabold text-slate-900 mt-0.5">{totalAttended}</p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
             <span className="material-symbols-outlined text-[20px]">check_circle</span>
@@ -343,7 +343,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                   <tr key={r.id} className="hover:bg-slate-50 transition-colors">
                     {/* Attendee Name & ID */}
                     <td className="py-3.5 px-4">
-                      <p className="font-bold text-white">{r.memberName}</p>
+                      <p className="font-bold text-slate-900">{r.memberName}</p>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs text-slate-400">{r.memberId}</span>
                         <span className="text-xs text-slate-500 font-medium">• {r.church}</span>

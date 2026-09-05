@@ -157,7 +157,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
               <h3 className="font-headline font-bold text-lg text-slate-900">Password Recovery</h3>
             </div>
             <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-              Enter your registered administrator email address. A secure authorization link will be sent via Supabase Auth.
+              Enter your registered administrator email address. A secure authorization link will be sent via Cloud database Auth.
             </p>
 
             {resetFeedback && (
