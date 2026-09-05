@@ -339,3 +339,42 @@ export function flattenLeaderNode(node: LeaderAttendanceNode): LeaderAttendanceN
   walk(node);
   return out;
 }
+
+/* ============================================================
+   Group names: Bible study class -> Cell -> PCF
+   ============================================================ */
+
+export interface GroupNames {
+  className: string;
+  cellName: string;
+  pcfName: string;
+}
+
+/**
+ * Walks up the leader structure from one leader and returns the names of the
+ * Bible study class, the cell and the PCF that leader belongs to.
+ */
+export function getGroupNamesForLeader(leaderId: string | undefined, leaders: Leader[]): GroupNames {
+  const empty: GroupNames = { className: '', cellName: '', pcfName: '' };
+  if (!leaderId) return empty;
+  const byId = new Map((leaders || []).filter(l => l && l.id).map(l => [l.id, l] as const));
+  const result: GroupNames = { ...empty };
+  let current = byId.get(leaderId);
+  let guard = 0;
+  while (current && guard < 12) {
+    guard += 1;
+    const name = (current.cellOrPcfName || '').trim() || `${current.fullName}'s group`;
+    if (current.leaderType === 'BSCT' && !result.className) result.className = name;
+    if (current.leaderType === 'Cell Leader' && !result.cellName) result.cellName = name;
+    if (current.leaderType === 'PCF Leader' && !result.pcfName) result.pcfName = name;
+    current = current.parentLeaderId ? byId.get(current.parentLeaderId) : undefined;
+  }
+  return result;
+}
+
+/** Finds a leader by name (used when only a leader name was recorded). */
+export function findLeaderByName(name: string | undefined, leaders: Leader[]): Leader | undefined {
+  if (!name) return undefined;
+  const key = name.trim().toLowerCase();
+  return (leaders || []).find(l => (l.fullName || '').trim().toLowerCase() === key);
+}
