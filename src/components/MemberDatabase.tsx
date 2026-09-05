@@ -229,19 +229,21 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold uppercase text-slate-400 mb-1">Church Branch</label>
-                  <select
-                    value={churchFilter}
-                    onChange={(e) => setChurchFilter(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl p-2 text-xs bg-slate-50 font-medium"
-                  >
-                    <option value="All">All Churches</option>
-                    {churchOptions.map(c => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
+                {!isChurchAdmin && (
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-slate-400 mb-1">Church Branch</label>
+                    <select
+                      value={churchFilter}
+                      onChange={(e) => setChurchFilter(e.target.value)}
+                      className="w-full border border-slate-200 rounded-xl p-2 text-xs bg-slate-50 font-medium"
+                    >
+                      <option value="All">All Churches</option>
+                      {churchOptions.map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">Foundation School</label>
