@@ -1,19 +1,20 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { supabase as cloudClient } from '../integrations/supabase/client';
+import { portalDb } from './portalDb';
 
-// The backend is managed by Lovable Cloud. The client is generated and
-// configured from environment variables — no manual credentials needed.
+// The backend is managed by Lovable Cloud. Tables are reachable only from
+// secure server code, so the app talks to them through the portal data API.
 export const SUPABASE_DEFAULT_URL = import.meta.env.VITE_SUPABASE_URL || '';
 export const SUPABASE_DEFAULT_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
 export const SUPABASE_DEFAULT_PUBLISHABLE_KEY = SUPABASE_DEFAULT_ANON_KEY;
 
-export const supabase = cloudClient as unknown as SupabaseClient;
+export const supabase = portalDb as unknown as SupabaseClient;
 
 export const isSupabaseConfigured = Boolean(SUPABASE_DEFAULT_URL && SUPABASE_DEFAULT_ANON_KEY);
 
 export function getSupabase(): SupabaseClient | null {
   return supabase;
 }
+
 
 // Credentials are managed by the platform; kept for backwards compatibility.
 export function saveSupabaseCredentials(_url?: string, _key?: string): SupabaseClient | null {

@@ -122,6 +122,10 @@ export default function App() {
       }));
   }, [leaders]);
 
+  // Data is loaded again after sign-in, because the secure server API only
+  // returns full records for a signed-in admin.
+  const [dataVersion, setDataVersion] = useState(0);
+
   // Initial Supabase Data Fetch
   useEffect(() => {
     async function loadSupabaseData() {
@@ -178,7 +182,7 @@ export default function App() {
     }
 
     loadSupabaseData();
-  }, []);
+  }, [dataVersion]);
 
   // Modals
   const [selectedMemberForCard, setSelectedMemberForCard] = useState<Member | null>(null);
@@ -522,6 +526,7 @@ export default function App() {
     setUser(newUserSession);
     setIsLoggedIn(true);
     setCurrentView('dashboard');
+    setDataVersion(v => v + 1);
     toast.showSuccess(
       `Signed In as ${effectiveRole}`,
       `Welcome, ${effectiveName}.${effectiveChurch ? ` Assigned to ${effectiveChurch}.` : ''}`

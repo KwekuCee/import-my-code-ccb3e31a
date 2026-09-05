@@ -543,6 +543,42 @@ export type Database = {
         }
         Relationships: []
       }
+      portal_sessions: {
+        Row: {
+          church_id: string | null
+          church_name: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          role: string
+          token_hash: string
+          user_email: string | null
+          user_name: string | null
+        }
+        Insert: {
+          church_id?: string | null
+          church_name?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          role: string
+          token_hash: string
+          user_email?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          church_id?: string | null
+          church_name?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          role?: string
+          token_hash?: string
+          user_email?: string | null
+          user_name?: string | null
+        }
+        Relationships: []
+      }
       promotion_queue: {
         Row: {
           church_id: string | null
