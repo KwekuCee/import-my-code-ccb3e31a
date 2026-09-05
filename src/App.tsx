@@ -681,6 +681,7 @@ export default function App() {
                 <NewRegistration
                   members={members}
                   leaders={leaders}
+                  churches={churches}
                   serviceTypes={serviceTypes}
                   onAddMember={handleAddMember}
                   onNavigate={setCurrentView}
@@ -692,6 +693,7 @@ export default function App() {
                 <AttendanceView
                   attendanceRecords={attendanceRecords}
                   user={user}
+                  churches={churches}
                   serviceTypes={serviceTypes}
                   onNavigate={setCurrentView}
                   onUpdateAttendance={handleUpdateAttendance}
@@ -767,6 +769,7 @@ export default function App() {
         {showAnnouncementModal && (
           <AnnouncementModal
             key="announcement-modal"
+            churches={churches}
             onClose={() => setShowAnnouncementModal(false)}
             onAddAuditLog={(log) => setAuditLogs(prev => [log, ...prev])}
           />
