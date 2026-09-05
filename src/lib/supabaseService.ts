@@ -943,20 +943,68 @@ export async function fetchPromotionQueueFromSupabase(): Promise<PromotionQueueI
     }
     if (!data || data.length === 0) return [];
 
-    return data.map((row: any) => ({
-      id: row.id,
-      leaderId: row.leader_id,
-      leaderName: row.leader_name || 'Leader',
-      church: row.church_name || 'Unassigned',
-      currentRole: row.current_leader_role,
-      targetRole: row.target_role,
-      downstreamCount: row.downstream_count || 5,
-      flaggedAt: row.flagged_at || new Date().toISOString(),
-      reason: row.reason
-    }));
+    return data
+      .filter((row: any) => (row.status || 'Pending') === 'Pending')
+      .map((row: any) => ({
+        id: row.id,
+        leaderId: row.leader_id,
+        leaderName: row.member_name || row.leader_name || 'Leader',
+        memberId: row.member_id || undefined,
+        church: row.church_name || 'Unassigned',
+        currentRole: row.current_leader_role,
+        targetRole: row.target_role,
+        downstreamCount: row.downstream_count || 0,
+        flaggedAt: (row.flagged_at || new Date().toISOString()).slice(0, 10),
+        reason: row.reason,
+        requestedBy: row.requested_by || undefined,
+        status: row.status || 'Pending'
+      }));
   } catch (err) {
     console.error('Error in fetchPromotionQueueFromSupabase:', err);
     return null;
+  }
+}
+
+/**
+ * A branch admin proposes that a member (or existing leader) takes on a leader
+ * role. Nothing changes until the group account approves it.
+ */
+export async function requestPromotionInSupabase(request: {
+  memberId?: string;
+  memberName: string;
+  leaderId?: string;
+  church: string;
+  currentRole: string;
+  targetRole: string;
+  reason: string;
+  requestedBy: string;
+}): Promise<boolean> {
+  const client = getSupabase();
+  if (!client) return false;
+
+  try {
+    const churchId = await resolveChurchId(request.church);
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(request.leaderId || '');
+    const { error } = await client.from('promotion_queue').insert({
+      leader_id: isUuid ? request.leaderId : null,
+      member_id: request.memberId || null,
+      member_name: request.memberName,
+      church_id: churchId,
+      church_name: request.church,
+      current_leader_role: request.currentRole,
+      target_role: request.targetRole,
+      reason: request.reason,
+      requested_by: request.requestedBy,
+      status: 'Pending'
+    });
+    if (error) {
+      console.warn('Supabase requestPromotion error:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error in requestPromotionInSupabase:', err);
+    return false;
   }
 }
 
@@ -975,6 +1023,11 @@ export async function confirmPromotionInSupabase(promotionId: string): Promise<b
     console.error('Error in confirmPromotionInSupabase:', err);
     return false;
   }
+}
+
+/** The group account turns down a promotion request. */
+export async function declinePromotionInSupabase(promotionId: string): Promise<boolean> {
+  return confirmPromotionInSupabase(promotionId);
 }
 
 // ============================================================================
