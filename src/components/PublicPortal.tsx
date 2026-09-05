@@ -249,18 +249,15 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const generateAndDownloadQrPass = async (member: Member, churchName: string, serviceType: string, timestamp: string) => {
     try {
       setIsGeneratingQr(true);
-      const qrContent = JSON.stringify({
-        id: member.id,
-        name: member.fullName,
-        church: churchName,
-        phone: member.phone,
-        service: serviceType
-      });
+      // Keep the code content as short as possible so phone cameras read it
+      // easily: the member ID alone is enough to look everything else up.
+      const qrContent = member.id;
 
       const qrDataUrl = await QRCode.toDataURL(qrContent, {
-        width: 300,
-        margin: 1,
-        color: { dark: '#020617', light: '#ffffff' }
+        width: 720,
+        margin: 3,
+        errorCorrectionLevel: 'H',
+        color: { dark: '#000000', light: '#ffffff' }
       });
 
       // Canvas element for Digital Member Pass Badge
@@ -300,14 +297,14 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       // White QR Container Box
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.roundRect(160, 140, 280, 280, 20);
+      ctx.roundRect(140, 130, 320, 320, 20);
       ctx.fill();
 
       // Draw QR Code Image
       const img = new Image();
       img.src = qrDataUrl;
       await new Promise((resolve) => { img.onload = resolve; });
-      ctx.drawImage(img, 175, 155, 250, 250);
+      ctx.drawImage(img, 150, 140, 300, 300);
 
       // Member Details Frame
       ctx.fillStyle = '#0f172a';
