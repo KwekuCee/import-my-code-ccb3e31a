@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { AttendanceRecord, ChurchBranch, ViewType } from '../types';
+import { AttendanceRecord, ChurchBranch, ViewType, Member, Leader } from '../types';
 import { useToast } from '../context/ToastContext';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
+import { getGroupNamesForLeader, findLeaderByName } from '../utils/analyticsUtils';
 
 interface AttendanceViewProps {
   attendanceRecords: AttendanceRecord[];
@@ -14,8 +15,11 @@ interface AttendanceViewProps {
   onClearTodayAttendance?: () => void;
   serviceTypes?: { id: string; name: string; active: boolean }[];
   churches?: ChurchBranch[];
+  members?: Member[];
+  leaders?: Leader[];
   onUpdateAttendance?: (record: AttendanceRecord) => void;
   onDeleteAttendance?: (recordId: string) => void;
+  onConfirmAttendance?: (record: AttendanceRecord) => void;
 }
 
 export const AttendanceView: React.FC<AttendanceViewProps> = ({
@@ -25,8 +29,11 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   onClearTodayAttendance,
   serviceTypes,
   churches = [],
+  members = [],
+  leaders = [],
   onUpdateAttendance,
-  onDeleteAttendance
+  onDeleteAttendance,
+  onConfirmAttendance
 }) => {
   const toast = useToast();
   const todayStr = new Date().toISOString().slice(0, 10);
