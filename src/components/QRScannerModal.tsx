@@ -4,6 +4,13 @@ import { useToast } from '../context/ToastContext';
 
 interface QRScannerModalProps {
   members: Member[];
+  attendance?: AttendanceRecord[];
+  serviceTypes?: Array<{ id: string; name: string; active: boolean }>;
+  user?: {
+    name: string;
+    role: 'Superadmin' | 'Church Admin';
+    church: string;
+  };
   onConfirmAttendance: (record: AttendanceRecord) => void;
   onClose: () => void;
   onNavigate: (view: ViewType) => void;
@@ -11,26 +18,35 @@ interface QRScannerModalProps {
 
 export const QRScannerModal: React.FC<QRScannerModalProps> = ({
   members,
+  attendance = [],
+  serviceTypes = [],
+  user,
   onConfirmAttendance,
   onClose,
   onNavigate
 }) => {
   const toast = useToast();
-  const [scannerState, setScannerState] = useState<'scanning' | 'success' | 'error'>('scanning');
-  const [selectedMember, setSelectedMember] = useState<Member | null>(() => {
-    return members?.find(m => m.id === 'CE-2901') || members?.[0] || null;
-  });
-  const [serviceType, setServiceType] = useState('Sunday Service');
+  const [scannerState, setScannerState] = useState<'scanning' | 'success' | 'duplicate' | 'error'>('scanning');
+  const [lookupQuery, setLookupQuery] = useState('');
+  const isChurchAdmin = user?.role === 'Church Admin';
+  const scopedMembers = (members || []).filter(m =>
+    m && (!isChurchAdmin || (m.church || '').toLowerCase() === (user?.church || '').toLowerCase())
+  );
+
+  const activeServiceNames = (serviceTypes || []).filter(s => s.active).map(s => s.name);
+  const serviceOptions = activeServiceNames.length > 0 ? activeServiceNames : ['Sunday Service'];
+
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [serviceType, setServiceType] = useState(serviceOptions[0]);
   const [flashlightOn, setFlashlightOn] = useState(false);
   const [useRealCamera, setUseRealCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Sync selected member when members array loads
   useEffect(() => {
-    if (!selectedMember && members && members.length > 0) {
-      setSelectedMember(members.find(m => m.id === 'CE-2901') || members[0]);
+    if (!serviceOptions.includes(serviceType)) {
+      setServiceType(serviceOptions[0]);
     }
-  }, [members, selectedMember]);
+  }, [serviceOptions.join('|')]);
 
   const bgImageUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAiyCmtx-XHebXJST5E1hExdoWCfkgB34IaY-mKBw36293DZ6MIwhbnexnGkUqdlqAaNKZudX4bT2zO3x95HvA-lTaU15gsuAMZV2jZZsFMFrfQui0ziSX_Xq-qFRxnT-29EqDgNZ-a99tcqQH2nGsrH--n68U7Ndv-C3YH7gI22HeUbpQeFNlmO6MqYpPNO377VPx8sE_d-iyvVmQqOkQ4R_Yh8tljgZHrf6dVgucORLA2AJzEiJby7c5Jl8SG4n76cJ_XEGpCt7o';
 
@@ -55,6 +71,13 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     }
   }, [useRealCamera]);
 
+  const today = new Date().toISOString().slice(0, 10);
+
+  const alreadyRecorded = (member: Member, service: string) =>
+    (attendance || []).some(a =>
+      a && a.memberId === member.id && a.serviceType === service && (a.date || '').slice(0, 10) === today
+    );
+
   const recordAttendance = (member: Member, service: string) => {
     const record: AttendanceRecord = {
       id: `att-${Date.now()}`,
@@ -64,7 +87,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
       serviceType: service,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       date: new Date().toISOString().slice(0, 10),
-      verifiedBy: 'QR Scanner Station 1',
+      verifiedBy: user?.name ? `${user.name} (QR Scanner)` : 'QR Scanner Station 1',
       status: 'Confirmed',
       church: member.church || 'GCYC Main',
       checkInMethod: 'QR Scan',
@@ -75,9 +98,18 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
   };
 
   const handleSimulateScan = (memberId: string) => {
-    const found = members.find(m => m.id === memberId);
+    const found = scopedMembers.find(m => m.id === memberId) || members.find(m => m.id === memberId);
     if (found) {
       setSelectedMember(found);
+      if (isChurchAdmin && (found.church || '').toLowerCase() !== (user?.church || '').toLowerCase()) {
+        setScannerState('error');
+        toast.showError('Wrong church', `${found.fullName} belongs to ${found.church}.`);
+        return;
+      }
+      if (alreadyRecorded(found, serviceType)) {
+        setScannerState('duplicate');
+        return;
+      }
       setScannerState('success');
       // Attendance is logged the instant a valid pass is scanned
       recordAttendance(found, serviceType);
@@ -140,31 +172,57 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
             Position QR Code Pass Inside Frame
           </span>
 
-          {/* Test Scan Simulator Buttons */}
-          <div className="mt-4 pointer-events-auto flex flex-wrap justify-center gap-2 px-4 max-w-md">
-            <button
-              onClick={() => handleSimulateScan('CE-2901')}
-              className="text-[11px] font-mono font-bold bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10"
+          {/* Service picker + manual lookup */}
+          <div className="mt-4 pointer-events-auto w-full px-4 max-w-md space-y-2">
+            <select
+              value={serviceType}
+              onChange={(e) => setServiceType(e.target.value)}
+              className="w-full bg-slate-900/80 border border-slate-700 text-white text-xs font-semibold rounded-xl px-3 py-2 outline-none"
             >
-              Scan Kofi (CE-2901)
-            </button>
-            <button
-              onClick={() => handleSimulateScan('CE-1001')}
-              className="text-[11px] font-mono font-bold bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10"
-            >
-              Scan Kwame (CE-1001)
-            </button>
-            <button
-              onClick={() => setScannerState('error')}
-              className="text-[11px] font-mono font-bold bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 px-3 py-1.5 rounded-full backdrop-blur-md border border-rose-500/30"
-            >
-              Invalid Code Test
-            </button>
+              {serviceOptions.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+
+            <input
+              type="text"
+              value={lookupQuery}
+              onChange={(e) => setLookupQuery(e.target.value)}
+              placeholder="Or find a member by name or ID"
+              className="w-full bg-slate-900/80 border border-slate-700 text-white text-xs rounded-xl px-3 py-2 outline-none placeholder:text-slate-400"
+            />
+
+            {lookupQuery.trim() && (
+              <div className="max-h-40 overflow-y-auto bg-slate-900/90 border border-slate-700 rounded-xl divide-y divide-slate-800">
+                {scopedMembers
+                  .filter(m =>
+                    (m.fullName || '').toLowerCase().includes(lookupQuery.trim().toLowerCase()) ||
+                    (m.id || '').toLowerCase().includes(lookupQuery.trim().toLowerCase())
+                  )
+                  .slice(0, 12)
+                  .map(m => (
+                    <button
+                      key={m.id}
+                      onClick={() => { setLookupQuery(''); handleSimulateScan(m.id); }}
+                      className="w-full text-left px-3 py-2 text-xs text-white hover:bg-slate-800"
+                    >
+                      {m.fullName} <span className="text-slate-400">• {m.id} • {m.church}</span>
+                    </button>
+                  ))}
+                {scopedMembers.filter(m =>
+                  (m.fullName || '').toLowerCase().includes(lookupQuery.trim().toLowerCase()) ||
+                  (m.id || '').toLowerCase().includes(lookupQuery.trim().toLowerCase())
+                ).length === 0 && (
+                  <p className="px-3 py-3 text-xs text-slate-400">No member found.</p>
+                )}
+              </div>
+            )}
+
             <button
               onClick={() => setUseRealCamera(!useRealCamera)}
-              className="text-[11px] font-mono font-bold bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 px-3 py-1.5 rounded-full backdrop-blur-md border border-amber-500/30"
+              className="w-full text-[11px] font-bold bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl border border-white/10"
             >
-              {useRealCamera ? 'Use Static Backdrop' : 'Toggle WebCam'}
+              {useRealCamera ? 'Turn camera off' : 'Turn camera on'}
             </button>
           </div>
         </div>
@@ -254,9 +312,9 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                   onChange={(e) => setServiceType(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-body text-xs font-semibold text-slate-900 outline-none focus:border-blue-600 cursor-pointer"
                 >
-                  <option value="Sunday Service">Sunday Service</option>
-                  <option value="Midweek Service">Midweek Service</option>
-                  <option value="Special Service">Special Service</option>
+                  {serviceOptions.map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
                 </select>
               </div>
 
@@ -270,6 +328,31 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
               </button>
 
 
+            </div>
+          </div>
+        )}
+
+        {/* Already recorded Overlay */}
+        {scannerState === 'duplicate' && selectedMember && (
+          <div className="bg-white rounded-t-3xl w-full shadow-2xl pointer-events-auto border-t border-slate-200 max-w-lg mx-auto animate-in slide-in-from-bottom duration-200">
+            <div className="w-full flex justify-center py-3">
+              <div className="w-12 h-1.5 rounded-full bg-slate-200" />
+            </div>
+            <div className="px-6 pb-8 pt-1 flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-amber-600 icon-fill text-[24px]">info</span>
+                <span className="font-headline font-bold text-sm text-amber-800">Already recorded today</span>
+              </div>
+              <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 text-xs text-slate-700">
+                <p className="font-bold text-slate-900 mb-1">{selectedMember.fullName}</p>
+                <p>{selectedMember.fullName} is already marked present for {serviceType} today, so nothing was added.</p>
+              </div>
+              <button
+                onClick={handleScanNext}
+                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 rounded-xl cursor-pointer"
+              >
+                Scan next member
+              </button>
             </div>
           </div>
         )}
