@@ -30,7 +30,7 @@ export interface ChurchAdminAccount {
   password?: string;
 }
 
-export type RoleType = 'Leader' | 'Member' | 'Visitor' | 'Deacon' | 'First Timer' | 'Pastor';
+export type RoleType = 'Leader' | 'Member' | 'First Timer';
 
 export type LeaderType = 'BSCT' | 'Cell Leader' | 'PCF Leader' | 'Church Coordinator';
 
