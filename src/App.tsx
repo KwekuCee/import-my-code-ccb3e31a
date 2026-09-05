@@ -289,7 +289,7 @@ export default function App() {
           occupation: 'Member',
           education: 'Tertiary',
           location: record.church || 'Korle Bu',
-          church: record.church || (churches[0]?.name || 'GCYC Main'),
+          church: record.church || churches[0]?.name || 'Unassigned',
           joinDate: today,
           initials: (record.memberName || 'Member').split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'MB',
           serviceCount: 1,

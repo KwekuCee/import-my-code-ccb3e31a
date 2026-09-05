@@ -89,7 +89,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
       date: new Date().toISOString().slice(0, 10),
       verifiedBy: user?.name ? `${user.name} (QR Scanner)` : 'QR Scanner Station 1',
       status: 'Confirmed',
-      church: member.church || 'GCYC Main',
+      church: member.church || 'Unassigned',
       checkInMethod: 'QR Scan',
       leaderName: member.invitedBy,
     };

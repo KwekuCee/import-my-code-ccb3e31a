@@ -25,7 +25,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
   const [dob, setDob] = useState('');
   const [location, setLocation] = useState('Korle Bu');
   const [leaderType, setLeaderType] = useState<LeaderType>('BSCT');
-  const [church, setChurch] = useState('GCYC Main');
+  const [church, setChurch] = useState('');
   const [parentLeaderId, setParentLeaderId] = useState('');
   const [isAppointed, setIsAppointed] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -338,7 +338,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
                 type="text"
                 value={location}
                 onChange={e => setLocation(e.target.value)}
-                placeholder="e.g. Korle Bu / Dansoman"
+                placeholder="e.g. area or suburb"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
               />
             </div>

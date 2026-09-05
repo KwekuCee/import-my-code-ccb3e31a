@@ -39,7 +39,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
 }) => {
   const isSuperadmin = user.role === 'Superadmin';
-  const currentChurchName = user.church || (churches[0]?.name || 'GCYC Main');
+  const currentChurchName = user.church || churches[0]?.name || 'Unassigned';
   const matchingBranch = churches.find(c => c && c.name && c.name.toLowerCase() === currentChurchName.toLowerCase());
   const matchingAdmin = churchAdmins.find(a => a && a.churchName && a.churchName.toLowerCase() === currentChurchName.toLowerCase());
   const currentBranchPastor = matchingBranch?.pastor || matchingAdmin?.adminName || (user.role === 'Church Admin' ? user.name : 'Branch Pastor');

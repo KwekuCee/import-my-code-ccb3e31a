@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Member, ViewType, Leader } from '../types';
+import { Member, ViewType, Leader, ChurchBranch } from '../types';
 import { useToast } from '../context/ToastContext';
 import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClassNumber } from '../data/constants';
 
 interface NewRegistrationProps {
   members: Member[];
   leaders?: Leader[];
+  churches?: ChurchBranch[];
   serviceTypes?: Array<{ id: string; name: string; active?: boolean }> | string[];
   onAddMember: (newMember: Member) => void;
   onNavigate: (view: ViewType) => void;
@@ -15,6 +16,7 @@ interface NewRegistrationProps {
 export const NewRegistration: React.FC<NewRegistrationProps> = ({
   members,
   leaders = [],
+  churches = [],
   onAddMember,
   onNavigate,
   onSelectMemberForCard
@@ -31,7 +33,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
   const [education, setEducation] = useState('Tertiary / University');
   const [foundationClass, setFoundationClass] = useState('Not Enrolled Yet');
   const [location, setLocation] = useState('Korle Bu');
-  const [church, setChurch] = useState('GCYC Main');
+  const [church, setChurch] = useState('');
 
   const [inviteSource, setInviteSource] = useState<'self' | 'leader'>('self');
   const [leaderSearch, setLeaderSearch] = useState('');
@@ -424,7 +426,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. Korle Bu / Dansoman / Mamprobi"
+                placeholder="e.g. area or suburb"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900"
               />
             </div>
@@ -440,12 +442,10 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
                 disabled={inviteSource === 'leader' && !!selectedLeader}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-900 disabled:opacity-70 disabled:bg-slate-100"
               >
-                <option value="GCYC Main">GCYC Main</option>
-                <option value="GCYC 1">GCYC 1</option>
-                <option value="GCYC 2">GCYC 2</option>
-                <option value="CE Mamprobi">CE Mamprobi</option>
-                <option value="CE Dansoman">CE Dansoman</option>
-                <option value="CE Kaneshie">CE Kaneshie</option>
+                <option value="">Select a church</option>
+                {churches.map(c => (
+                  <option key={c.id} value={c.name}>{c.name}</option>
+                ))}
               </select>
             </div>
           </div>
