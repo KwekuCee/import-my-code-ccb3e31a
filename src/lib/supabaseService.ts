@@ -259,13 +259,14 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
       church_id: churchId,
       church_name: leader.church,
       promotion_status: leader.promotionStatus || 'None',
-      photo_url: leader.photoUrl || null
+      photo_url: leader.photoUrl || null,
+      leader_code: leader.leaderCode || generateLeaderCode()
     };
     if (isUuid) payload.id = leader.id;
 
     const { data, error } = isUuid
-      ? await client.from('leaders').upsert(payload, { onConflict: 'id' }).select('id').maybeSingle()
-      : await client.from('leaders').insert(payload).select('id').maybeSingle();
+      ? await client.from('leaders').upsert(payload, { onConflict: 'id' }).select('id, leader_code').maybeSingle()
+      : await client.from('leaders').insert(payload).select('id, leader_code').maybeSingle();
 
     if (error) {
       console.warn('Supabase saveLeader error:', error.message);
@@ -277,12 +278,85 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
     if (newId && newId !== leader.id) {
       leader.id = newId;
     }
+    leader.leaderCode = (data as any)?.leader_code || payload.leader_code;
     return true;
   } catch (err) {
     console.error('Error in saveLeaderToSupabase:', err);
     return false;
   }
 }
+
+/** Short scan code printed on a leader's pass, e.g. LDR-4821. */
+export function generateLeaderCode(): string {
+  return `LDR-${Math.floor(1000 + Math.random() * 9000)}`;
+}
+
+/**
+ * Every leader is also a member. This keeps the member database in step:
+ * an existing member record is tagged as a leader, otherwise a new member row
+ * is created using the leader's scan code as its ID. Returns the member ID.
+ */
+export async function syncLeaderAsMember(leader: Leader): Promise<string | null> {
+  const client = getSupabase();
+  if (!client) return null;
+
+  try {
+    const email = (leader.email || '').trim();
+    let existingId: string | null = null;
+
+    if (email) {
+      const { data } = await client.from('members').select('id').ilike('email', email).maybeSingle();
+      existingId = (data as any)?.id || null;
+    }
+    if (!existingId && leader.fullName) {
+      const { data } = await client
+        .from('members')
+        .select('id, church_name')
+        .ilike('full_name', leader.fullName.trim())
+        .limit(5);
+      const match = (data || []).find(
+        (row: any) => (row.church_name || '').toLowerCase() === (leader.church || '').toLowerCase()
+      ) || (data || [])[0];
+      existingId = (match as any)?.id || null;
+    }
+
+    const memberId = existingId || leader.leaderCode || generateLeaderCode();
+    const churchId = await resolveChurchId(leader.church);
+
+    const payload: any = {
+      id: memberId,
+      full_name: leader.fullName,
+      email: leader.email || null,
+      phone: leader.contact || null,
+      dob: leader.dob || null,
+      role: 'Leader',
+      location: leader.location || null,
+      church_id: churchId,
+      church_name: leader.church,
+      photo_url: leader.photoUrl || null,
+      status: 'General Member'
+    };
+    if (!existingId) {
+      payload.occupation = 'General';
+      payload.education_level = 'Tertiary';
+      payload.service_count = 1;
+      payload.foundation_class = 0;
+      payload.join_date = leader.joinedDate || new Date().toISOString().slice(0, 10);
+      payload.invited_by_name = leader.parentLeaderName || 'Leader Registration';
+    }
+
+    const { error } = await client.from('members').upsert(payload, { onConflict: 'id' });
+    if (error) {
+      console.warn('Supabase syncLeaderAsMember error:', error.message);
+      return null;
+    }
+    return memberId;
+  } catch (err) {
+    console.error('Error in syncLeaderAsMember:', err);
+    return null;
+  }
+}
+
 
 
 export async function deleteLeaderFromSupabase(leaderId: string): Promise<boolean> {
