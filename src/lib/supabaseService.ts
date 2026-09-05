@@ -220,6 +220,7 @@ export async function fetchLeadersFromSupabase(): Promise<Leader[] | null> {
       parentLeaderName: row.parent_leader_name,
       isAppointed: row.is_appointed || false,
       downstreamCount: row.downstream_count || 0,
+      leaderCode: row.leader_code || undefined,
       church: row.church_name || 'Unassigned',
       promotionStatus: row.promotion_status || 'None',
       photoUrl: row.photo_url || undefined,
