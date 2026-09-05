@@ -934,7 +934,25 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Leader / Inviter Selection */}
+                  {/* Church Branch Selection (first — leaders below are filtered by it) */}
+                  <div>
+                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Select Your Church *
+                    </label>
+                    <select
+                      value={attChurch}
+                      onChange={(e) => { setAttChurch(e.target.value); setAttInvitedByLeaderId('self_invite'); }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-blue-900 font-bold outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                    >
+                      {effectiveChurches.map((c) => (
+                        <option key={c.id} value={c.name}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Leader / Inviter Selection — only leaders from the selected church */}
                   <div>
                     <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
                       Who Invited You / Name of Leader? *
@@ -945,33 +963,17 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
                     >
                       <option value="self_invite">Self Invited / Walk-In</option>
-                      {leaders.map((ldr) => (
-                        <option key={ldr.id} value={ldr.id}>
-                          {ldr.fullName} ({ldr.leaderType} - {ldr.church})
-                        </option>
-                      ))}
+                      {leaders
+                        .filter((ldr) => !attChurch || (ldr.church || '').toLowerCase() === attChurch.toLowerCase())
+                        .map((ldr) => (
+                          <option key={ldr.id} value={ldr.id}>
+                            {ldr.fullName} ({ldr.leaderType})
+                          </option>
+                        ))}
                     </select>
                     <p className="text-[10px] text-slate-500 mt-1">
-                      Selecting a leader automatically sets your church branch!
+                      Choose your church first — only leaders from that church are shown.
                     </p>
-                  </div>
-
-                  {/* Church Branch Selection */}
-                  <div>
-                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
-                      Select Your Church *
-                    </label>
-                    <select
-                      value={attChurch}
-                      onChange={(e) => setAttChurch(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-blue-900 font-bold outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
-                    >
-                      {effectiveChurches.map((c) => (
-                        <option key={c.id} value={c.name}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
                   </div>
                 </div>
 
