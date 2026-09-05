@@ -17,3 +17,9 @@
 - [x] QR scanner really reads the passes the app creates (camera decoding, records instantly, blocks repeats)
 - [x] Member roles narrowed to Leader, Member, First Timer (legacy roles read as Member)
 - [x] Leader self-registration lists every registered church branch
+
+## Branch privacy, group names, automatic growth (done)
+- Branch admins limited to their own branch (members, leaders, attendance) — no cross-branch filters or church editing.
+- Admins can record attendance by hand for people without phones; same person/service/day blocked.
+- Bible study class / cell / PCF names shown and saved on members, leaders and attendance.
+- Automatic growth: foundation graduates become Bible study class teachers; 4 under a leader promotes to cell leader; 4 cells promote to PCF leader. Superadmin appointments protected.

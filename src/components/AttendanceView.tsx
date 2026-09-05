@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { AttendanceRecord, ChurchBranch, ViewType } from '../types';
+import { AttendanceRecord, ChurchBranch, ViewType, Member, Leader } from '../types';
 import { useToast } from '../context/ToastContext';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
+import { getGroupNamesForLeader, findLeaderByName } from '../utils/analyticsUtils';
 
 interface AttendanceViewProps {
   attendanceRecords: AttendanceRecord[];
@@ -14,8 +15,11 @@ interface AttendanceViewProps {
   onClearTodayAttendance?: () => void;
   serviceTypes?: { id: string; name: string; active: boolean }[];
   churches?: ChurchBranch[];
+  members?: Member[];
+  leaders?: Leader[];
   onUpdateAttendance?: (record: AttendanceRecord) => void;
   onDeleteAttendance?: (recordId: string) => void;
+  onConfirmAttendance?: (record: AttendanceRecord) => void;
 }
 
 export const AttendanceView: React.FC<AttendanceViewProps> = ({
@@ -25,8 +29,11 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   onClearTodayAttendance,
   serviceTypes,
   churches = [],
+  members = [],
+  leaders = [],
   onUpdateAttendance,
-  onDeleteAttendance
+  onDeleteAttendance,
+  onConfirmAttendance
 }) => {
   const toast = useToast();
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -40,9 +47,61 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   const [editingRecord, setEditingRecord] = useState<AttendanceRecord | null>(null);
   const [deletingRecord, setDeletingRecord] = useState<AttendanceRecord | null>(null);
   const [savedArchives, setSavedArchives] = useState<string[]>([]);
+  const [showManualPanel, setShowManualPanel] = useState<boolean>(false);
+  const [manualSearch, setManualSearch] = useState<string>('');
+  const [manualService, setManualService] = useState<string>('');
 
   const isChurchAdmin = user?.role === 'Church Admin';
   const targetChurch = user?.church || '';
+
+  const serviceOptions = (serviceTypes || []).filter(s => s.active).map(s => s.name);
+  const activeServices = serviceOptions.length > 0 ? serviceOptions : ['Sunday Service'];
+  const chosenService = manualService || activeServices[0];
+
+  // People this admin may record: their own branch only
+  const recordableMembers = isChurchAdmin
+    ? (members || []).filter(m => m && m.church === targetChurch)
+    : (members || []);
+
+  const manualMatches = manualSearch.trim()
+    ? recordableMembers.filter(m =>
+      (m.fullName || '').toLowerCase().includes(manualSearch.trim().toLowerCase()) ||
+      (m.id || '').toLowerCase().includes(manualSearch.trim().toLowerCase())
+    ).slice(0, 10)
+    : recordableMembers.slice(0, 10);
+
+  const alreadyRecordedToday = (memberId: string, service: string) =>
+    (attendanceRecords || []).some(r =>
+      r && r.memberId === memberId && r.serviceType === service && (r.date || '').slice(0, 10) === todayStr
+    );
+
+  const handleManualRecord = (m: Member) => {
+    if (alreadyRecordedToday(m.id, chosenService)) {
+      toast.showError('Already recorded', `${m.fullName} is already marked present for ${chosenService} today.`);
+      return;
+    }
+    const leader = m.invitedByLeaderId
+      ? (leaders || []).find(l => l.id === m.invitedByLeaderId)
+      : findLeaderByName(m.invitedBy, leaders);
+    const groups = getGroupNamesForLeader(leader?.id, leaders);
+    onConfirmAttendance?.({
+      id: `att-${Date.now()}`,
+      memberId: m.id,
+      memberName: m.fullName,
+      memberRole: m.role || 'Member',
+      serviceType: chosenService,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      date: todayStr,
+      verifiedBy: user?.name ? `${user.name} (recorded by hand)` : 'Church Admin',
+      status: 'Confirmed',
+      church: m.church || targetChurch || 'Unassigned',
+      checkInMethod: 'Manual Admin',
+      leaderName: leader?.fullName || m.invitedBy,
+      pcfName: [groups.className, groups.cellName, groups.pcfName].filter(Boolean).join(' • ') || 'General PCF'
+    });
+    setManualSearch('');
+    toast.showSuccess('Attendance recorded', `${m.fullName} is marked present for ${chosenService}.`);
+  };
 
   // Filter scoped to Church Admin branch if applicable
   const scopedRecords = isChurchAdmin
@@ -170,6 +229,15 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2.5">
+          {onConfirmAttendance && (
+            <button
+              onClick={() => setShowManualPanel(v => !v)}
+              className="bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+            >
+              <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
+              <span>Record attendance</span>
+            </button>
+          )}
           <button
             onClick={() => setShowFinalizeModal(true)}
             className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
@@ -187,6 +255,72 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Record attendance by hand (for people without a phone) */}
+      {showManualPanel && onConfirmAttendance && (
+        <div className="bg-white border border-blue-200 rounded-2xl p-4 md:p-5 shadow-sm space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="font-display text-base font-extrabold text-slate-900">Record attendance by hand</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                For people who came without a phone or a pass. {isChurchAdmin ? `Only ${targetChurch} people are listed.` : 'All branches are listed.'}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowManualPanel(false)}
+              className="text-slate-400 hover:text-slate-700 cursor-pointer"
+              aria-label="Close"
+            >
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input
+              type="text"
+              value={manualSearch}
+              onChange={e => setManualSearch(e.target.value)}
+              placeholder="Find a person by name or ID"
+              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs bg-slate-50 text-slate-900 outline-none focus:border-blue-600 placeholder:text-slate-400"
+            />
+            <select
+              value={chosenService}
+              onChange={e => setManualService(e.target.value)}
+              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold bg-slate-50 text-slate-900 outline-none focus:border-blue-600"
+            >
+              {activeServices.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <div className="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-64 overflow-y-auto">
+            {manualMatches.length === 0 && (
+              <p className="px-3 py-4 text-xs text-slate-500">No one found in this branch.</p>
+            )}
+            {manualMatches.map(m => {
+              const done = alreadyRecordedToday(m.id, chosenService);
+              return (
+                <div key={m.id} className="flex items-center justify-between gap-3 px-3 py-2.5">
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-900 truncate">{m.fullName}</p>
+                    <p className="text-[11px] text-slate-500 truncate">
+                      {m.id} • {m.church} • {m.invitedBy || 'No leader yet'}
+                    </p>
+                  </div>
+                  <button
+                    disabled={done}
+                    onClick={() => handleManualRecord(m)}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-lg shrink-0 ${done
+                      ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                      : 'bg-blue-700 hover:bg-blue-800 text-white cursor-pointer'}`}
+                  >
+                    {done ? 'Recorded' : 'Mark present'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Stats Summary Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -476,9 +610,9 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
               : { key: 'serviceType', label: 'Service Type' }),
             { key: 'date', label: 'Date', type: 'date' },
             { key: 'timestamp', label: 'Check-in Time' },
-            { key: 'church', label: 'Church Branch' },
+            ...(isChurchAdmin ? [] : [{ key: 'church', label: 'Church Branch' }]),
             { key: 'leaderName', label: 'Leader' },
-            { key: 'pcfName', label: 'PCF / Cell' },
+            { key: 'pcfName', label: 'Bible Study Class / Cell / PCF' },
             { key: 'verifiedBy', label: 'Verified By' }
           ]}
           onCancel={() => setEditingRecord(null)}

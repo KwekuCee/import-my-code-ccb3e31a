@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Member, RoleType, ViewType, ChurchBranch, Leader } from '../types';
 import { MemberPhoto } from './MemberPhoto';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
+import { getGroupNamesForLeader, findLeaderByName } from '../utils/analyticsUtils';
 
 interface MemberDatabaseProps {
   members: Member[];
@@ -41,6 +42,12 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
 
   const isChurchAdmin = user?.role === 'Church Admin';
   const targetChurch = user?.church || '';
+
+  // Bible study class / cell / PCF names a member belongs to, via their leader
+  const groupNamesForMember = (m: Member) => {
+    const leaderId = m.invitedByLeaderId || findLeaderByName(m.invitedBy, leaders)?.id;
+    return getGroupNamesForLeader(leaderId, leaders);
+  };
 
   // Restrict pool to branch members if Church Admin
   const scopedMembers = isChurchAdmin
@@ -229,19 +236,21 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold uppercase text-slate-400 mb-1">Church Branch</label>
-                  <select
-                    value={churchFilter}
-                    onChange={(e) => setChurchFilter(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl p-2 text-xs bg-slate-50 font-medium"
-                  >
-                    <option value="All">All Churches</option>
-                    {churchOptions.map(c => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
+                {!isChurchAdmin && (
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-slate-400 mb-1">Church Branch</label>
+                    <select
+                      value={churchFilter}
+                      onChange={(e) => setChurchFilter(e.target.value)}
+                      className="w-full border border-slate-200 rounded-xl p-2 text-xs bg-slate-50 font-medium"
+                    >
+                      <option value="All">All Churches</option>
+                      {churchOptions.map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">Foundation School</label>
@@ -456,7 +465,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                       {member.location}
                     </td>
 
-                    {/* Church Tag */}
+                    {/* Church Tag + group names */}
                     <td className="py-3.5 px-4">
                       {member.church === 'Unassigned' ? (
                         <span className="text-slate-400 italic">Unassigned</span>
@@ -465,6 +474,16 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                           {member.church}
                         </span>
                       )}
+                      {(() => {
+                        const g = groupNamesForMember(member);
+                        const parts = [g.className, g.cellName, g.pcfName].filter(Boolean);
+                        if (parts.length === 0) return null;
+                        return (
+                          <div className="text-[11px] text-slate-500 mt-1 leading-snug">
+                            {parts.join(' • ')}
+                          </div>
+                        );
+                      })()}
                     </td>
 
                     {/* Actions Menu */}
@@ -582,9 +601,11 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
             { key: 'occupation', label: 'Occupation' },
             { key: 'education', label: 'Education' },
             { key: 'location', label: 'Location' },
-            (churches && churches.length > 0
-              ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
-              : { key: 'church', label: 'Church Branch' }),
+            ...(isChurchAdmin
+              ? []
+              : [(churches && churches.length > 0
+                ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
+                : { key: 'church', label: 'Church Branch' })]),
             ...(leaders && leaders.length > 0
               ? [{
                   key: 'invitedBy',

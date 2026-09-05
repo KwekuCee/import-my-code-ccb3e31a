@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Leader, LeaderType, PromotionQueueItem, ViewType, ChurchBranch, Member } from '../types';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
+import { getGroupNamesForLeader } from '../utils/analyticsUtils';
 
 interface LeaderDirectoryProps {
   leaders: Leader[];
@@ -177,16 +178,22 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
             <option value="BSCT">BSCTs</option>
           </select>
 
-          <select
-            value={selectedChurch}
-            onChange={e => setSelectedChurch(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-blue-600 cursor-pointer"
-          >
-            <option value="All">All Churches</option>
-            {(churches || []).map(c => (
-              <option key={c.id} value={c.name}>{c.name}</option>
-            ))}
-          </select>
+          {isChurchAdmin ? (
+            <div className="bg-slate-100 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700">
+              {targetChurch}
+            </div>
+          ) : (
+            <select
+              value={selectedChurch}
+              onChange={e => setSelectedChurch(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-blue-600 cursor-pointer"
+            >
+              <option value="All">All Churches</option>
+              {(churches || []).map(c => (
+                <option key={c.id} value={c.name}>{c.name}</option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
@@ -205,7 +212,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
               <tr className="bg-slate-50/60 text-xs font-bold text-slate-400 border-b border-slate-200">
                 <th className="py-3 px-4">Leader Name</th>
                 <th className="py-3 px-4">Type</th>
-                <th className="py-3 px-4">Cell / PCF</th>
+                <th className="py-3 px-4">Group name</th>
                 <th className="py-3 px-4">Church</th>
                 <th className="py-3 px-4">Reports to</th>
                 <th className="py-3 px-4 text-center">Members</th>
@@ -242,7 +249,13 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
                     </td>
 
                     <td className="py-3.5 px-4 font-semibold text-slate-800">
-                      {ldr.cellOrPcfName}
+                      {ldr.cellOrPcfName || `${ldr.fullName}'s group`}
+                      {(() => {
+                        const g = getGroupNamesForLeader(ldr.parentLeaderId, leaders);
+                        const parts = [g.cellName, g.pcfName].filter(Boolean);
+                        if (parts.length === 0) return null;
+                        return <div className="text-[11px] font-normal text-slate-500 mt-0.5">in {parts.join(' • ')}</div>;
+                      })()}
                     </td>
 
                     <td className="py-3.5 px-4 text-slate-600">
@@ -356,10 +369,12 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
             { key: 'contact', label: 'Contact', type: 'tel' },
             { key: 'dob', label: 'Date of Birth', type: 'date' },
             { key: 'location', label: 'Location' },
-            { key: 'cellOrPcfName', label: 'Cell / PCF' },
-            (churches && churches.length > 0
-              ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
-              : { key: 'church', label: 'Church Branch' }),
+            { key: 'cellOrPcfName', label: 'Bible Study Class / Cell / PCF Name' },
+            ...(isChurchAdmin
+              ? []
+              : [(churches && churches.length > 0
+                ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
+                : { key: 'church', label: 'Church Branch' })]),
             { key: 'leaderType', label: 'Leader Type', type: 'select', options: ['BSCT', 'Cell Leader', 'PCF Leader', 'Church Coordinator'] }
           ]}
           onCancel={() => setEditingLeader(null)}

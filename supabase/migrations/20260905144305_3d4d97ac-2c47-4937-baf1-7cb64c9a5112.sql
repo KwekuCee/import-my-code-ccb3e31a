@@ -1,0 +1,9 @@
+REVOKE ALL ON FUNCTION public.trigger_leader_structure_changed() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.trigger_leader_structure_changed() FROM anon;
+REVOKE ALL ON FUNCTION public.trigger_leader_structure_changed() FROM authenticated;
+REVOKE ALL ON FUNCTION public.trigger_member_foundation_graduation() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.trigger_member_foundation_graduation() FROM anon;
+REVOKE ALL ON FUNCTION public.trigger_member_foundation_graduation() FROM authenticated;
+REVOKE ALL ON FUNCTION public.apply_leader_growth_rules() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.apply_leader_growth_rules() FROM anon;
+REVOKE ALL ON FUNCTION public.apply_leader_growth_rules() FROM authenticated;
