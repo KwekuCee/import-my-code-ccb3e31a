@@ -1344,6 +1344,46 @@ export async function sendPasswordResetEmail(email: string): Promise<{ success: 
   }
 }
 
+/**
+ * Sends (or resends) the email verification link a branch admin needs before
+ * they are allowed to sign in.
+ */
+export async function sendAdminVerificationEmail(
+  email: string,
+  name?: string
+): Promise<{ success: boolean; message: string; link?: string; alreadyVerified?: boolean }> {
+  const client = getSupabase();
+  if (!client) {
+    return { success: false, message: 'Cannot reach the system right now. Please try again shortly.' };
+  }
+  const trimmedEmail = (email || '').trim();
+  if (!trimmedEmail || !trimmedEmail.includes('@')) {
+    return { success: false, message: 'Please provide a valid email address.' };
+  }
+  try {
+    const { data, error } = await client.functions.invoke('verify-email', {
+      body: {
+        action: 'send',
+        email: trimmedEmail,
+        name: name || '',
+        origin: typeof window !== 'undefined' ? window.location.origin : ''
+      }
+    });
+    if (error) {
+      return { success: false, message: error.message || 'Could not send the verification email.' };
+    }
+    const res = data as any;
+    return {
+      success: !!res?.success,
+      message: res?.message || 'Please check your email for the verification link.',
+      link: res?.link,
+      alreadyVerified: !!res?.alreadyVerified
+    };
+  } catch (err: any) {
+    return { success: false, message: err?.message || 'Could not send the verification email.' };
+  }
+}
+
 export async function confirmPasswordReset(token: string, password: string): Promise<{ success: boolean; message: string }> {
   const client = getSupabase();
   if (!client) {
