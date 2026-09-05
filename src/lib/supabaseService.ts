@@ -321,6 +321,57 @@ export async function saveAttendanceToSupabase(record: AttendanceRecord): Promis
   }
 }
 
+export async function deleteAttendanceFromSupabase(recordId: string): Promise<boolean> {
+  const client = getSupabase();
+  if (!client) return false;
+
+  try {
+    const { error } = await client.from('attendance_records').delete().eq('id', recordId);
+    if (error) {
+      console.warn('Supabase deleteAttendance error:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error in deleteAttendanceFromSupabase:', err);
+    return false;
+  }
+}
+
+export async function deleteChurchAdminFromSupabase(adminEmail: string): Promise<boolean> {
+  const email = (adminEmail || '').trim().toLowerCase();
+  if (!email) return false;
+
+  try {
+    const stored: any[] = JSON.parse(localStorage.getItem('cekbu_church_admins') || '[]');
+    localStorage.setItem(
+      'cekbu_church_admins',
+      JSON.stringify(stored.filter(a => a && (a.adminEmail || '').toLowerCase().trim() !== email))
+    );
+  } catch (e) { }
+
+  const client = getSupabase();
+  if (!client) return true;
+
+  try {
+    const { error: adminErr } = await client.from('church_admin_accounts').delete().ilike('admin_email', email);
+    if (adminErr) console.warn('Supabase deleteChurchAdmin error:', adminErr.message);
+
+    const { error: profileErr } = await client
+      .from('user_profiles')
+      .delete()
+      .ilike('email', email)
+      .neq('role', 'Superadmin');
+    if (profileErr) console.warn('Supabase deleteChurchAdmin profile error:', profileErr.message);
+
+    return !adminErr;
+  } catch (err) {
+    console.error('Error in deleteChurchAdminFromSupabase:', err);
+    return false;
+  }
+}
+
+
 export async function clearTodayAttendanceFromSupabase(todayDate: string): Promise<boolean> {
   const client = getSupabase();
   if (!client) return false;
