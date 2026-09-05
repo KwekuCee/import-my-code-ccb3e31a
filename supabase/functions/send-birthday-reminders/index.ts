@@ -83,27 +83,19 @@ Deno.serve(async (req) => {
         )
         .join('');
 
-      if (!resendKey) {
-        failures.push(`${email}: email service not configured`);
-        continue;
-      }
-
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          from: FROM_ADDRESS,
-          to: [email],
-          subject: `Birthday tomorrow: ${bucket.people.length} to celebrate`,
-          html: `<p>Hello ${bucket.name},</p>
+      const res = await sendGmail({
+        to: email,
+        fromName: 'GCYC Group',
+        subject: `Birthday tomorrow: ${bucket.people.length} to celebrate`,
+        html: `<p>Hello ${bucket.name},</p>
 <p>The following ${bucket.people.length === 1 ? 'person is' : 'people are'} celebrating a birthday tomorrow:</p>
 <ul>${rows}</ul>
 <p>A call or message today would mean a lot.</p>`,
-        }),
       });
 
       if (res.ok) sent += 1;
-      else failures.push(`${email}: ${await res.text()}`);
+      else failures.push(`${email}: ${res.error}`);
+
     }
 
     if (failures.length) console.warn('Birthday reminder failures:', failures.join(' | '));
