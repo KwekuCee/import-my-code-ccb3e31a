@@ -126,6 +126,11 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const [attOccupation, setAttOccupation] = useState('Student');
   const [attOtherOccupation, setAttOtherOccupation] = useState('');
   const [attEducation, setAttEducation] = useState('Tertiary / University');
+  const [attOtherEducation, setAttOtherEducation] = useState('');
+  const [attGender, setAttGender] = useState<'Male' | 'Female'>('Male');
+  const [attMaritalStatus, setAttMaritalStatus] = useState('Single');
+  const [attPhotoFile, setAttPhotoFile] = useState<File | null>(null);
+  const [attPhotoPreview, setAttPhotoPreview] = useState('');
   const [attFoundationClass, setAttFoundationClass] = useState('Class 1: The New Creation');
   const [attInvitedByLeaderId, setAttInvitedByLeaderId] = useState('self_invite');
   const [attChurch, setAttChurch] = useState(effectiveChurches[0]?.name || '');
@@ -372,6 +377,10 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       ? (attOtherOccupation.trim() || 'Other')
       : attOccupation;
 
+    const resolvedEducation = attEducation === 'Other'
+      ? (attOtherEducation.trim() || 'Other')
+      : attEducation;
+
     const foundationClassNum = parseFoundationClassNumber(attFoundationClass);
 
     // Check if member already exists by name & phone
@@ -390,7 +399,9 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
         dob: attDob || undefined,
         role: 'Member',
         occupation: resolvedOccupation,
-        education: attEducation,
+        education: resolvedEducation,
+        gender: attGender,
+        maritalStatus: attMaritalStatus,
         location: attLocation,
         church: attChurch,
         invitedBy: invitedByName,
@@ -401,13 +412,23 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
         foundationClass: foundationClassNum,
         status: 'General Member',
       };
+      if (attPhotoFile) {
+        const storedPath = await uploadMemberPhoto(existingMember.id, attPhotoFile);
+        if (storedPath) existingMember.photoUrl = storedPath;
+      }
       onAddMember(existingMember);
     } else {
       // Update existing member's location, occupation, education, and foundation class
       existingMember.location = attLocation;
       existingMember.occupation = resolvedOccupation;
-      existingMember.education = attEducation;
+      existingMember.education = resolvedEducation;
+      existingMember.gender = attGender;
+      existingMember.maritalStatus = attMaritalStatus;
       existingMember.foundationClass = foundationClassNum;
+      if (attPhotoFile) {
+        const storedPath = await uploadMemberPhoto(existingMember.id, attPhotoFile);
+        if (storedPath) existingMember.photoUrl = storedPath;
+      }
     }
 
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -837,6 +858,65 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                      Gender *
+                    </label>
+                    <select
+                      value={attGender}
+                      onChange={(e) => setAttGender(e.target.value as 'Male' | 'Female')}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    >
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                      Marital Status *
+                    </label>
+                    <select
+                      value={attMaritalStatus}
+                      onChange={(e) => setAttMaritalStatus(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                    >
+                      <option value="Single">Single</option>
+                      <option value="Married">Married</option>
+                      <option value="Engaged">Engaged</option>
+                      <option value="Divorced">Divorced</option>
+                      <option value="Widowed">Widowed</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Optional photo */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                    Profile Photo (Optional)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    {attPhotoPreview ? (
+                      <img src={attPhotoPreview} alt="Selected profile photo" className="w-14 h-14 rounded-xl object-cover border border-slate-200" />
+                    ) : (
+                      <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+                        <span className="material-symbols-outlined text-[22px]">person</span>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        setAttPhotoFile(file);
+                        setAttPhotoPreview(file ? URL.createObjectURL(file) : '');
+                      }}
+                      className="text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-800 file:text-xs file:font-bold cursor-pointer"
+                    />
+                  </div>
+                </div>
+
                 {/* Location, Occupation, Educational Level, Foundation Class */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -907,8 +987,24 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                       <option value="Postgraduate / Masters">Postgraduate / Masters / Doctorate</option>
                       <option value="Professional Certificate">Professional Certificate</option>
                       <option value="Basic Education / JHS">Basic Education / JHS</option>
-                      <option value="Other">Other</option>
+                      <option value="Other">Other (Specify below)</option>
                     </select>
+
+                    {attEducation === 'Other' && (
+                      <div className="mt-2.5">
+                        <label className="block text-xs font-bold text-blue-700 uppercase mb-1">
+                          Specify Your Educational Level *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Vocational Training, Apprenticeship"
+                          value={attOtherEducation}
+                          onChange={(e) => setAttOtherEducation(e.target.value)}
+                          className="w-full bg-blue-50/60 border border-blue-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div>
