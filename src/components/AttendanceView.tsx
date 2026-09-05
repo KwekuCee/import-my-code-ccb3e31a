@@ -54,6 +54,55 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   const isChurchAdmin = user?.role === 'Church Admin';
   const targetChurch = user?.church || '';
 
+  const serviceOptions = (serviceTypes || []).filter(s => s.active).map(s => s.name);
+  const activeServices = serviceOptions.length > 0 ? serviceOptions : ['Sunday Service'];
+  const chosenService = manualService || activeServices[0];
+
+  // People this admin may record: their own branch only
+  const recordableMembers = isChurchAdmin
+    ? (members || []).filter(m => m && m.church === targetChurch)
+    : (members || []);
+
+  const manualMatches = manualSearch.trim()
+    ? recordableMembers.filter(m =>
+      (m.fullName || '').toLowerCase().includes(manualSearch.trim().toLowerCase()) ||
+      (m.id || '').toLowerCase().includes(manualSearch.trim().toLowerCase())
+    ).slice(0, 10)
+    : recordableMembers.slice(0, 10);
+
+  const alreadyRecordedToday = (memberId: string, service: string) =>
+    (attendanceRecords || []).some(r =>
+      r && r.memberId === memberId && r.serviceType === service && (r.date || '').slice(0, 10) === todayStr
+    );
+
+  const handleManualRecord = (m: Member) => {
+    if (alreadyRecordedToday(m.id, chosenService)) {
+      toast.showError('Already recorded', `${m.fullName} is already marked present for ${chosenService} today.`);
+      return;
+    }
+    const leader = m.invitedByLeaderId
+      ? (leaders || []).find(l => l.id === m.invitedByLeaderId)
+      : findLeaderByName(m.invitedBy, leaders);
+    const groups = getGroupNamesForLeader(leader?.id, leaders);
+    onConfirmAttendance?.({
+      id: `att-${Date.now()}`,
+      memberId: m.id,
+      memberName: m.fullName,
+      memberRole: m.role || 'Member',
+      serviceType: chosenService,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      date: todayStr,
+      verifiedBy: user?.name ? `${user.name} (recorded by hand)` : 'Church Admin',
+      status: 'Confirmed',
+      church: m.church || targetChurch || 'Unassigned',
+      checkInMethod: 'Manual Admin',
+      leaderName: leader?.fullName || m.invitedBy,
+      pcfName: [groups.className, groups.cellName, groups.pcfName].filter(Boolean).join(' • ') || 'General PCF'
+    });
+    setManualSearch('');
+    toast.showSuccess('Attendance recorded', `${m.fullName} is marked present for ${chosenService}.`);
+  };
+
   // Filter scoped to Church Admin branch if applicable
   const scopedRecords = isChurchAdmin
     ? attendanceRecords.filter(r => r.church === targetChurch)
