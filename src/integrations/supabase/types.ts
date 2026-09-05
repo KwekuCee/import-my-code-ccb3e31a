@@ -273,6 +273,7 @@ export type Database = {
           admin_email: string
           admin_name: string
           admin_phone: string | null
+          admin_verified: boolean
           church_id: string | null
           church_name: string
           created_at: string
@@ -288,6 +289,7 @@ export type Database = {
           admin_email: string
           admin_name: string
           admin_phone?: string | null
+          admin_verified?: boolean
           church_id?: string | null
           church_name: string
           created_at?: string
@@ -303,6 +305,7 @@ export type Database = {
           admin_email?: string
           admin_name?: string
           admin_phone?: string | null
+          admin_verified?: boolean
           church_id?: string | null
           church_name?: string
           created_at?: string
@@ -357,6 +360,33 @@ export type Database = {
         }
         Relationships: []
       }
+      email_verification_tokens: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          token_hash: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          token_hash: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          token_hash?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       leaders: {
         Row: {
           cell_or_pcf_name: string | null
@@ -370,6 +400,7 @@ export type Database = {
           full_name: string
           id: string
           is_appointed: boolean | null
+          leader_code: string | null
           leader_type: Database["public"]["Enums"]["leader_type_enum"]
           location: string | null
           parent_leader_id: string | null
@@ -389,6 +420,7 @@ export type Database = {
           full_name: string
           id?: string
           is_appointed?: boolean | null
+          leader_code?: string | null
           leader_type?: Database["public"]["Enums"]["leader_type_enum"]
           location?: string | null
           parent_leader_id?: string | null
@@ -408,6 +440,7 @@ export type Database = {
           full_name?: string
           id?: string
           is_appointed?: boolean | null
+          leader_code?: string | null
           leader_type?: Database["public"]["Enums"]["leader_type_enum"]
           location?: string | null
           parent_leader_id?: string | null
@@ -588,29 +621,44 @@ export type Database = {
       promotion_queue: {
         Row: {
           church_id: string | null
+          church_name: string | null
           current_leader_role: Database["public"]["Enums"]["leader_type_enum"]
           flagged_at: string
           id: string
           leader_id: string | null
+          member_id: string | null
+          member_name: string | null
           reason: string
+          requested_by: string | null
+          status: string
           target_role: Database["public"]["Enums"]["leader_type_enum"]
         }
         Insert: {
           church_id?: string | null
-          current_leader_role: Database["public"]["Enums"]["leader_type_enum"]
-          flagged_at?: string
-          id?: string
-          leader_id?: string | null
-          reason: string
-          target_role: Database["public"]["Enums"]["leader_type_enum"]
-        }
-        Update: {
-          church_id?: string | null
+          church_name?: string | null
           current_leader_role?: Database["public"]["Enums"]["leader_type_enum"]
           flagged_at?: string
           id?: string
           leader_id?: string | null
+          member_id?: string | null
+          member_name?: string | null
+          reason: string
+          requested_by?: string | null
+          status?: string
+          target_role: Database["public"]["Enums"]["leader_type_enum"]
+        }
+        Update: {
+          church_id?: string | null
+          church_name?: string | null
+          current_leader_role?: Database["public"]["Enums"]["leader_type_enum"]
+          flagged_at?: string
+          id?: string
+          leader_id?: string | null
+          member_id?: string | null
+          member_name?: string | null
           reason?: string
+          requested_by?: string | null
+          status?: string
           target_role?: Database["public"]["Enums"]["leader_type_enum"]
         }
         Relationships: [

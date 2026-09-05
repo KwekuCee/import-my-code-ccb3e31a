@@ -220,6 +220,7 @@ export async function fetchLeadersFromSupabase(): Promise<Leader[] | null> {
       parentLeaderName: row.parent_leader_name,
       isAppointed: row.is_appointed || false,
       downstreamCount: row.downstream_count || 0,
+      leaderCode: row.leader_code || undefined,
       church: row.church_name || 'Unassigned',
       promotionStatus: row.promotion_status || 'None',
       photoUrl: row.photo_url || undefined,
@@ -258,13 +259,14 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
       church_id: churchId,
       church_name: leader.church,
       promotion_status: leader.promotionStatus || 'None',
-      photo_url: leader.photoUrl || null
+      photo_url: leader.photoUrl || null,
+      leader_code: leader.leaderCode || generateLeaderCode()
     };
     if (isUuid) payload.id = leader.id;
 
     const { data, error } = isUuid
-      ? await client.from('leaders').upsert(payload, { onConflict: 'id' }).select('id').maybeSingle()
-      : await client.from('leaders').insert(payload).select('id').maybeSingle();
+      ? await client.from('leaders').upsert(payload, { onConflict: 'id' }).select('id, leader_code').maybeSingle()
+      : await client.from('leaders').insert(payload).select('id, leader_code').maybeSingle();
 
     if (error) {
       console.warn('Supabase saveLeader error:', error.message);
@@ -276,12 +278,85 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
     if (newId && newId !== leader.id) {
       leader.id = newId;
     }
+    leader.leaderCode = (data as any)?.leader_code || payload.leader_code;
     return true;
   } catch (err) {
     console.error('Error in saveLeaderToSupabase:', err);
     return false;
   }
 }
+
+/** Short scan code printed on a leader's pass, e.g. LDR-4821. */
+export function generateLeaderCode(): string {
+  return `LDR-${Math.floor(1000 + Math.random() * 9000)}`;
+}
+
+/**
+ * Every leader is also a member. This keeps the member database in step:
+ * an existing member record is tagged as a leader, otherwise a new member row
+ * is created using the leader's scan code as its ID. Returns the member ID.
+ */
+export async function syncLeaderAsMember(leader: Leader): Promise<string | null> {
+  const client = getSupabase();
+  if (!client) return null;
+
+  try {
+    const email = (leader.email || '').trim();
+    let existingId: string | null = null;
+
+    if (email) {
+      const { data } = await client.from('members').select('id').ilike('email', email).maybeSingle();
+      existingId = (data as any)?.id || null;
+    }
+    if (!existingId && leader.fullName) {
+      const { data } = await client
+        .from('members')
+        .select('id, church_name')
+        .ilike('full_name', leader.fullName.trim())
+        .limit(5);
+      const match = (data || []).find(
+        (row: any) => (row.church_name || '').toLowerCase() === (leader.church || '').toLowerCase()
+      ) || (data || [])[0];
+      existingId = (match as any)?.id || null;
+    }
+
+    const memberId = existingId || leader.leaderCode || generateLeaderCode();
+    const churchId = await resolveChurchId(leader.church);
+
+    const payload: any = {
+      id: memberId,
+      full_name: leader.fullName,
+      email: leader.email || null,
+      phone: leader.contact || null,
+      dob: leader.dob || null,
+      role: 'Leader',
+      location: leader.location || null,
+      church_id: churchId,
+      church_name: leader.church,
+      photo_url: leader.photoUrl || null,
+      status: 'General Member'
+    };
+    if (!existingId) {
+      payload.occupation = 'General';
+      payload.education_level = 'Tertiary';
+      payload.service_count = 1;
+      payload.foundation_class = 0;
+      payload.join_date = leader.joinedDate || new Date().toISOString().slice(0, 10);
+      payload.invited_by_name = leader.parentLeaderName || 'Leader Registration';
+    }
+
+    const { error } = await client.from('members').upsert(payload, { onConflict: 'id' });
+    if (error) {
+      console.warn('Supabase syncLeaderAsMember error:', error.message);
+      return null;
+    }
+    return memberId;
+  } catch (err) {
+    console.error('Error in syncLeaderAsMember:', err);
+    return null;
+  }
+}
+
 
 
 export async function deleteLeaderFromSupabase(leaderId: string): Promise<boolean> {
@@ -868,20 +943,68 @@ export async function fetchPromotionQueueFromSupabase(): Promise<PromotionQueueI
     }
     if (!data || data.length === 0) return [];
 
-    return data.map((row: any) => ({
-      id: row.id,
-      leaderId: row.leader_id,
-      leaderName: row.leader_name || 'Leader',
-      church: row.church_name || 'Unassigned',
-      currentRole: row.current_leader_role,
-      targetRole: row.target_role,
-      downstreamCount: row.downstream_count || 5,
-      flaggedAt: row.flagged_at || new Date().toISOString(),
-      reason: row.reason
-    }));
+    return data
+      .filter((row: any) => (row.status || 'Pending') === 'Pending')
+      .map((row: any) => ({
+        id: row.id,
+        leaderId: row.leader_id,
+        leaderName: row.member_name || row.leader_name || 'Leader',
+        memberId: row.member_id || undefined,
+        church: row.church_name || 'Unassigned',
+        currentRole: row.current_leader_role,
+        targetRole: row.target_role,
+        downstreamCount: row.downstream_count || 0,
+        flaggedAt: (row.flagged_at || new Date().toISOString()).slice(0, 10),
+        reason: row.reason,
+        requestedBy: row.requested_by || undefined,
+        status: row.status || 'Pending'
+      }));
   } catch (err) {
     console.error('Error in fetchPromotionQueueFromSupabase:', err);
     return null;
+  }
+}
+
+/**
+ * A branch admin proposes that a member (or existing leader) takes on a leader
+ * role. Nothing changes until the group account approves it.
+ */
+export async function requestPromotionInSupabase(request: {
+  memberId?: string;
+  memberName: string;
+  leaderId?: string;
+  church: string;
+  currentRole: string;
+  targetRole: string;
+  reason: string;
+  requestedBy: string;
+}): Promise<boolean> {
+  const client = getSupabase();
+  if (!client) return false;
+
+  try {
+    const churchId = await resolveChurchId(request.church);
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(request.leaderId || '');
+    const { error } = await client.from('promotion_queue').insert({
+      leader_id: isUuid ? request.leaderId : null,
+      member_id: request.memberId || null,
+      member_name: request.memberName,
+      church_id: churchId,
+      church_name: request.church,
+      current_leader_role: request.currentRole,
+      target_role: request.targetRole,
+      reason: request.reason,
+      requested_by: request.requestedBy,
+      status: 'Pending'
+    });
+    if (error) {
+      console.warn('Supabase requestPromotion error:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error in requestPromotionInSupabase:', err);
+    return false;
   }
 }
 
@@ -900,6 +1023,11 @@ export async function confirmPromotionInSupabase(promotionId: string): Promise<b
     console.error('Error in confirmPromotionInSupabase:', err);
     return false;
   }
+}
+
+/** The group account turns down a promotion request. */
+export async function declinePromotionInSupabase(promotionId: string): Promise<boolean> {
+  return confirmPromotionInSupabase(promotionId);
 }
 
 // ============================================================================
@@ -1341,6 +1469,46 @@ export async function sendPasswordResetEmail(email: string): Promise<{ success: 
     };
   } catch (err: any) {
     return { success: false, message: err?.message || 'Could not start the password reset.' };
+  }
+}
+
+/**
+ * Sends (or resends) the email verification link a branch admin needs before
+ * they are allowed to sign in.
+ */
+export async function sendAdminVerificationEmail(
+  email: string,
+  name?: string
+): Promise<{ success: boolean; message: string; link?: string; alreadyVerified?: boolean }> {
+  const client = getSupabase();
+  if (!client) {
+    return { success: false, message: 'Cannot reach the system right now. Please try again shortly.' };
+  }
+  const trimmedEmail = (email || '').trim();
+  if (!trimmedEmail || !trimmedEmail.includes('@')) {
+    return { success: false, message: 'Please provide a valid email address.' };
+  }
+  try {
+    const { data, error } = await client.functions.invoke('verify-email', {
+      body: {
+        action: 'send',
+        email: trimmedEmail,
+        name: name || '',
+        origin: typeof window !== 'undefined' ? window.location.origin : ''
+      }
+    });
+    if (error) {
+      return { success: false, message: error.message || 'Could not send the verification email.' };
+    }
+    const res = data as any;
+    return {
+      success: !!res?.success,
+      message: res?.message || 'Please check your email for the verification link.',
+      link: res?.link,
+      alreadyVerified: !!res?.alreadyVerified
+    };
+  } catch (err: any) {
+    return { success: false, message: err?.message || 'Could not send the verification email.' };
   }
 }
 

@@ -53,6 +53,7 @@ export interface Leader {
   joinedDate: string;
   initials: string;
   photoUrl?: string;
+  leaderCode?: string;
 }
 
 export interface Member {
@@ -137,6 +138,9 @@ export interface PromotionQueueItem {
   downstreamCount: number;
   flaggedAt: string;
   reason: string;
+  memberId?: string;
+  requestedBy?: string;
+  status?: string;
 }
 
 export interface AuditLogItem {

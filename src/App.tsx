@@ -25,6 +25,9 @@ import {
   deleteMemberFromSupabase,
   fetchLeadersFromSupabase,
   saveLeaderToSupabase,
+  syncLeaderAsMember,
+  confirmPromotionInSupabase,
+  declinePromotionInSupabase,
   deleteLeaderFromSupabase,
   fetchAttendanceFromSupabase,
   saveAttendanceToSupabase,
@@ -210,7 +213,9 @@ export default function App() {
 
   const handleAddLeader = (newLeader: Leader) => {
     setLeaders(prev => [newLeader, ...prev]);
-    saveLeaderToSupabase(newLeader);
+    // Save the leader, then make sure they also exist in the member records
+    // tagged with their leader role (every leader is a member).
+    saveLeaderToSupabase(newLeader).then(() => syncLeaderAsMember(newLeader)).catch(() => {});
 
     const newLog: AuditLogItem = {
       id: `log-${Date.now()}`,
@@ -238,8 +243,15 @@ export default function App() {
         }
         return ldr;
       }));
+      // Tag the person as a leader in the member records too
+      setMembers(prev => prev.map(m =>
+        m && (m.id === item.memberId || (m.fullName || '').toLowerCase() === (item.leaderName || '').toLowerCase())
+          ? { ...m, role: 'Leader' as const }
+          : m
+      ));
       // Remove from queue
       setPromotionQueue(prev => prev.filter(p => p.id !== promotionId));
+      confirmPromotionInSupabase(promotionId);
       // Log audit
       const newLog: AuditLogItem = {
         id: `log-${Date.now()}`,
@@ -253,6 +265,26 @@ export default function App() {
       setAuditLogs(prev => [newLog, ...prev]);
       saveAuditLogToSupabase(newLog);
       toast.showSuccess(`Promotion Confirmed!`, `${item.leaderName} promoted to ${item.targetRole}.`);
+    }
+  };
+
+  const handleDeclinePromotion = (promotionId: string) => {
+    const item = promotionQueue.find(p => p.id === promotionId);
+    setPromotionQueue(prev => prev.filter(p => p.id !== promotionId));
+    declinePromotionInSupabase(promotionId);
+    if (item) {
+      const newLog: AuditLogItem = {
+        id: `log-${Date.now()}`,
+        action: `Group Pastor turned down the leader request for ${item.leaderName}`,
+        timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
+        icon: 'block',
+        user: 'Group Pastor',
+        church: item.church,
+        category: 'Leader'
+      };
+      setAuditLogs(prev => [newLog, ...prev]);
+      saveAuditLogToSupabase(newLog);
+      toast.showSuccess('Request turned down', `${item.leaderName} stays in their current role.`);
     }
   };
 
@@ -687,6 +719,7 @@ export default function App() {
                   members={members}
 
                   onConfirmPromotion={handleConfirmPromotion}
+                  onDeclinePromotion={handleDeclinePromotion}
                   onNavigate={setCurrentView}
                   onUpdateLeader={handleUpdateLeader}
                   onDeleteLeader={handleDeleteLeader}
