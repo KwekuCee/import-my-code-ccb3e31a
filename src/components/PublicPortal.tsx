@@ -968,7 +968,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     >
                       {effectiveChurches.map((c) => (
                         <option key={c.id} value={c.name}>
-                          {c.name} ({c.zone})
+                          {c.name}
                         </option>
                       ))}
                     </select>

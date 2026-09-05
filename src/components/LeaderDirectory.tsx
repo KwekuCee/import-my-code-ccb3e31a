@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Leader, LeaderType, PromotionQueueItem, ViewType, ChurchBranch } from '../types';
+import { Leader, LeaderType, PromotionQueueItem, ViewType, ChurchBranch, Member } from '../types';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
 interface LeaderDirectoryProps {
@@ -13,6 +13,7 @@ interface LeaderDirectoryProps {
   onConfirmPromotion: (promotionId: string) => void;
   onNavigate: (view: ViewType) => void;
   churches?: ChurchBranch[];
+  members?: Member[];
   onUpdateLeader?: (leader: Leader) => void;
   onDeleteLeader?: (leaderId: string) => void;
 }
@@ -24,6 +25,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
   onConfirmPromotion,
   onNavigate,
   churches,
+  members = [],
   onUpdateLeader,
   onDeleteLeader
 }) => {
@@ -32,6 +34,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
   const [selectedChurch, setSelectedChurch] = useState<string>('All');
   const [editingLeader, setEditingLeader] = useState<Leader | null>(null);
   const [deletingLeader, setDeletingLeader] = useState<Leader | null>(null);
+  const [viewingLeader, setViewingLeader] = useState<Leader | null>(null);
 
   const isChurchAdmin = user?.role === 'Church Admin';
   const targetChurch = user?.church || '';
@@ -43,6 +46,14 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
   const scopedPromotionQueue = isChurchAdmin
     ? promotionQueue.filter(p => p.church === targetChurch)
     : promotionQueue;
+
+  const membersOfLeader = (ldr: Leader) =>
+    members.filter(m =>
+      m && (
+        (m.invitedByLeaderId && m.invitedByLeaderId === ldr.id) ||
+        (m.invitedBy && ldr.fullName && m.invitedBy.trim().toLowerCase() === ldr.fullName.trim().toLowerCase())
+      )
+    );
 
   const cleanLeaderSearch = (searchTerm || '').trim().toLowerCase();
   const filteredLeaders = scopedLeaders.filter(ldr => {
@@ -69,10 +80,10 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
         <div>
           <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full mb-1 border border-blue-200">
             <span className="material-symbols-outlined text-[14px]">diversity_3</span>
-            GCYC Hierarchy & Leadership Directory
+            Leaders
           </div>
           <h1 className="font-display text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Leadership & Cell Directory
+            Leaders
           </h1>
           <p className="font-body text-xs md:text-sm text-slate-500 mt-1">
             Supervise Church Coordinators, PCF Leaders, Cell Leaders, and BSCTs across all network branches.
@@ -94,7 +105,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-amber-900 font-headline font-bold text-sm">
               <span className="material-symbols-outlined text-[20px] text-amber-600 icon-fill">military_tech</span>
-              <span>Auto-Flagged Leader Promotion Queue ({promotionQueue.length})</span>
+              <span>Ready for promotion ({promotionQueue.length})</span>
             </div>
             <span className="font-mono text-[10px] font-bold bg-amber-200/80 text-amber-900 px-2.5 py-0.5 rounded-full">
               Action Required by Group Pastor
@@ -185,8 +196,8 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
       <div className="bg-white border border-slate-200/80 rounded-3xl overflow-hidden shadow-2xs">
         <div className="p-4 md:p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
           <div>
-            <h3 className="font-headline text-base font-bold text-slate-900">Registered Leaders List</h3>
-            <p className="text-xs text-slate-500">Total {filteredLeaders.length} leaders in directory</p>
+            <h3 className="font-headline text-base font-bold text-slate-900">All leaders</h3>
+            <p className="text-xs text-slate-500">{filteredLeaders.length} leader(s)</p>
           </div>
         </div>
 
@@ -196,10 +207,10 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
               <tr className="bg-slate-50/60 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
                 <th className="py-3 px-4">Leader Name</th>
                 <th className="py-3 px-4">Type</th>
-                <th className="py-3 px-4">Cell / PCF Name</th>
+                <th className="py-3 px-4">Cell / PCF</th>
                 <th className="py-3 px-4">Church</th>
-                <th className="py-3 px-4">Supervising Parent</th>
-                <th className="py-3 px-4 text-center">Downstream Members</th>
+                <th className="py-3 px-4">Reports to</th>
+                <th className="py-3 px-4 text-center">Members</th>
                 <th className="py-3 px-4 text-center">Appointment</th>
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
@@ -244,10 +255,14 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
                       {ldr.parentLeaderName || 'Direct Pastor Report'}
                     </td>
 
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-900">
-                      <span className="bg-slate-100 px-2.5 py-1 rounded-lg">
-                        {ldr.downstreamCount || 0}
-                      </span>
+                    <td className="py-3.5 px-4 text-center">
+                      <button
+                        onClick={() => setViewingLeader(ldr)}
+                        className="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-100 px-2.5 py-1 rounded-lg font-bold cursor-pointer"
+                        title="See this leader's members"
+                      >
+                        {membersOfLeader(ldr).length}
+                      </button>
                     </td>
 
                     <td className="py-3.5 px-4 text-center">
@@ -293,6 +308,44 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
       </div>
 
 
+      {viewingLeader && (
+        <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg border border-slate-200 shadow-xl overflow-hidden">
+            <div className="flex items-start justify-between p-5 border-b border-slate-100">
+              <div>
+                <h3 className="font-headline font-bold text-base text-slate-900">{viewingLeader.fullName}'s members</h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {viewingLeader.leaderType} • {viewingLeader.church} • {membersOfLeader(viewingLeader).length} member(s)
+                </p>
+              </div>
+              <button
+                onClick={() => setViewingLeader(null)}
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+            <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+              {membersOfLeader(viewingLeader).length > 0 ? (
+                membersOfLeader(viewingLeader).map(m => (
+                  <div key={m.id} className="px-5 py-3 flex items-center justify-between text-xs">
+                    <div>
+                      <p className="font-semibold text-slate-900">{m.fullName}</p>
+                      <p className="text-slate-500">{m.phone || 'No phone'} • {m.church}</p>
+                    </div>
+                    <span className="text-slate-500">{m.status}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="px-5 py-10 text-center text-xs text-slate-400">
+                  No members have chosen this leader yet.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {editingLeader && (
         <EditRecordModal
           title="Edit Leader"
@@ -305,7 +358,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
             { key: 'contact', label: 'Contact', type: 'tel' },
             { key: 'dob', label: 'Date of Birth', type: 'date' },
             { key: 'location', label: 'Location' },
-            { key: 'cellOrPcfName', label: 'Cell / PCF Name' },
+            { key: 'cellOrPcfName', label: 'Cell / PCF' },
             (churches && churches.length > 0
               ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
               : { key: 'church', label: 'Church Branch' }),

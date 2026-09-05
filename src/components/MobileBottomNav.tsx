@@ -92,7 +92,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     <span className="material-symbols-outlined text-[22px]">analytics</span>
                   </div>
                   <span className="font-headline font-bold text-xs text-slate-900">Analytics</span>
-                  <span className="text-[10px] text-slate-500 mt-0.5">Demographics</span>
+                  <span className="text-[10px] text-slate-500 mt-0.5">Insights</span>
                 </button>
 
                 <button

@@ -352,7 +352,7 @@ export default function App() {
 
     const newLog: AuditLogItem = {
       id: `log-${Date.now()}`,
-      action: `Self-registered Church Admin: ${newAdmin.adminName} for ${newAdmin.churchName} (${newAdmin.zone})`,
+      action: `Self-registered Church Admin: ${newAdmin.adminName} for ${newAdmin.churchName}`,
       timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
       icon: 'admin_panel_settings',
       user: 'Public Registration Gate (Security Code Verified)',
@@ -645,6 +645,8 @@ export default function App() {
                   promotionQueue={promotionQueue}
                   user={user}
                   churches={churches}
+                  members={members}
+
                   onConfirmPromotion={handleConfirmPromotion}
                   onNavigate={setCurrentView}
                   onUpdateLeader={handleUpdateLeader}
@@ -702,10 +704,14 @@ export default function App() {
               {currentView === 'qr_scanner' && user?.role !== 'Superadmin' && (
                 <QRScannerModal
                   members={members}
+                  attendance={attendanceRecords}
+                  serviceTypes={serviceTypes}
+                  user={user}
                   onConfirmAttendance={handleConfirmAttendance}
                   onClose={() => setCurrentView('dashboard')}
                   onNavigate={setCurrentView}
                 />
+
               )}
 
               {currentView === 'analytics' && (

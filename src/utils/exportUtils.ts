@@ -86,7 +86,6 @@ export function exportMultiSheetExcel(
     'Head Pastor / Admin': '',
     'Admin Contact Email': '',
     'Admin Phone': '',
-    'Zone / Area': '',
     'Total Registered Members': '',
     'First Timers Count': '',
     'General Members Count': '',
@@ -112,7 +111,6 @@ export function exportMultiSheetExcel(
       'Head Pastor / Admin': church.pastor || matchingAdmin?.adminName || 'Branch Pastor',
       'Admin Contact Email': matchingAdmin?.adminEmail || `${church.name.toLowerCase().replace(/\s+/g, '')}@cekorlebu.org`,
       'Admin Phone': matchingAdmin?.adminPhone || '+233 24 000 0000',
-      'Zone / Area': church.zone || matchingAdmin?.zone || 'Zone 1 (Korle Bu)',
       'Total Registered Members': churchMembers.length,
       'First Timers Count': firstTimers,
       'General Members Count': generalMembers,
@@ -128,7 +126,6 @@ export function exportMultiSheetExcel(
     'Head Pastor / Admin': '',
     'Admin Contact Email': '',
     'Admin Phone': '',
-    'Zone / Area': '',
     'Total Registered Members': '',
     'First Timers Count': '',
     'General Members Count': '',
@@ -143,7 +140,6 @@ export function exportMultiSheetExcel(
       'Head Pastor / Admin': m.fullName,
       'Admin Contact Email': m.email || 'N/A',
       'Admin Phone': m.phone || 'N/A',
-      'Zone / Area': m.location || 'Korle Bu',
       'Total Registered Members': m.id,
       'First Timers Count': m.role || 'Member',
       'General Members Count': m.status || 'General Member',
@@ -353,7 +349,7 @@ export function exportMultiSectionCSV(
 
   // SECTION 1
   lines.push('=== SHEET 1: TOTAL MEMBERS PER CHURCH (ADMIN) ===');
-  lines.push('Church Name,Head Pastor / Admin,Admin Email,Admin Phone,Zone,Total Members,First Timers,General Members');
+  lines.push('Church Name,Head Pastor / Admin,Admin Email,Admin Phone,Total Members,First Timers,General Members');
   data.churches.forEach(church => {
     const matchingAdmin = data.churchAdmins.find(
       a => (a?.churchName || '').toLowerCase() === (church?.name || '').toLowerCase()
@@ -365,7 +361,7 @@ export function exportMultiSectionCSV(
     const generalMembers = churchMembers.filter(m => m.status === 'General Member' || (m.serviceCount || 0) > 1).length;
 
     lines.push(
-      `"${church.name}","${church.pastor || matchingAdmin?.adminName || ''}","${matchingAdmin?.adminEmail || ''}","${matchingAdmin?.adminPhone || ''}","${church.zone || ''}",${churchMembers.length},${firstTimers},${generalMembers}`
+      `"${church.name}","${church.pastor || matchingAdmin?.adminName || ''}","${matchingAdmin?.adminEmail || ''}","${matchingAdmin?.adminPhone || ''}",${churchMembers.length},${firstTimers},${generalMembers}`
     );
   });
 
