@@ -65,11 +65,14 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
     return Array.from(map.values());
   }, [churches, churchAdmins]);
 
-  // Leader self-registration must only ever offer churches that came from an
-  // admin self-signup (i.e. branches actually run by a registered Church Admin),
-  // not the full DB-seeded church list used elsewhere in this portal.
+  // Leader self-registration offers every church branch registered on the
+  // platform (created when a church admin signs up), read live from the
+  // database so new branches show up straight away.
   const adminRegisteredChurches = useMemo(() => {
     const map = new Map<string, ChurchBranch>();
+    (churches || []).forEach(c => {
+      if (c && c.name) map.set(c.name.toLowerCase(), c);
+    });
     (churchAdmins || []).forEach(a => {
       if (a && a.churchName) {
         const key = a.churchName.toLowerCase();
@@ -89,7 +92,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       }
     });
     return Array.from(map.values());
-  }, [churchAdmins]);
+  }, [churches, churchAdmins]);
 
   // Dynamic service types list from props and database
   const [dbServiceTypes, setDbServiceTypes] = useState<string[]>([]);
@@ -1254,7 +1257,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     disabled={adminRegisteredChurches.length === 0}
                   >
                     {adminRegisteredChurches.length === 0 && (
-                      <option value="">No admin-registered church branches yet</option>
+                      <option value="">No church branches registered yet</option>
                     )}
                     {adminRegisteredChurches.map((c) => (
                       <option key={c.id} value={c.name}>

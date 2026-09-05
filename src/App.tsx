@@ -643,6 +643,9 @@ export default function App() {
                   churches={churches}
                   churchAdmins={churchAdmins}
                   auditLogs={auditLogs}
+                  members={members}
+                  leaders={leaders}
+                  attendanceRecords={attendanceRecords}
                   onNavigate={setCurrentView}
                   onOpenAnnouncement={() => setShowAnnouncementModal(true)}
                   onAddChurch={handleAddChurch}
