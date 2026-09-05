@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Member, RoleType, ViewType, ChurchBranch, Leader } from '../types';
 import { MemberPhoto } from './MemberPhoto';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
+import { getGroupNamesForLeader, findLeaderByName } from '../utils/analyticsUtils';
 
 interface MemberDatabaseProps {
   members: Member[];
