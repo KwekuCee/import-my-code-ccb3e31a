@@ -334,13 +334,14 @@ export async function syncLeaderAsMember(leader: Leader): Promise<string | null>
       church_id: churchId,
       church_name: leader.church,
       photo_url: leader.photoUrl || null,
-      status: 'General Member'
+      status: 'General Member',
+      // Registering as a leader means foundation school is complete.
+      foundation_class: 7
     };
     if (!existingId) {
       payload.occupation = 'General';
       payload.education_level = 'Tertiary';
       payload.service_count = 1;
-      payload.foundation_class = 0;
       payload.join_date = leader.joinedDate || new Date().toISOString().slice(0, 10);
       payload.invited_by_name = leader.parentLeaderName || 'Leader Registration';
     }

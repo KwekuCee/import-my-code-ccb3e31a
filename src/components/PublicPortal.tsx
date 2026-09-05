@@ -142,6 +142,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const [attSuccessPass, setAttSuccessPass] = useState<AttendanceRecord | null>(null);
   const [attPassImageDataUrl, setAttPassImageDataUrl] = useState('');
   const [isGeneratingQr, setIsGeneratingQr] = useState(false);
+  const [isSubmittingAttendance, setIsSubmittingAttendance] = useState(false);
 
   // Auto-fill church when leader is chosen
   const handleInvitedByChange = (leaderId: string) => {
@@ -168,6 +169,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const [ldrAuthCode, setLdrAuthCode] = useState('');
   const [ldrError, setLdrError] = useState('');
   const [ldrSuccessMsg, setLdrSuccessMsg] = useState('');
+  const [isSubmittingLeader, setIsSubmittingLeader] = useState(false);
 
   // Keep church selections synced when effectiveChurches updates
   useEffect(() => {
@@ -199,6 +201,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const [admAuthCode, setAdmAuthCode] = useState('');
   const [admError, setAdmError] = useState('');
   const [admSuccessMsg, setAdmSuccessMsg] = useState('');
+  const [isSubmittingAdmin, setIsSubmittingAdmin] = useState(false);
 
   // --- 4. Admin Sign In State ---
   const [loginRole, setLoginRole] = useState<'Superadmin' | 'Church Admin'>('Superadmin');
@@ -367,10 +370,13 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   // Handlers
   const handleSelfAttendanceSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingAttendance) return;
     if (!attFullName.trim() || !attPhone.trim()) {
       alert('Please fill in your Full Name and Contact Phone Number.');
       return;
     }
+    setIsSubmittingAttendance(true);
+    try {
 
     // Determine invitedBy name
     let invitedByName = 'Self-Walkin / Self Invited';
@@ -473,10 +479,14 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       timestamp,
       qrPassBase64: passDataUrl || undefined,
     }).catch(() => {});
+    } finally {
+      setIsSubmittingAttendance(false);
+    }
   };
 
   const handleLeaderSelfReg = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingLeader) return;
     setLdrError('');
     setLdrSuccessMsg('');
 
@@ -491,6 +501,8 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       return;
     }
 
+    setIsSubmittingLeader(true);
+    try {
     let leaderPhotoPath: string | undefined;
     if (ldrPhotoFile) {
       leaderPhotoPath = (await uploadProfilePhoto(`leaders/${ldrEmail.trim().toLowerCase() || Date.now()}`, ldrPhotoFile)) || undefined;
@@ -540,7 +552,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       joinDate: newLeader.joinedDate,
       initials: newLeader.initials,
       serviceCount: 0,
-      foundationClass: 0,
+      foundationClass: 7,
       status: 'General Member',
       photoUrl: newLeader.photoUrl,
     };
@@ -556,10 +568,14 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
     setLdrPhotoFile(null);
     setLdrPhotoPreview('');
     setLdrAuthCode('');
+    } finally {
+      setIsSubmittingLeader(false);
+    }
   };
 
   const handleAdminSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingAdmin) return;
     setAdmError('');
     setAdmSuccessMsg('');
 
@@ -580,6 +596,8 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       return;
     }
 
+    setIsSubmittingAdmin(true);
+    try {
     const newBranch: ChurchBranch = {
       id: `CH-${Date.now().toString().slice(-4)}`,
       name: admChurchName.trim(),
@@ -619,6 +637,9 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
         ? `Almost done! We sent a confirmation link to ${newAdmin.adminEmail}. Open it to confirm your email, then sign in. The link lasts 24 hours.`
         : `Your account was created, but we could not send the confirmation email (${res.message}). Use "Resend confirmation" on the sign-in page.`
     );
+    } finally {
+      setIsSubmittingAdmin(false);
+    }
   };
 
   const handleAdminLogin = async (e: React.FormEvent) => {
@@ -1167,11 +1188,11 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
                 <button
                   type="submit"
-                  disabled={isGeneratingQr}
+                  disabled={isGeneratingQr || isSubmittingAttendance}
                   className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-4 rounded-xl transition-all shadow-sm shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer mt-4 active:scale-98 disabled:opacity-50"
                 >
                   <span className="material-symbols-outlined text-[20px]">qr_code_2</span>
-                  <span>{isGeneratingQr ? 'Generating QR Pass...' : 'Confirm Attendance & Download Digital QR Pass'}</span>
+                  <span>{isGeneratingQr || isSubmittingAttendance ? 'Recording attendance…' : 'Confirm Attendance & Download Digital QR Pass'}</span>
                 </button>
               </form>
             )}
@@ -1388,10 +1409,11 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
               <button
                 type="submit"
-                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3.5 rounded-xl transition-all shadow-sm shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer"
+                disabled={isSubmittingLeader}
+                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3.5 rounded-xl transition-all shadow-sm shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
-                <span>Submit Official Leader Registration</span>
+                <span>{isSubmittingLeader ? 'Registering…' : 'Submit Official Leader Registration'}</span>
               </button>
             </form>
           </div>
@@ -1571,10 +1593,11 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
               <button
                 type="submit"
-                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3.5 rounded-xl transition-all shadow-sm shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer"
+                disabled={isSubmittingAdmin}
+                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3.5 rounded-xl transition-all shadow-sm shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="material-symbols-outlined text-[18px]">add_business</span>
-                <span>Register Church Account & Create Admin Account</span>
+                <span>{isSubmittingAdmin ? 'Creating account…' : 'Register Church Account & Create Admin Account'}</span>
               </button>
             </form>
           </div>
