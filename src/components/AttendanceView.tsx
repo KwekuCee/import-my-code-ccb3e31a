@@ -256,6 +256,72 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
         </div>
       </div>
 
+      {/* Record attendance by hand (for people without a phone) */}
+      {showManualPanel && onConfirmAttendance && (
+        <div className="bg-white border border-blue-200 rounded-2xl p-4 md:p-5 shadow-sm space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="font-display text-base font-extrabold text-slate-900">Record attendance by hand</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                For people who came without a phone or a pass. {isChurchAdmin ? `Only ${targetChurch} people are listed.` : 'All branches are listed.'}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowManualPanel(false)}
+              className="text-slate-400 hover:text-slate-700 cursor-pointer"
+              aria-label="Close"
+            >
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input
+              type="text"
+              value={manualSearch}
+              onChange={e => setManualSearch(e.target.value)}
+              placeholder="Find a person by name or ID"
+              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs bg-slate-50 text-slate-900 outline-none focus:border-blue-600 placeholder:text-slate-400"
+            />
+            <select
+              value={chosenService}
+              onChange={e => setManualService(e.target.value)}
+              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold bg-slate-50 text-slate-900 outline-none focus:border-blue-600"
+            >
+              {activeServices.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <div className="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-64 overflow-y-auto">
+            {manualMatches.length === 0 && (
+              <p className="px-3 py-4 text-xs text-slate-500">No one found in this branch.</p>
+            )}
+            {manualMatches.map(m => {
+              const done = alreadyRecordedToday(m.id, chosenService);
+              return (
+                <div key={m.id} className="flex items-center justify-between gap-3 px-3 py-2.5">
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-900 truncate">{m.fullName}</p>
+                    <p className="text-[11px] text-slate-500 truncate">
+                      {m.id} • {m.church} • {m.invitedBy || 'No leader yet'}
+                    </p>
+                  </div>
+                  <button
+                    disabled={done}
+                    onClick={() => handleManualRecord(m)}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-lg shrink-0 ${done
+                      ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                      : 'bg-blue-700 hover:bg-blue-800 text-white cursor-pointer'}`}
+                  >
+                    {done ? 'Recorded' : 'Mark present'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Stats Summary Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
