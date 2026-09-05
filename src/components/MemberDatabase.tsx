@@ -225,8 +225,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                     <option value="Leader">Leader</option>
                     <option value="Member">Member</option>
                     <option value="First Timer">First Timer</option>
-                    <option value="Deacon">Deacon</option>
-                    <option value="Visitor">Visitor</option>
+
                   </select>
                 </div>
 
