@@ -80,10 +80,10 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
         <div>
           <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full mb-1 border border-blue-200">
             <span className="material-symbols-outlined text-[14px]">diversity_3</span>
-            GCYC Hierarchy & Leadership Directory
+            Leaders
           </div>
           <h1 className="font-display text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Leadership & Cell Directory
+            Leaders
           </h1>
           <p className="font-body text-xs md:text-sm text-slate-500 mt-1">
             Supervise Church Coordinators, PCF Leaders, Cell Leaders, and BSCTs across all network branches.
@@ -105,7 +105,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-amber-900 font-headline font-bold text-sm">
               <span className="material-symbols-outlined text-[20px] text-amber-600 icon-fill">military_tech</span>
-              <span>Auto-Flagged Leader Promotion Queue ({promotionQueue.length})</span>
+              <span>Ready for promotion ({promotionQueue.length})</span>
             </div>
             <span className="font-mono text-[10px] font-bold bg-amber-200/80 text-amber-900 px-2.5 py-0.5 rounded-full">
               Action Required by Group Pastor
@@ -196,8 +196,8 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
       <div className="bg-white border border-slate-200/80 rounded-3xl overflow-hidden shadow-2xs">
         <div className="p-4 md:p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
           <div>
-            <h3 className="font-headline text-base font-bold text-slate-900">Registered Leaders List</h3>
-            <p className="text-xs text-slate-500">Total {filteredLeaders.length} leaders in directory</p>
+            <h3 className="font-headline text-base font-bold text-slate-900">All leaders</h3>
+            <p className="text-xs text-slate-500">{filteredLeaders.length} leader(s)</p>
           </div>
         </div>
 
@@ -207,9 +207,9 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
               <tr className="bg-slate-50/60 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
                 <th className="py-3 px-4">Leader Name</th>
                 <th className="py-3 px-4">Type</th>
-                <th className="py-3 px-4">Cell / PCF Name</th>
+                <th className="py-3 px-4">Cell / PCF</th>
                 <th className="py-3 px-4">Church</th>
-                <th className="py-3 px-4">Supervising Parent</th>
+                <th className="py-3 px-4">Reports to</th>
                 <th className="py-3 px-4 text-center">Members</th>
                 <th className="py-3 px-4 text-center">Appointment</th>
                 <th className="py-3 px-4 text-right">Actions</th>
@@ -358,7 +358,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
             { key: 'contact', label: 'Contact', type: 'tel' },
             { key: 'dob', label: 'Date of Birth', type: 'date' },
             { key: 'location', label: 'Location' },
-            { key: 'cellOrPcfName', label: 'Cell / PCF Name' },
+            { key: 'cellOrPcfName', label: 'Cell / PCF' },
             (churches && churches.length > 0
               ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
               : { key: 'church', label: 'Church Branch' }),

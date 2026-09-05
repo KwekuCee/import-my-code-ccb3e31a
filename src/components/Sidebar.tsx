@@ -46,8 +46,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navItems: { id: ViewType; label: string; icon: string }[] = isSuperadmin ? [
     { id: 'dashboard', label: 'Group Pastor Dashboard', icon: 'shield' },
     { id: 'group_overview', label: 'Group Network Overview', icon: 'account_tree' },
-    { id: 'church_admins_directory', label: 'Church Admins Directory', icon: 'badge' },
-    { id: 'leaders', label: 'Group Leaders Directory', icon: 'diversity_3' },
+    { id: 'church_admins_directory', label: 'Church Admins', icon: 'badge' },
+    { id: 'leaders', label: 'Leaders', icon: 'diversity_3' },
     { id: 'leader_registration', label: 'Leader Self-Reg Portal', icon: 'military_tech' },
     { id: 'members', label: 'All Church Members', icon: 'group' },
     { id: 'attendance', label: 'Group Attendance Log', icon: 'fact_check' },
@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ] : [
     { id: 'dashboard', label: `${user?.church || 'Church'} Dashboard`, icon: 'church' },
     { id: 'leaders', label: 'PCF & Cell Leaders', icon: 'military_tech' },
-    { id: 'members', label: 'Branch Members Directory', icon: 'group' },
+    { id: 'members', label: 'Members', icon: 'group' },
     { id: 'attendance', label: 'Service Attendance Log', icon: 'fact_check' },
     { id: 'analytics', label: 'Branch Analytics', icon: 'analytics' },
     { id: 'leader_registration', label: 'Register New Leader', icon: 'person_add' },

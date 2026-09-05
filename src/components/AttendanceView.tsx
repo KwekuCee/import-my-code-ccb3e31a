@@ -104,7 +104,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
       'Leader / PCF Leader',
       'Cell / PCF Name',
       'Check-in Method',
-      'Verification Status'
+      'Status'
     ];
 
     const rows = filteredRecords.map(r => [
@@ -333,7 +333,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                 <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Role</th>
                 <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Service & Date</th>
                 <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Time & Station</th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Verification</th>
+                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Status</th>
                 <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase text-right">Actions</th>
               </tr>
             </thead>
