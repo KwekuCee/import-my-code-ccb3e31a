@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Member, RoleType, ViewType, ChurchBranch } from '../types';
+import { MemberPhoto } from './MemberPhoto';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
 interface MemberDatabaseProps {
@@ -375,6 +376,9 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                   Occupation & Edu
                 </th>
                 <th className="py-3.5 px-4 text-xs font-bold text-slate-400 ">
+                  Gender & Status
+                </th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 ">
                   Residential Area
                 </th>
                 <th className="py-3.5 px-4 text-xs font-bold text-slate-400 ">
@@ -397,9 +401,11 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                     {/* Name + Role Badge */}
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center shrink-0 group-hover:border-blue-300 transition-colors">
-                          {member.initials || (member.fullName ? member.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'MB')}
-                        </div>
+                        <MemberPhoto
+                          photoUrl={member.photoUrl}
+                          size={36}
+                          initials={member.initials || (member.fullName ? member.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'MB')}
+                        />
                         <div>
                           <div className="font-bold text-xs text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-2">
                             <span>{member.fullName}</span>
@@ -575,12 +581,21 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
             { key: 'dob', label: 'Date of Birth', type: 'date' },
             { key: 'role', label: 'Role', type: 'select', options: ['Member', 'Leader', 'Visitor', 'Deacon', 'First Timer', 'Pastor'] },
             { key: 'gender', label: 'Gender', type: 'select', options: ['Male', 'Female'] },
+            { key: 'maritalStatus', label: 'Marital Status', type: 'select', options: ['Single', 'Married', 'Engaged', 'Divorced', 'Widowed'] },
             { key: 'occupation', label: 'Occupation' },
             { key: 'education', label: 'Education' },
             { key: 'location', label: 'Location' },
             (churches && churches.length > 0
               ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
               : { key: 'church', label: 'Church Branch' }),
+            ...(leaders && leaders.length > 0
+              ? [{
+                  key: 'invitedBy',
+                  label: 'Assigned Leader',
+                  type: 'select' as const,
+                  options: ['Self-Walkin / Self Invited', ...leaders.map(l => `${l.fullName} — ${l.church || 'Unassigned'}`)]
+                }]
+              : []),
             { key: 'serviceCount', label: 'Service Count', type: 'number' },
             { key: 'foundationClass', label: 'Foundation Class', type: 'number' }
           ]}
