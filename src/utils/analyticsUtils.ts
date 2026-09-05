@@ -1,4 +1,4 @@
-import { AttendanceRecord, Member } from '../types';
+import { AttendanceRecord, Member, Leader, LeaderType } from '../types';
 
 /**
  * Robustly checks if a given date of birth (DOB) string falls in the current calendar month.
