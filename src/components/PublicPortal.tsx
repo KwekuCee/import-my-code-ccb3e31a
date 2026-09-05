@@ -1651,6 +1651,15 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
               </div>
             )}
 
+            {resetLink && (
+              <a
+                href={resetLink}
+                className="block mb-4 p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold hover:bg-blue-100"
+              >
+                Tap here to create your new password
+              </a>
+            )}
+
             <form onSubmit={handleSendResetEmail} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
