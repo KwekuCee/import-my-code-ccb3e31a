@@ -791,15 +791,6 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             )}
           </div>
 
-          {/* 4c. Attendance grouped by PCF / cell / leader */}
-          <HierarchyAttendancePanel
-            members={members}
-            leaders={leaders}
-            attendance={attendanceRecords}
-            churchScope={isSuperadmin ? undefined : currentChurchName}
-            showChurchLabel={isSuperadmin}
-          />
-
           {/* 5. Recent Service Attendance Log (First 5 records from First Signup Form or QR Scan) */}
 
           <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
@@ -1116,6 +1107,15 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Attendance grouped by PCF, cell and leader — for both dashboards */}
+      <HierarchyAttendancePanel
+        members={members}
+        leaders={leaders}
+        attendance={attendanceRecords}
+        churchScope={isSuperadmin ? undefined : currentChurchName}
+        showChurchLabel={isSuperadmin}
+      />
 
       {/* ===================================================================== */}
       {/* BIRTHDAYS + STUDENT GROUPS                                            */}
