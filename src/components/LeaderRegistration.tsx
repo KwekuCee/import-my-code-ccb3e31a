@@ -32,6 +32,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
   const [createdLeader, setCreatedLeader] = useState<Leader | null>(null);
   const [authCode, setAuthCode] = useState('');
   const [authError, setAuthError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const churchOptions = Array.from(new Set([
     ...churches.map(c => c.name),
@@ -64,6 +65,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setAuthError('');
 
     if (authCode.trim().toUpperCase() !== 'YOM26') {
@@ -100,9 +102,11 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
         .slice(0, 2) || 'LD'
     };
 
+    setIsSubmitting(true);
     onAddLeader(newLeader);
     setCreatedLeader(newLeader);
     setIsSubmitted(true);
+    setIsSubmitting(false);
   };
 
   const handleReset = () => {
@@ -427,7 +431,8 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
           {/* Submit */}
           <button
             type="submit"
-            className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 px-6 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            disabled={isSubmitting}
+            className="disabled:opacity-50 disabled:cursor-not-allowed w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 px-6 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98"
           >
             <span className="material-symbols-outlined text-[18px]">person_add</span>
             <span>Complete Leader Registration</span>
