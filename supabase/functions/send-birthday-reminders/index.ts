@@ -1,7 +1,7 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { sendGmail } from '../_shared/gmail.ts';
 
-const FROM_ADDRESS = 'GCYC Group <onboarding@resend.dev>';
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -13,7 +13,7 @@ function json(body: unknown, status = 200) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
-  const resendKey = Deno.env.get('RESEND_API_KEY');
+  
   const admin = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
@@ -83,27 +83,19 @@ Deno.serve(async (req) => {
         )
         .join('');
 
-      if (!resendKey) {
-        failures.push(`${email}: email service not configured`);
-        continue;
-      }
-
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          from: FROM_ADDRESS,
-          to: [email],
-          subject: `Birthday tomorrow: ${bucket.people.length} to celebrate`,
-          html: `<p>Hello ${bucket.name},</p>
+      const res = await sendGmail({
+        to: email,
+        fromName: 'GCYC Group',
+        subject: `Birthday tomorrow: ${bucket.people.length} to celebrate`,
+        html: `<p>Hello ${bucket.name},</p>
 <p>The following ${bucket.people.length === 1 ? 'person is' : 'people are'} celebrating a birthday tomorrow:</p>
 <ul>${rows}</ul>
 <p>A call or message today would mean a lot.</p>`,
-        }),
       });
 
       if (res.ok) sent += 1;
-      else failures.push(`${email}: ${await res.text()}`);
+      else failures.push(`${email}: ${res.error}`);
+
     }
 
     if (failures.length) console.warn('Birthday reminder failures:', failures.join(' | '));

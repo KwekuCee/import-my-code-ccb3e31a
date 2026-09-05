@@ -1,5 +1,7 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { sendGmail } from '../_shared/gmail.ts';
+
 
 const TOKEN_TTL_MINUTES = 60;
 
@@ -74,31 +76,19 @@ Deno.serve(async (req) => {
       const origin = String(body?.origin || '').replace(/\/$/, '');
       const link = `${origin}/?reset_token=${token}`;
 
-      const resendKey = Deno.env.get('RESEND_API_KEY');
-      let emailSent = false;
-      let emailError = '';
-      if (resendKey) {
-        const res = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${resendKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: 'GCYC Group <onboarding@resend.dev>',
-            to: [email],
-            subject: 'Set a new password for your GCYC account',
-            html: `<p>Hello,</p>
+      const sendResult = await sendGmail({
+        to: email,
+        fromName: 'GCYC Group',
+        subject: 'Set a new password for your GCYC account',
+        html: `<p>Hello,</p>
 <p>You asked to set a new password for your GCYC Group account.</p>
 <p><a href="${link}" style="background:#1d4ed8;color:#ffffff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:bold;">Create a new password</a></p>
 <p>This link works once and expires in ${TOKEN_TTL_MINUTES} minutes. If you did not ask for this, you can ignore this email.</p>`,
-          }),
-        });
-        emailSent = res.ok;
-        if (!res.ok) emailError = await res.text();
-      }
+      });
+      const emailSent = sendResult.ok;
 
-      if (!emailSent) console.warn('Reset email not sent:', emailError || 'no email key');
+      if (!emailSent) console.warn('Reset email not sent:', sendResult.error);
+
 
       return json({
         success: true,
