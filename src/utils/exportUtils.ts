@@ -136,7 +136,7 @@ export function exportMultiSheetExcel(
   // Detailed Member Roster
   data.members.forEach(m => {
     churchSummaryRows.push({
-      'Church Branch Name': m.church || 'GCYC Main',
+      'Church Branch Name': m.church || 'Unassigned',
       'Head Pastor / Admin': m.fullName,
       'Admin Contact Email': m.email || 'N/A',
       'Admin Phone': m.phone || 'N/A',
@@ -180,7 +180,7 @@ export function exportMultiSheetExcel(
 
   data.attendanceRecords.forEach(att => {
     const dateStr = att.date || new Date().toISOString().slice(0, 10);
-    const churchStr = att.church || 'GCYC Main';
+    const churchStr = att.church || 'Unassigned';
     const srvStr = att.serviceType || 'Sunday Service';
     const key = `${dateStr}__${churchStr}__${srvStr}`;
 
@@ -245,7 +245,7 @@ export function exportMultiSheetExcel(
   data.attendanceRecords.forEach(att => {
     attendanceSummaryRows.push({
       'Attendance Date': att.date || new Date().toISOString().slice(0, 10),
-      'Church Branch': att.church || 'GCYC Main',
+      'Church Branch': att.church || 'Unassigned',
       'Service Program': att.serviceType || 'Sunday Service',
       'Total Attendees': att.memberName || 'Attendee',
       'First Timers Checked-In': att.memberId || 'N/A',
@@ -302,7 +302,7 @@ export function exportMultiSheetExcel(
       'Full Name': m.fullName,
       'Phone Contact': m.phone || 'N/A',
       'Email Address': m.email || 'N/A',
-      'Church Branch': m.church || 'GCYC Main',
+      'Church Branch': m.church || 'Unassigned',
       'Service Type Attended': attMatch?.serviceType || 'Sunday Service',
       'Occupation': m.occupation || 'General',
       'Educational Level': m.education || 'Tertiary',

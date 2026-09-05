@@ -39,7 +39,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
 }) => {
   const isSuperadmin = user.role === 'Superadmin';
-  const currentChurchName = user.church || (churches[0]?.name || 'GCYC Main');
+  const currentChurchName = user.church || churches[0]?.name || 'Unassigned';
   const matchingBranch = churches.find(c => c && c.name && c.name.toLowerCase() === currentChurchName.toLowerCase());
   const matchingAdmin = churchAdmins.find(a => a && a.churchName && a.churchName.toLowerCase() === currentChurchName.toLowerCase());
   const currentBranchPastor = matchingBranch?.pastor || matchingAdmin?.adminName || (user.role === 'Church Admin' ? user.name : 'Branch Pastor');
@@ -427,7 +427,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-2">
-                <p className="font-bold text-xs text-white">Database Backup & Restoration</p>
+                <p className="font-bold text-xs text-slate-900">Database Backup & Restoration</p>
                 <p className="text-xs text-slate-500">Create instant cloud snapshot of members, attendance, and leadership structure.</p>
                 <button
                   onClick={() => triggerToast('Cloud backup snapshot created successfully!')}
@@ -438,7 +438,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               </div>
 
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-2">
-                <p className="font-bold text-xs text-white">Auth Gate Security Logs</p>
+                <p className="font-bold text-xs text-slate-900">Auth Gate Security Logs</p>
                 <p className="text-xs text-slate-500">Church Admin and Leader registration attempts authenticated with Security Gate Code.</p>
                 <button
                   onClick={() => triggerToast('Security Gate Code verified active & locked')}
@@ -527,7 +527,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                   </span>
                   <span className="text-xs text-slate-500">{groupAnnouncements[0].date}</span>
                 </div>
-                <p className="font-bold text-xs text-white">{groupAnnouncements[0].title}</p>
+                <p className="font-bold text-xs text-slate-900">{groupAnnouncements[0].title}</p>
                 <p className="text-xs text-slate-700">{groupAnnouncements[0].body}</p>
               </div>
             </div>
@@ -1084,14 +1084,14 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                     <div className="grid grid-cols-2 gap-3 text-xs pt-1 text-slate-600">
                       <div className="bg-white p-2.5 rounded-lg border border-blue-100/60 space-y-1">
                         <span className="text-slate-400 block">Foundation School:</span>
-                        <span className="font-bold text-white text-xs">{foundationEnrolledCount} Enrolled / {foundationGraduatedCount} Graduated</span>
+                        <span className="font-bold text-slate-900 text-xs">{foundationEnrolledCount} Enrolled / {foundationGraduatedCount} Graduated</span>
                         <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                           <div className="bg-blue-600 h-full rounded-full" style={{ width: `${totalBranchMembers > 0 ? (foundationGraduatedCount / totalBranchMembers) * 100 : 0}%` }}></div>
                         </div>
                       </div>
                       <div className="bg-white p-2.5 rounded-lg border border-blue-100/60 space-y-1">
                         <span className="text-slate-400 block">First-Timer Follow-up:</span>
-                        <span className="font-bold text-white text-xs">{thisWeekNewMembers.length} In Active Follow-up</span>
+                        <span className="font-bold text-slate-900 text-xs">{thisWeekNewMembers.length} In Active Follow-up</span>
                         <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                           <div className="bg-blue-600 h-full rounded-full" style={{ width: `${totalBranchMembers > 0 ? (thisWeekNewMembers.length / totalBranchMembers) * 100 : 0}%` }}></div>
                         </div>

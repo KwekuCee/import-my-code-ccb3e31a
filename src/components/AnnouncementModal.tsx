@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { AuditLogItem } from '../types';
+import { AuditLogItem, ChurchBranch } from '../types';
 import { useToast } from '../context/ToastContext';
 
 interface AnnouncementModalProps {
   onClose: () => void;
+  churches?: ChurchBranch[];
   onAddAuditLog: (log: AuditLogItem) => void;
 }
 
-export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, onAddAuditLog }) => {
+export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, churches = [], onAddAuditLog }) => {
   const toast = useToast();
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -95,8 +96,9 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, o
             >
               <option value="All Members">All Members & Leaders (Group Consolidated)</option>
               <option value="Group Leaders Only">Group Leaders & Deacons Only</option>
-              <option value="GCYC Main">GCYC Main Only</option>
-              <option value="Ushering Team">Ushering Team</option>
+              {churches.map(c => (
+                <option key={c.id} value={c.name}>{c.name} Only</option>
+              ))}
             </select>
           </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AttendanceRecord, ViewType } from '../types';
+import { AttendanceRecord, ChurchBranch, ViewType } from '../types';
 import { useToast } from '../context/ToastContext';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
@@ -13,6 +13,7 @@ interface AttendanceViewProps {
   onNavigate: (view: ViewType) => void;
   onClearTodayAttendance?: () => void;
   serviceTypes?: { id: string; name: string; active: boolean }[];
+  churches?: ChurchBranch[];
   onUpdateAttendance?: (record: AttendanceRecord) => void;
   onDeleteAttendance?: (recordId: string) => void;
 }
@@ -23,6 +24,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   onNavigate,
   onClearTodayAttendance,
   serviceTypes,
+  churches = [],
   onUpdateAttendance,
   onDeleteAttendance
 }) => {
@@ -305,11 +307,9 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                 className="w-full border border-slate-200 bg-slate-50 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-800 outline-none focus:border-blue-600"
               >
                 <option value="All">All Church Branches</option>
-                <option value="GCYC Main">GCYC Main</option>
-                <option value="GCYC 1">GCYC 1</option>
-                <option value="GCYC 2">GCYC 2</option>
-                <option value="CE Mamprobi">CE Mamprobi</option>
-                <option value="CE Dansoman">CE Dansoman</option>
+                {churches.map(c => (
+                  <option key={c.id} value={c.name}>{c.name}</option>
+                ))}
               </select>
             </div>
           ) : (

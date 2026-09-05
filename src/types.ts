@@ -74,6 +74,8 @@ export interface Member {
   foundationClass: number; // 0 to 7
   status: 'First Timer' | 'General Member';
   gender?: 'Male' | 'Female';
+  maritalStatus?: string;
+  photoUrl?: string;
   educationLevel?: string;
   occupationCategory?: string;
 }

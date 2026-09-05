@@ -94,7 +94,7 @@ export async function fetchMembersFromSupabase(): Promise<Member[] | null> {
       occupation: row.occupation || 'General',
       education: row.education_level || 'Tertiary',
       location: row.location || 'Korle Bu',
-      church: row.church_name || 'GCYC Main',
+      church: row.church_name || 'Unassigned',
       joinDate: row.join_date || row.created_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
       initials: (row.full_name || 'MB').split(' ').filter(Boolean).map((n: string) => n ? n[0] : '').join('').toUpperCase().slice(0, 2) || 'MB',
       serviceCount: row.service_count || 1,
@@ -102,7 +102,9 @@ export async function fetchMembersFromSupabase(): Promise<Member[] | null> {
       status: row.status || 'First Timer',
       invitedBy: row.invited_by_name || 'Self Check-In',
       invitedByLeaderId: row.invited_by_leader_id || undefined,
-      gender: row.gender || 'Male'
+      gender: row.gender || 'Male',
+      maritalStatus: row.marital_status || undefined,
+      photoUrl: row.photo_url || undefined
 
     }));
   } catch (err) {
@@ -154,6 +156,9 @@ export async function saveMemberToSupabase(member: Member): Promise<boolean> {
       service_count: member.serviceCount,
       foundation_class: member.foundationClass,
       status: member.status,
+      gender: member.gender || null,
+      marital_status: member.maritalStatus || null,
+      photo_url: member.photoUrl || null,
       join_date: member.joinDate
     };
 
@@ -215,7 +220,7 @@ export async function fetchLeadersFromSupabase(): Promise<Leader[] | null> {
       parentLeaderName: row.parent_leader_name,
       isAppointed: row.is_appointed || false,
       downstreamCount: row.downstream_count || 0,
-      church: row.church_name || 'GCYC Main',
+      church: row.church_name || 'Unassigned',
       promotionStatus: row.promotion_status || 'None',
       joinedDate: row.created_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
       initials: (row.full_name || 'LD').split(' ').filter(Boolean).map((n: string) => n ? n[0] : '').join('').toUpperCase().slice(0, 2) || 'LD'
@@ -1019,7 +1024,7 @@ export async function fetchPromotionQueueFromSupabase(): Promise<PromotionQueueI
       id: row.id,
       leaderId: row.leader_id,
       leaderName: row.leader_name || 'Leader',
-      church: row.church_name || 'GCYC Main',
+      church: row.church_name || 'Unassigned',
       currentRole: row.current_leader_role,
       targetRole: row.target_role,
       downstreamCount: row.downstream_count || 5,

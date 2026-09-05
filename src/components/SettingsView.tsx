@@ -802,7 +802,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     <span className="material-symbols-outlined text-[26px]">admin_panel_settings</span>
                   </div>
                   <div>
-                    <h3 className="font-headline font-bold text-lg text-white">
+                    <h3 className="font-headline font-bold text-lg text-slate-900">
                       Group Pastor & HQ Account Profile
                     </h3>
                     <p className="text-xs text-slate-500">
@@ -1026,7 +1026,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <div className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-headline font-bold text-base text-white">
+                <h3 className="font-headline font-bold text-base text-slate-900">
                   Global Service Types Manager
                 </h3>
                 <p className="text-xs text-slate-500">Service types saved to Supabase and displayed at the self check-in station</p>
@@ -1055,7 +1055,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <div key={idx} className="p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
                     <span className="material-symbols-outlined text-blue-600 text-[18px]">event_available</span>
-                    <span className="font-bold text-xs text-white">{srv}</span>
+                    <span className="font-bold text-xs text-slate-900">{srv}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs bg-emerald-50 text-emerald-700 font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">

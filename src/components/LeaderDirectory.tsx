@@ -183,11 +183,9 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
             className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-blue-600 cursor-pointer"
           >
             <option value="All">All Churches</option>
-            <option value="GCYC Main">GCYC Main</option>
-            <option value="GCYC 1">GCYC 1</option>
-            <option value="GCYC 2">GCYC 2</option>
-            <option value="CE Mamprobi">CE Mamprobi</option>
-            <option value="CE Dansoman">CE Dansoman</option>
+            {(churches || []).map(c => (
+              <option key={c.id} value={c.name}>{c.name}</option>
+            ))}
           </select>
         </div>
       </div>

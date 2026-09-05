@@ -500,7 +500,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                 required
                 value={newChurchName}
                 onChange={e => setNewChurchName(e.target.value)}
-                placeholder="e.g. CE Achimota Central"
+                placeholder="e.g. your church branch name"
                 className="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none focus:bg-white focus:border-blue-600 font-semibold"
               />
             </div>

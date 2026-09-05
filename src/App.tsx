@@ -289,7 +289,7 @@ export default function App() {
           occupation: 'Member',
           education: 'Tertiary',
           location: record.church || 'Korle Bu',
-          church: record.church || (churches[0]?.name || 'GCYC Main'),
+          church: record.church || churches[0]?.name || 'Unassigned',
           joinDate: today,
           initials: (record.memberName || 'Member').split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'MB',
           serviceCount: 1,
@@ -681,6 +681,7 @@ export default function App() {
                 <NewRegistration
                   members={members}
                   leaders={leaders}
+                  churches={churches}
                   serviceTypes={serviceTypes}
                   onAddMember={handleAddMember}
                   onNavigate={setCurrentView}
@@ -692,6 +693,7 @@ export default function App() {
                 <AttendanceView
                   attendanceRecords={attendanceRecords}
                   user={user}
+                  churches={churches}
                   serviceTypes={serviceTypes}
                   onNavigate={setCurrentView}
                   onUpdateAttendance={handleUpdateAttendance}
@@ -767,6 +769,7 @@ export default function App() {
         {showAnnouncementModal && (
           <AnnouncementModal
             key="announcement-modal"
+            churches={churches}
             onClose={() => setShowAnnouncementModal(false)}
             onAddAuditLog={(log) => setAuditLogs(prev => [log, ...prev])}
           />

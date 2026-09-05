@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      absence_records: {
+        Row: {
+          church_id: string | null
+          church_name: string | null
+          created_at: string
+          id: string
+          member_id: string
+          member_name: string
+          note: string | null
+          reason: string | null
+          recorded_by: string | null
+          service_date: string
+          service_type: string
+          updated_at: string
+        }
+        Insert: {
+          church_id?: string | null
+          church_name?: string | null
+          created_at?: string
+          id?: string
+          member_id: string
+          member_name: string
+          note?: string | null
+          reason?: string | null
+          recorded_by?: string | null
+          service_date: string
+          service_type: string
+          updated_at?: string
+        }
+        Update: {
+          church_id?: string | null
+          church_name?: string | null
+          created_at?: string
+          id?: string
+          member_id?: string
+          member_name?: string
+          note?: string | null
+          reason?: string | null
+          recorded_by?: string | null
+          service_date?: string
+          service_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "absence_records_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_settings: {
         Row: {
           admin_id: string | null
@@ -389,8 +442,10 @@ export type Database = {
           invited_by_name: string | null
           join_date: string
           location: string | null
+          marital_status: string | null
           occupation: string | null
           phone: string | null
+          photo_url: string | null
           role: string | null
           service_count: number
           status: Database["public"]["Enums"]["member_status_enum"]
@@ -411,8 +466,10 @@ export type Database = {
           invited_by_name?: string | null
           join_date?: string
           location?: string | null
+          marital_status?: string | null
           occupation?: string | null
           phone?: string | null
+          photo_url?: string | null
           role?: string | null
           service_count?: number
           status?: Database["public"]["Enums"]["member_status_enum"]
@@ -433,8 +490,10 @@ export type Database = {
           invited_by_name?: string | null
           join_date?: string
           location?: string | null
+          marital_status?: string | null
           occupation?: string | null
           phone?: string | null
+          photo_url?: string | null
           role?: string | null
           service_count?: number
           status?: Database["public"]["Enums"]["member_status_enum"]

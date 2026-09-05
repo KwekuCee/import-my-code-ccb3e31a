@@ -586,7 +586,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
         <div className="flex items-center gap-3">
           <ChurchLogo className="w-10 h-10 rounded-2xl overflow-hidden shadow-sm shadow-blue-700/20 shrink-0" alt="GCYC Logo" />
           <div>
-            <h1 className="font-display font-extrabold text-base md:text-lg text-white tracking-tight flex items-center gap-2">
+            <h1 className="font-display font-extrabold text-base md:text-lg text-slate-900 tracking-tight flex items-center gap-2">
               GCYC Group
 
             </h1>
@@ -632,7 +632,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
             }}
             className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'attendance'
               ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
-              : 'text-slate-600 hover:text-white hover:bg-white/80'
+              : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
               }`}
           >
             <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
@@ -643,7 +643,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
             onClick={() => setActiveTab('leader_reg')}
             className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'leader_reg'
               ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
-              : 'text-slate-600 hover:text-white hover:bg-white/80'
+              : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
               }`}
           >
             <span className="material-symbols-outlined text-[18px]">person_add</span>
@@ -654,7 +654,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
             onClick={() => setActiveTab('admin_signup')}
             className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'admin_signup'
               ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
-              : 'text-slate-600 hover:text-white hover:bg-white/80'
+              : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
               }`}
           >
             <span className="material-symbols-outlined text-[18px]">church</span>
@@ -665,7 +665,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
             onClick={() => setActiveTab('login')}
             className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'login'
               ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
-              : 'text-slate-600 hover:text-white hover:bg-white/80'
+              : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
               }`}
           >
             <span className="material-symbols-outlined text-[18px]">lock</span>
@@ -846,7 +846,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Korle Bu, Mamprobi, Dansoman"
+                      placeholder="e.g. your area or suburb"
                       value={attLocation}
                       onChange={(e) => setAttLocation(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
@@ -1272,7 +1272,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   <input
                     type="text"
                     required
-                    placeholder="e.g. GCYC 2 or CE Achimota"
+                    placeholder="e.g. your church branch name"
                     value={admChurchName}
                     onChange={(e) => setAdmChurchName(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
@@ -1365,7 +1365,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
               <div className="w-12 h-12 rounded-2xl bg-blue-700 text-white font-black text-xl flex items-center justify-center mx-auto mb-2 shadow-sm shadow-blue-700/20">
                 KB
               </div>
-              <h3 className="font-display font-extrabold text-xl text-white">Platform Admin Sign In</h3>
+              <h3 className="font-display font-extrabold text-xl text-slate-900">Platform Admin Sign In</h3>
               <p className="text-xs text-slate-500">Select account level to access dashboard</p>
             </div>
 
@@ -1379,7 +1379,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 }}
                 className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${loginRole === 'Superadmin'
                   ? 'bg-blue-700 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-white'
+                  : 'text-slate-600 hover:text-blue-800'
                   }`}
               >
                 <span className="material-symbols-outlined text-[16px]">shield</span>
@@ -1394,7 +1394,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 }}
                 className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${loginRole === 'Church Admin'
                   ? 'bg-blue-700 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-white'
+                  : 'text-slate-600 hover:text-blue-800'
                   }`}
               >
                 <span className="material-symbols-outlined text-[16px]">church</span>
