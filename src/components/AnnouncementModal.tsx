@@ -55,12 +55,12 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, o
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 350 }}
-        className="bg-white/90 backdrop-blur-2xl rounded-3xl max-w-md w-full border border-white/60 shadow-2xl overflow-hidden"
+        className="bg-white/90 backdrop-blur-2xl rounded-2xl max-w-md w-full border border-white/60 shadow-sm overflow-hidden"
       >
 
-        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white p-5 flex justify-between items-center border-b border-slate-800">
+        <div className="bg-blue-700 text-white p-5 flex justify-between items-center border-b border-slate-800">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-amber-400 icon-fill text-[20px]">campaign</span>
+            <span className="material-symbols-outlined text-blue-500 icon-fill text-[20px]">campaign</span>
             <span className="font-headline font-bold text-sm tracking-wide">Group Broadcast Message</span>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
@@ -71,7 +71,7 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, o
         <form onSubmit={handleSend} className="p-6 space-y-4">
 
           <div>
-            <label className="block font-mono text-[10px] font-bold uppercase text-slate-500 mb-1">
+            <label className="block text-xs font-bold uppercase text-slate-500 mb-1">
               Broadcast Title *
             </label>
             <input
@@ -80,18 +80,18 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, o
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Special Sunday Service Time Notice"
-              className="w-full bg-slate-50/80 border border-slate-200/80 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 font-semibold"
+              className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 font-semibold"
             />
           </div>
 
           <div>
-            <label className="block font-mono text-[10px] font-bold uppercase text-slate-500 mb-1">
+            <label className="block text-xs font-bold uppercase text-slate-500 mb-1">
               Target Audience
             </label>
             <select
               value={targetAudience}
               onChange={e => setTargetAudience(e.target.value)}
-              className="w-full bg-slate-50/80 border border-slate-200/80 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 font-semibold"
+              className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 font-semibold"
             >
               <option value="All Members">All Members & Leaders (Group Consolidated)</option>
               <option value="Group Leaders Only">Group Leaders & Deacons Only</option>
@@ -102,13 +102,13 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, o
 
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="font-mono text-[10px] font-bold uppercase text-slate-500">
+              <label className="text-xs font-bold uppercase text-slate-500">
                 Message Body *
               </label>
               <button
                 type="button"
                 onClick={handleGenerateAIAnnouncement}
-                className="text-[11px] text-blue-600 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                className="text-xs text-blue-600 font-bold hover:underline cursor-pointer flex items-center gap-1"
               >
                 <span className="material-symbols-outlined text-[14px]">auto_awesome</span>
                 <span>Auto-draft template</span>
@@ -120,7 +120,7 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, o
               value={message}
               onChange={e => setMessage(e.target.value)}
               placeholder="Type your announcement content here..."
-              className="w-full bg-slate-50/80 border border-slate-200/80 rounded-xl p-3 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600"
+              className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600"
             />
           </div>
 
@@ -135,7 +135,7 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({ onClose, o
             <button
               type="submit"
               disabled={isSending}
-              className="px-5 py-2.5 bg-slate-950 text-white rounded-xl text-xs font-bold hover:bg-slate-800 flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-md"
+              className="px-5 py-2.5 bg-slate-950 text-white rounded-xl text-xs font-bold hover:bg-slate-800 flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-sm"
             >
               <span className="material-symbols-outlined text-[16px]">send</span>
               <span>{isSending ? 'Sending...' : 'Dispatch Broadcast'}</span>

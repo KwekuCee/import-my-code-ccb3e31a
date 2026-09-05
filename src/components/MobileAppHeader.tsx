@@ -91,7 +91,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="font-headline font-extrabold text-sm text-slate-900 tracking-tight truncate leading-tight">
+                <span className="font-headline font-extrabold text-sm text-white tracking-tight truncate leading-tight">
                   {getPageTitle(currentView)}
                 </span>
                 {user?.role === 'Superadmin' ? (
@@ -104,7 +104,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-slate-500 font-body font-medium truncate flex items-center gap-1">
+              <p className="text-xs text-slate-500 font-body font-medium truncate flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span>GCYC Network</span>
               </p>
@@ -116,7 +116,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
             {!isInstalled && (
               <button
                 onClick={handleInstallClick}
-                className="flex items-center gap-1 bg-blue-700 hover:bg-blue-800 text-white font-bold text-[11px] px-2.5 py-1.5 rounded-full shadow-xs active:scale-95 transition-all cursor-pointer"
+                className="flex items-center gap-1 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-2.5 py-1.5 rounded-full shadow-xs active:scale-95 transition-all cursor-pointer"
                 title="Install Mobile App"
               >
                 <span className="material-symbols-outlined text-[14px]">download</span>
@@ -155,7 +155,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
       {/* iOS & Android Manual Installation Modal */}
       {showIOSInstructions && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-slate-900 space-y-4 animate-in fade-in zoom-in-95">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm w-full shadow-sm text-slate-900 space-y-4 animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center border border-blue-200">
@@ -179,7 +179,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
 
             <div className="space-y-3 text-xs bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
               <div className="flex items-start gap-2.5">
-                <span className="font-mono bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0">
+                <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-0.5 rounded-full shrink-0">
                   iOS
                 </span>
                 <p className="text-slate-700">
@@ -187,7 +187,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
                 </p>
               </div>
               <div className="flex items-start gap-2.5 border-t border-slate-200 pt-2.5">
-                <span className="font-mono bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0">
+                <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-0.5 rounded-full shrink-0">
                   Android
                 </span>
                 <p className="text-slate-700">

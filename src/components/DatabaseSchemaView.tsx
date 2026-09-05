@@ -24,12 +24,12 @@ export const DatabaseSchemaView: React.FC<DatabaseSchemaViewProps> = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full mb-1 border border-emerald-200">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full mb-1 border border-emerald-200">
             <span className="material-symbols-outlined text-[14px]">database</span>
-            Supabase Relational Database Architecture
+            Database Architecture
           </div>
           <h1 className="font-display text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Relational DB & Supabase RLS Schema
+            Database & Security Schema
           </h1>
           <p className="font-body text-xs md:text-sm text-slate-500 mt-1">
             Production PostgreSQL migration DDL with multi-tenancy Row Level Security policies for GCYC Group.
@@ -38,12 +38,12 @@ export const DatabaseSchemaView: React.FC<DatabaseSchemaViewProps> = () => {
 
         <button
           onClick={handleCopySql}
-          className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all flex items-center gap-2 shadow-md cursor-pointer shrink-0"
+          className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all flex items-center gap-2 shadow-sm cursor-pointer shrink-0"
         >
           <span className="material-symbols-outlined text-[18px]">
             {copied ? 'check' : 'content_copy'}
           </span>
-          <span>{copied ? 'SQL Copied!' : 'Copy Supabase DDL'}</span>
+          <span>{copied ? 'SQL Copied!' : 'Copy Database DDL'}</span>
         </button>
       </div>
 
@@ -75,9 +75,9 @@ export const DatabaseSchemaView: React.FC<DatabaseSchemaViewProps> = () => {
       </div>
 
       {activeTab === 'schema' && (
-        <div className="bg-slate-950 text-slate-100 p-6 rounded-3xl font-mono text-xs overflow-x-auto shadow-2xl border border-slate-800 space-y-2">
+        <div className="bg-slate-950 text-slate-100 p-6 rounded-2xl text-xs overflow-x-auto shadow-sm border border-slate-800 space-y-2">
           <div className="flex justify-between items-center text-slate-400 border-b border-slate-800 pb-3 mb-2">
-            <span className="text-emerald-400 font-bold">// Supabase PostgreSQL Initial Migration DDL Script</span>
+            <span className="text-emerald-400 font-bold">// live database Initial Migration DDL Script</span>
             <span>PostgreSQL 15+</span>
           </div>
           <pre className="text-slate-300 leading-relaxed whitespace-pre-wrap">
@@ -87,24 +87,24 @@ export const DatabaseSchemaView: React.FC<DatabaseSchemaViewProps> = () => {
       )}
 
       {activeTab === 'rls' && (
-        <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-2xs space-y-4">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
           <h3 className="font-headline font-bold text-lg text-slate-900">Multi-Tenancy Security Model</h3>
           <p className="text-xs text-slate-600 leading-relaxed font-body">
-            Row Level Security (RLS) is enforced directly at the database level using Supabase custom JWT claims (<code className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-blue-700">church_id</code> and <code className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-amber-700">is_superadmin</code>).
+            Row Level Security (RLS) is enforced directly at the database level using secure database claims (<code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700">church_id</code> and <code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700">is_superadmin</code>).
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
               <h4 className="font-headline font-bold text-sm text-slate-900">Church Admin Isolation</h4>
               <p className="text-xs text-slate-600">
-                Church Admins are restricted strictly to querying records belonging to their assigned <code className="font-mono text-blue-700">church_id</code>. They cannot view or modify members from another church branch.
+                Church Admins are restricted strictly to querying records belonging to their assigned <code className="text-blue-700">church_id</code>. They cannot view or modify members from another church branch.
               </p>
             </div>
 
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
               <h4 className="font-headline font-bold text-sm text-slate-900">Group Pastor Superadmin Privilege</h4>
               <p className="text-xs text-slate-600">
-                The Group Pastor account bypasses single-church filters via <code className="font-mono text-amber-700">is_superadmin = true</code> or username <code className="font-mono text-amber-700">group.pastor</code>, granting instant access to all network databases, audit trails, and backup logs.
+                The Group Pastor account bypasses single-church filters via <code className="text-blue-700">is_superadmin = true</code> or username <code className="text-blue-700">group.pastor</code>, granting instant access to all network databases, audit trails, and backup logs.
               </p>
             </div>
           </div>
@@ -124,12 +124,12 @@ export const DatabaseSchemaView: React.FC<DatabaseSchemaViewProps> = () => {
             { name: 'audit_logs', desc: 'Complete system action audit trail', count: 4 },
             { name: 'promotion_queue', desc: 'Auto-flagged hierarchy promotion queue', count: 2 }
           ].map(tbl => (
-            <div key={tbl.name} className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2">
+            <div key={tbl.name} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
               <div className="flex justify-between items-start">
-                <span className="font-mono font-bold text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+                <span className="font-bold text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
                   {tbl.name}
                 </span>
-                <span className="font-mono text-[10px] text-slate-400 font-semibold">{tbl.count} live rows</span>
+                <span className="text-xs text-slate-400 font-semibold">{tbl.count} live rows</span>
               </div>
               <p className="text-xs text-slate-500 font-body">{tbl.desc}</p>
             </div>

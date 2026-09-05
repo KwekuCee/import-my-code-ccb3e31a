@@ -55,7 +55,7 @@ export const EditRecordModal: React.FC<EditRecordModalProps> = ({
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         onSubmit={handleSubmit}
-        className="bg-white border border-slate-200 rounded-3xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col"
+        className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg shadow-sm max-h-[90vh] flex flex-col"
       >
         <div className="p-5 border-b border-slate-100 flex items-start gap-3">
           <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
@@ -78,7 +78,7 @@ export const EditRecordModal: React.FC<EditRecordModalProps> = ({
         <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
           {fields.map(f => (
             <div key={f.key} className={f.type === 'select' || f.key === 'fullName' ? 'sm:col-span-2' : ''}>
-              <label className="block font-mono text-[10px] font-bold uppercase text-slate-400 mb-1">
+              <label className="block text-xs font-bold uppercase text-slate-400 mb-1">
                 {f.label}
               </label>
               {f.type === 'select' ? (
@@ -116,7 +116,7 @@ export const EditRecordModal: React.FC<EditRecordModalProps> = ({
           </button>
           <button
             type="submit"
-            className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 rounded-xl cursor-pointer shadow-md"
+            className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 rounded-xl cursor-pointer shadow-sm"
           >
             Save Changes
           </button>
@@ -143,7 +143,7 @@ export const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-white border border-slate-200 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4"
+      className="bg-white border border-slate-200 rounded-2xl p-6 max-w-md w-full shadow-sm space-y-4"
     >
       <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center">
         <span className="material-symbols-outlined text-[26px]">delete_forever</span>
@@ -161,7 +161,7 @@ export const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
         </button>
         <button
           onClick={onConfirm}
-          className="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs py-2.5 rounded-xl cursor-pointer shadow-md"
+          className="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs py-2.5 rounded-xl cursor-pointer shadow-sm"
         >
           Yes, Delete
         </button>

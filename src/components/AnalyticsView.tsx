@@ -117,7 +117,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full mb-1 border border-blue-200">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full mb-1 border border-blue-200">
             <span className="material-symbols-outlined text-[14px]">analytics</span>
             {isSuperadmin ? 'GCYC Group Analytics Engine' : `${churchName} Branch Analytics Engine`}
           </div>
@@ -137,7 +137,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
             <select
               value={selectedBranch}
               onChange={e => setSelectedBranch(e.target.value)}
-              className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 shadow-2xs outline-none focus:border-blue-600 cursor-pointer"
+              className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 shadow-sm outline-none focus:border-blue-600 cursor-pointer"
             >
               <option value="All">All Church Branches (Group Consolidated)</option>
               {branchOptions.map(b => (
@@ -145,7 +145,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
               ))}
             </select>
           ) : (
-            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-800 px-3.5 py-2 rounded-xl text-xs font-bold font-mono">
+            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-800 px-3.5 py-2 rounded-xl text-xs font-bold">
               <span className="material-symbols-outlined text-[16px]">church</span>
               <span>{churchName} Members Only</span>
             </div>
@@ -159,7 +159,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                 setSyncTimestamp(new Date().toLocaleTimeString());
               }, 600);
             }}
-            className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-mono text-xs font-bold px-3 py-2 rounded-xl transition-all cursor-pointer"
+            className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-3 py-2 rounded-xl transition-all cursor-pointer"
           >
             <span className={`material-symbols-outlined text-[16px] ${isSyncing ? 'animate-spin text-blue-600' : ''}`}>
               sync
@@ -169,7 +169,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
 
           <button
             onClick={handleExportAnalyticsCSV}
-            className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-2xs transition-all cursor-pointer"
+            className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-sm transition-all cursor-pointer"
           >
             <span className="material-symbols-outlined text-[16px]">download</span>
             <span>Export Demographics CSV</span>
@@ -179,28 +179,28 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
 
       {/* Top 4 Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-2xs space-y-1">
-          <p className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">Filtered Members</p>
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-1">
+          <p className="text-xs font-bold text-slate-400 ">Filtered Members</p>
           <div className="font-display text-3xl font-extrabold text-slate-900">{total}</div>
-          <p className="text-xs text-emerald-600 font-semibold font-mono">Live registered in branch database</p>
+          <p className="text-xs text-emerald-600 font-semibold">Live registered in branch database</p>
         </div>
 
-        <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-2xs space-y-1">
-          <p className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">First Timers Conversion</p>
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-1">
+          <p className="text-xs font-bold text-slate-400 ">First Timers Conversion</p>
           <div className="font-display text-3xl font-extrabold text-blue-600">{firstTimersCount}</div>
-          <p className="text-xs text-slate-500 font-mono">Automated transition to General Member</p>
+          <p className="text-xs text-slate-500">Automated transition to General Member</p>
         </div>
 
-        <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-2xs space-y-1">
-          <p className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">Gender Balance</p>
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-1">
+          <p className="text-xs font-bold text-slate-400 ">Gender Balance</p>
           <div className="font-display text-3xl font-extrabold text-slate-900">{maleCount}M : {femaleCount}F</div>
-          <p className="text-xs text-amber-600 font-semibold font-mono">Real branch demographic census</p>
+          <p className="text-xs text-blue-700 font-semibold">Real branch demographic census</p>
         </div>
 
-        <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-2xs space-y-1">
-          <p className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tertiary Educated Ratio</p>
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-1">
+          <p className="text-xs font-bold text-slate-400 ">Tertiary Educated Ratio</p>
           <div className="font-display text-3xl font-extrabold text-purple-600">{tertiaryPercent}%</div>
-          <p className="text-xs text-slate-500 font-mono">{tertiaryCount} of {total} verified tertiary/postgrad</p>
+          <p className="text-xs text-slate-500">{tertiaryCount} of {total} verified tertiary/postgrad</p>
         </div>
       </div>
 
@@ -211,13 +211,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
         <div className="lg:col-span-8 space-y-6">
 
           {/* Occupations Breakdown */}
-          <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-2xs space-y-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div>
                 <h3 className="font-headline font-bold text-base text-slate-900">Occupational Profile Distribution</h3>
                 <p className="text-xs text-slate-500">Professionals, healthcare, students, and entrepreneurs in church</p>
               </div>
-              <span className="font-mono text-[10px] bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full font-bold">
+              <span className="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full font-bold">
                 Categorized
               </span>
             </div>
@@ -229,7 +229,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                   <div key={occ} className="space-y-1">
                     <div className="flex justify-between text-xs font-semibold text-slate-800">
                       <span>{occ}</span>
-                      <span className="font-mono text-slate-500">{count} members ({percentage}%)</span>
+                      <span className="text-slate-500">{count} members ({percentage}%)</span>
                     </div>
                     <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
                       <div
@@ -247,13 +247,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             {/* Educational Level */}
-            <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs space-y-3">
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
               <h3 className="font-headline font-bold text-sm text-slate-900">Educational Background</h3>
               <div className="space-y-2.5 pt-1">
                 {Object.entries(educationMap).map(([edu, count]) => (
                   <div key={edu} className="flex justify-between items-center p-2.5 bg-slate-50 rounded-xl text-xs">
                     <span className="font-bold text-slate-800">{edu}</span>
-                    <span className="font-mono bg-blue-50 text-blue-800 px-2.5 py-0.5 rounded-full font-bold border border-blue-100">
+                    <span className="bg-blue-50 text-blue-800 px-2.5 py-0.5 rounded-full font-bold border border-blue-100">
                       {count}
                     </span>
                   </div>
@@ -262,13 +262,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
             </div>
 
             {/* Locations Heatmap */}
-            <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs space-y-3">
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
               <h3 className="font-headline font-bold text-sm text-slate-900">Residential Areas</h3>
               <div className="space-y-2.5 pt-1">
                 {Object.entries(locationMap).map(([loc, count]) => (
                   <div key={loc} className="flex justify-between items-center p-2.5 bg-slate-50 rounded-xl text-xs">
                     <span className="font-bold text-slate-800">{loc}</span>
-                    <span className="font-mono bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold border border-emerald-100">
+                    <span className="bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold border border-emerald-100">
                       {count}
                     </span>
                   </div>
@@ -284,13 +284,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
         <div className="lg:col-span-4 space-y-6">
 
           {/* Upcoming Birthdays Section */}
-          <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-amber-500 icon-fill text-[22px]">cake</span>
+                <span className="material-symbols-outlined text-blue-600 icon-fill text-[22px]">cake</span>
                 <h3 className="font-headline font-bold text-base text-slate-900">Upcoming Birthdays</h3>
               </div>
-              <span className="font-mono text-[10px] bg-amber-50 text-amber-800 font-bold px-2 py-0.5 rounded-full border border-amber-200">
+              <span className="text-xs bg-blue-50 text-blue-800 font-bold px-2 py-0.5 rounded-full border border-blue-100">
                 Celebrations
               </span>
             </div>
@@ -301,10 +301,10 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                   const isSent = sentBirthdayFor.includes(m.id);
                   const birthdayLabel = formatBirthdayDisplay(m.dob);
                   return (
-                    <div key={m.id} className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex justify-between items-center">
+                    <div key={m.id} className="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex justify-between items-center">
                       <div>
                         <p className="font-headline font-bold text-xs text-slate-900">{m.fullName}</p>
-                        <p className="font-mono text-[10px] text-amber-800 font-bold mt-0.5">
+                        <p className="text-xs text-blue-800 font-bold mt-0.5">
                           {birthdayLabel} • <span className="text-slate-500 font-normal">{m.church}</span>
                         </p>
                       </div>
@@ -312,7 +312,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                       <button
                         onClick={() => handleSendBirthdayGreeting(m)}
                         disabled={isSent}
-                        className={`text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1 ${isSent
+                        className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1 ${isSent
                             ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                             : 'bg-slate-900 text-white hover:bg-slate-800 shadow-xs'
                           }`}
@@ -334,7 +334,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           </div>
 
           {/* First Timers Seeking Engagement Card */}
-          <div className="bg-gradient-to-br from-blue-900 to-slate-900 text-white rounded-3xl p-6 shadow-md border border-slate-800 space-y-3">
+          <div className="bg-blue-700 text-white rounded-2xl p-6 shadow-sm border border-slate-800 space-y-3">
             <div className="flex items-center gap-2 text-blue-300 font-headline font-bold text-sm">
               <span className="material-symbols-outlined text-[20px]">how_to_reg</span>
               <span>First Timers Follow-up Engine</span>
@@ -344,7 +344,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
             </p>
             <button
               onClick={() => onNavigate('members')}
-              className="w-full mt-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-sm"
+              className="w-full mt-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-sm"
             >
               View First Timers Follow-Up List
             </button>

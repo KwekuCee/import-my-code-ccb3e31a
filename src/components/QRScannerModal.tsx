@@ -168,7 +168,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
         </div>
 
         <div className="flex-1 bg-slate-950/70 backdrop-blur-xs flex flex-col items-center pt-6">
-          <span className="font-mono text-xs font-bold text-amber-300 bg-slate-900/90 px-4 py-1.5 rounded-full border border-amber-500/30 shadow-lg">
+          <span className="text-xs font-bold text-amber-300 bg-slate-900/90 px-4 py-1.5 rounded-full border border-amber-500/30 shadow-lg">
             Position QR Code Pass Inside Frame
           </span>
 
@@ -220,7 +220,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
             <button
               onClick={() => setUseRealCamera(!useRealCamera)}
-              className="w-full text-[11px] font-bold bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl border border-white/10"
+              className="w-full text-xs font-bold bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl border border-white/10"
             >
               {useRealCamera ? 'Turn camera off' : 'Turn camera on'}
             </button>
@@ -240,7 +240,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
         <div className="flex items-center gap-2 bg-slate-900/80 px-3 py-1 rounded-full border border-slate-700">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="font-mono text-xs font-bold text-slate-200 uppercase tracking-wider">
+          <span className="text-xs font-bold text-slate-200 ">
             Usher Station 1
           </span>
         </div>
@@ -262,7 +262,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
         {/* Success Overlay */}
         {scannerState === 'success' && selectedMember && (
-          <div className="bg-white rounded-t-3xl w-full shadow-2xl transition-transform duration-300 pointer-events-auto border-t border-slate-200 max-w-lg mx-auto animate-in slide-in-from-bottom duration-200">
+          <div className="bg-white rounded-t-3xl w-full shadow-sm transition-transform duration-300 pointer-events-auto border-t border-slate-200 max-w-lg mx-auto animate-in slide-in-from-bottom duration-200">
 
             <div className="w-full flex justify-center py-3">
               <div className="w-12 h-1.5 rounded-full bg-slate-200" />
@@ -280,7 +280,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                     Attendance Recorded
                   </span>
                 </div>
-                <span className="font-mono text-[10px] bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full font-bold border border-emerald-200">
+                <span className="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full font-bold border border-emerald-200">
                   LOGGED
                 </span>
               </div>
@@ -288,14 +288,14 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
               {/* Member Card */}
               <div className="flex items-center gap-3.5 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 flex items-center justify-center font-display text-lg font-extrabold shrink-0 shadow-md">
+                <div className="w-12 h-12 rounded-2xl bg-blue-700 text-white flex items-center justify-center font-display text-lg font-extrabold shrink-0 shadow-sm">
                   {selectedMember.initials || selectedMember.fullName?.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'MB'}
                 </div>
                 <div className="flex-1">
                   <h2 className="font-headline text-lg text-slate-900 font-bold leading-tight">
                     {selectedMember.fullName}
                   </h2>
-                  <p className="font-mono text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     ID: {selectedMember.id} • {selectedMember.role} • {selectedMember.church}
                   </p>
                 </div>
@@ -303,7 +303,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
               {/* Service Type Selector (applies to next scan) */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="modalServiceType" className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                <label htmlFor="modalServiceType" className="text-xs font-bold text-slate-500 ">
                   Target Service — logged as {serviceType}
                 </label>
                 <select
@@ -334,7 +334,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
         {/* Already recorded Overlay */}
         {scannerState === 'duplicate' && selectedMember && (
-          <div className="bg-white rounded-t-3xl w-full shadow-2xl pointer-events-auto border-t border-slate-200 max-w-lg mx-auto animate-in slide-in-from-bottom duration-200">
+          <div className="bg-white rounded-t-3xl w-full shadow-sm pointer-events-auto border-t border-slate-200 max-w-lg mx-auto animate-in slide-in-from-bottom duration-200">
             <div className="w-full flex justify-center py-3">
               <div className="w-12 h-1.5 rounded-full bg-slate-200" />
             </div>
@@ -359,7 +359,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
         {/* Error Overlay */}
         {scannerState === 'error' && (
-          <div className="bg-white rounded-t-3xl w-full shadow-2xl transition-transform duration-300 pointer-events-auto border-t border-slate-200 max-w-lg mx-auto animate-in slide-in-from-bottom duration-200">
+          <div className="bg-white rounded-t-3xl w-full shadow-sm transition-transform duration-300 pointer-events-auto border-t border-slate-200 max-w-lg mx-auto animate-in slide-in-from-bottom duration-200">
 
             <div className="w-full flex justify-center py-3">
               <div className="w-12 h-1.5 rounded-full bg-slate-200" />

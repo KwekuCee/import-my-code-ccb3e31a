@@ -139,7 +139,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
       {/* Header & Main Actions */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 shrink-0">
         <div>
-          <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full mb-1">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full mb-1">
             <span className="material-symbols-outlined text-[14px]">database</span>
             {isChurchAdmin ? `${targetChurch} Directory • ${scopedMembers.length} Branch Members` : `Group Directory • ${members.length} Total Records`}
           </div>
@@ -166,7 +166,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="pl-9 pr-9 py-2 w-full sm:w-80 bg-white border border-slate-200 rounded-xl font-body text-xs text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition-all placeholder:text-slate-400 font-medium shadow-2xs"
+              className="pl-9 pr-9 py-2 w-full sm:w-80 bg-white border border-slate-200 rounded-xl font-body text-xs text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition-all placeholder:text-slate-400 font-medium shadow-sm"
             />
             {searchTerm && (
               <button
@@ -200,19 +200,19 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
             </button>
 
             {showFilterDropdown && (
-              <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 p-4 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-sm z-50 p-4 space-y-4 animate-in fade-in zoom-in-95 duration-150">
                 <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                  <h4 className="font-semibold text-xs text-slate-900">Filter Directory</h4>
+                  <h4 className="font-semibold text-xs text-white">Filter Directory</h4>
                   <button
                     onClick={() => { setRoleFilter('All'); setChurchFilter('All'); setFoundationFilter('All'); setLeaderFilter('All'); }}
-                    className="text-[11px] text-blue-600 hover:underline font-semibold"
+                    className="text-xs text-blue-600 hover:underline font-semibold"
                   >
                     Reset All
                   </button>
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[10px] font-bold uppercase text-slate-400 mb-1">Role Type</label>
+                  <label className="block text-xs font-bold uppercase text-slate-400 mb-1">Role Type</label>
                   <select
                     value={roleFilter}
                     onChange={(e) => setRoleFilter(e.target.value as any)}
@@ -228,7 +228,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[10px] font-bold uppercase text-slate-400 mb-1">Church Branch</label>
+                  <label className="block text-xs font-bold uppercase text-slate-400 mb-1">Church Branch</label>
                   <select
                     value={churchFilter}
                     onChange={(e) => setChurchFilter(e.target.value)}
@@ -286,7 +286,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
           {/* Export CSV Button */}
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-xs rounded-xl transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-100 font-bold text-xs rounded-xl transition-all cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
             <span>Export CSV</span>
@@ -309,26 +309,26 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
           <div className="flex items-center gap-2 flex-wrap">
             <span className="material-symbols-outlined text-[16px] text-blue-700">filter_alt</span>
             <span className="font-semibold">Real-Time Results:</span>
-            <span className="bg-blue-600 text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded-md">
+            <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-md">
               {totalResults} {totalResults === 1 ? 'member' : 'members'} found
             </span>
             {searchTerm && (
-              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-[11px] text-blue-950">
+              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-xs text-blue-950">
                 Search: <strong className="font-semibold text-blue-700">"{searchTerm}"</strong>
               </span>
             )}
             {roleFilter !== 'All' && (
-              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-[11px] text-blue-950">
+              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-xs text-blue-950">
                 Role: <strong className="font-semibold text-blue-700">{roleFilter}</strong>
               </span>
             )}
             {!isChurchAdmin && churchFilter !== 'All' && (
-              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-[11px] text-blue-950">
+              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-xs text-blue-950">
                 Church: <strong className="font-semibold text-blue-700">{churchFilter}</strong>
               </span>
             )}
             {foundationFilter !== 'All' && (
-              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-[11px] text-blue-950">
+              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-xs text-blue-950">
                 Foundation School: <strong className="font-semibold text-blue-700">{
                   foundationFilter === 'none' ? 'Not enrolled'
                     : foundationFilter === 'incomplete' ? 'Not yet finished'
@@ -338,7 +338,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
               </span>
             )}
             {leaderFilter !== 'All' && (
-              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-[11px] text-blue-950">
+              <span className="bg-white border border-blue-200 px-2 py-0.5 rounded-md text-xs text-blue-950">
                 Leader: <strong className="font-semibold text-blue-700">{leaderFilter === 'none' ? 'No leader yet' : leaderFilter}</strong>
               </span>
             )}
@@ -352,7 +352,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
               setLeaderFilter('All');
               setCurrentPage(1);
             }}
-            className="text-[11px] text-blue-700 hover:text-blue-900 font-bold underline cursor-pointer"
+            className="text-xs text-blue-700 hover:text-blue-900 font-bold underline cursor-pointer"
           >
             Clear Filters
           </button>
@@ -360,27 +360,27 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
       )}
 
       {/* Table Container */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden flex flex-col shadow-2xs flex-1">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-sm flex-1">
         <div className="overflow-x-auto flex-1">
           <table className="w-full text-left border-collapse min-w-[900px]">
             <thead className="bg-slate-50/80 sticky top-0 z-10 border-b border-slate-200">
               <tr>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 ">
                   Member Details
                 </th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 ">
                   Contact
                 </th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 ">
                   Occupation & Edu
                 </th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 ">
                   Residential Area
                 </th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 ">
                   Church
                 </th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 text-right">
                   Action
                 </th>
               </tr>
@@ -403,31 +403,31 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                         <div>
                           <div className="font-bold text-xs text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-2">
                             <span>{member.fullName}</span>
-                            <span className="font-mono text-[10px] text-slate-400 font-normal">{member.id}</span>
+                            <span className="text-xs text-slate-400 font-normal">{member.id}</span>
                           </div>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             {member.role === 'Leader' && (
-                              <span className="bg-amber-100 text-amber-900 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-amber-200">
+                              <span className="bg-blue-100 text-blue-900 text-xs font-bold px-2 py-0.5 rounded-md border border-blue-100">
                                 Leader
                               </span>
                             )}
                             {member.role === 'Deacon' && (
-                              <span className="bg-purple-100 text-purple-900 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-purple-200">
+                              <span className="bg-purple-100 text-purple-900 text-xs font-bold px-2 py-0.5 rounded-md border border-purple-200">
                                 Deacon
                               </span>
                             )}
                             {member.role === 'Pastor' && (
-                              <span className="bg-indigo-100 text-indigo-900 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-indigo-200">
+                              <span className="bg-indigo-100 text-indigo-900 text-xs font-bold px-2 py-0.5 rounded-md border border-indigo-200">
                                 Pastor
                               </span>
                             )}
                             {member.role === 'Member' && (
-                              <span className="bg-emerald-50 text-emerald-800 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-200">
+                              <span className="bg-emerald-50 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded-md border border-emerald-200">
                                 Member
                               </span>
                             )}
                             {member.role === 'Visitor' && (
-                              <span className="bg-slate-100 text-slate-700 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200">
+                              <span className="bg-slate-100 text-slate-700 text-xs font-bold px-2 py-0.5 rounded-md border border-slate-200">
                                 Visitor
                               </span>
                             )}
@@ -438,14 +438,14 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
 
                     {/* Contact */}
                     <td className="py-3.5 px-4">
-                      <div className="font-mono font-semibold text-slate-800">{member.phone}</div>
+                      <div className="font-semibold text-slate-800">{member.phone}</div>
                       <div className="text-slate-400 mt-0.5">{member.email || '--'}</div>
                     </td>
 
                     {/* Occupation & Education */}
                     <td className="py-3.5 px-4">
                       <div className="font-semibold text-slate-800">{member.occupation}</div>
-                      <div className="text-slate-400 text-[11px]">{member.education}</div>
+                      <div className="text-slate-400 text-xs">{member.education}</div>
                     </td>
 
                     {/* Location */}
@@ -533,7 +533,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
 
         {/* Table Footer / Pagination */}
         <div className="border-t border-slate-200 px-4 py-3 flex items-center justify-between bg-slate-50 shrink-0">
-          <div className="font-mono text-xs text-slate-500">
+          <div className="text-xs text-slate-500">
             Showing <span className="font-bold text-slate-900">{totalResults > 0 ? startIndex + 1 : 0}</span> to{' '}
             <span className="font-bold text-slate-900">{Math.min(startIndex + itemsPerPage, totalResults)}</span> of{' '}
             <span className="font-bold text-slate-900">{totalResults}</span> entries
@@ -547,7 +547,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
             >
               <span className="material-symbols-outlined text-[18px]">chevron_left</span>
             </button>
-            <span className="font-mono text-xs font-bold px-2 text-slate-900">
+            <span className="text-xs font-bold px-2 text-slate-900">
               Page {currentPage} of {totalPages}
             </span>
             <button

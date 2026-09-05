@@ -144,7 +144,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
 
       {/* Header */}
       <div>
-        <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full mb-1 border border-blue-200">
+        <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full mb-1 border border-blue-200">
           <span className="material-symbols-outlined text-[14px]">how_to_reg</span>
           Usher Desk Registration Station
         </div>
@@ -158,57 +158,57 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
 
       {/* Success View Screen */}
       {registeredMember ? (
-        <div className="bg-white border border-emerald-200 rounded-3xl p-6 md:p-8 shadow-xl space-y-6 text-center animate-in fade-in zoom-in-95 duration-200">
+        <div className="bg-white border border-emerald-200 rounded-2xl p-6 md:p-8 shadow-sm space-y-6 text-center animate-in fade-in zoom-in-95 duration-200">
           <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto border border-emerald-200">
             <span className="material-symbols-outlined text-[36px]">check_circle</span>
           </div>
 
           <div>
-            <span className="font-mono text-xs font-bold text-emerald-700 uppercase bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            <span className="text-xs font-bold text-emerald-700 uppercase bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
               Registration & First Check-In Complete
             </span>
             <h2 className="font-headline font-bold text-2xl text-slate-900 mt-2">QR ID Pass Generated!</h2>
             <p className="text-xs text-slate-500 mt-1">
               <strong className="text-slate-900">{registeredMember.fullName}</strong> assigned Member ID{' '}
-              <span className="font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">{registeredMember.id}</span>
+              <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">{registeredMember.id}</span>
             </p>
           </div>
 
           {/* QR Pass Preview */}
-          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200/80 inline-block shadow-2xs space-y-3">
+          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 inline-block shadow-sm space-y-3">
             <img
               src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(registeredMember.id)}&color=0f172a`}
               alt="Member QR Code"
               className="w-40 h-40 mx-auto rounded-xl border border-slate-200"
             />
-            <p className="font-mono text-[10px] text-slate-500 font-bold">
+            <p className="text-xs text-slate-500 font-bold">
               Scan next service for instant 1-second check-in
             </p>
           </div>
 
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 text-left text-xs space-y-2 font-body">
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left text-xs space-y-2 font-body">
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Service Checked-In:</span>
-              <span className="font-bold text-slate-900">{serviceType}</span>
+              <span className="font-bold text-white">{serviceType}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Phone Contact:</span>
-              <span className="font-mono font-bold text-slate-900">{registeredMember.phone}</span>
+              <span className="font-bold text-white">{registeredMember.phone}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Auto-Assigned Church:</span>
-              <span className="font-bold text-slate-900">{registeredMember.church}</span>
+              <span className="font-bold text-white">{registeredMember.church}</span>
             </div>
             <div className="flex justify-between py-1">
               <span className="text-slate-500">Invited By:</span>
-              <span className="font-bold text-amber-700">{registeredMember.invitedBy}</span>
+              <span className="font-bold text-blue-700">{registeredMember.invitedBy}</span>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               onClick={() => handleDownloadQrPass(registeredMember)}
-              className="flex-1 bg-slate-900 hover:bg-slate-800 text-white py-3 px-4 rounded-xl font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              className="flex-1 bg-slate-900 hover:bg-slate-800 text-white py-3 px-4 rounded-xl font-bold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
               <span>Auto-Download QR Pass</span>
@@ -216,7 +216,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
 
             <button
               onClick={() => onSelectMemberForCard(registeredMember)}
-              className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 px-4 rounded-xl font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              className="flex-1 bg-blue-700 hover:bg-blue-800 text-white py-3 px-4 rounded-xl font-bold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px]">badge</span>
               <span>View Printable Card</span>
@@ -232,11 +232,11 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
         </div>
       ) : (
         /* Registration Form */
-        <form onSubmit={handleSubmit} className="bg-white border border-slate-200/80 p-6 md:p-8 rounded-3xl shadow-2xs space-y-5">
+        <form onSubmit={handleSubmit} className="bg-white border border-slate-200 p-6 md:p-8 rounded-2xl shadow-sm space-y-5">
 
           {/* Target Service Type */}
           <div className="space-y-1.5">
-            <label htmlFor="serviceTypeSelect" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            <label htmlFor="serviceTypeSelect" className="block text-xs font-bold text-slate-500 ">
               Target Service *
             </label>
             <select
@@ -254,7 +254,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
           {/* Full Name & Phone */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="fullNameInput" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="fullNameInput" className="block text-xs font-bold text-slate-500 mb-1">
                 Full Name *
               </label>
               <input
@@ -269,7 +269,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
             </div>
 
             <div>
-              <label htmlFor="phoneInput" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="phoneInput" className="block text-xs font-bold text-slate-500 mb-1">
                 Phone Contact *
               </label>
               <input
@@ -279,7 +279,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="e.g. +233 24 123 4567"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-900 focus:bg-white focus:border-blue-600 outline-none"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-blue-600 outline-none"
               />
             </div>
           </div>
@@ -287,7 +287,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
           {/* Email & Gender */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="emailInput" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="emailInput" className="block text-xs font-bold text-slate-500 mb-1">
                 Email Address (Optional)
               </label>
               <input
@@ -301,7 +301,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
             </div>
 
             <div>
-              <label htmlFor="genderSelect" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="genderSelect" className="block text-xs font-bold text-slate-500 mb-1">
                 Gender
               </label>
               <select
@@ -319,7 +319,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
           {/* Date of Birth & Occupation */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="dobInput" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="dobInput" className="block text-xs font-bold text-slate-500 mb-1">
                 Date of Birth *
               </label>
               <input
@@ -333,7 +333,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
             </div>
 
             <div>
-              <label htmlFor="occupationSelect" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="occupationSelect" className="block text-xs font-bold text-slate-500 mb-1">
                 Occupation / Profession *
               </label>
               <select
@@ -372,7 +372,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
           {/* Education & Foundation School */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="educationSelect" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="educationSelect" className="block text-xs font-bold text-slate-500 mb-1">
                 Educational Level
               </label>
               <select
@@ -391,7 +391,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
             </div>
 
             <div>
-              <label htmlFor="foundationClassSelect" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="foundationClassSelect" className="block text-xs font-bold text-slate-500 mb-1">
                 Foundation School Class
               </label>
               <select
@@ -416,7 +416,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
           {/* Location & Church */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="locationSelectInput" className="block font-mono text-[10px] font-bold uppercase text-slate-500 mb-1">
+              <label htmlFor="locationSelectInput" className="block text-xs font-bold uppercase text-slate-500 mb-1">
                 Residential Location
               </label>
               <input
@@ -430,7 +430,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
             </div>
 
             <div>
-              <label htmlFor="churchSelectBox" className="block font-mono text-[10px] font-bold uppercase text-slate-500 mb-1">
+              <label htmlFor="churchSelectBox" className="block text-xs font-bold uppercase text-slate-500 mb-1">
                 Branch Church {inviteSource === 'leader' && '(Auto-Filled by Leader Selection)'}
               </label>
               <select
@@ -452,7 +452,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
 
           {/* Invitee Source & Leader Dropdown */}
           <div className="pt-3 border-t border-slate-100 space-y-2">
-            <label className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-slate-500 ">
               Invitation Source
             </label>
 
@@ -507,7 +507,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
                 />
 
                 {showLeaderDropdown && (
-                  <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-20 overflow-hidden max-h-56 overflow-y-auto">
+                  <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-sm z-20 overflow-hidden max-h-56 overflow-y-auto">
                     {leaderSuggestions.map((ldr) => (
                       <div
                         key={ldr.id}
@@ -515,15 +515,15 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
                         className="p-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between border-b border-slate-100 last:border-none"
                       >
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-900 font-bold text-[10px] flex items-center justify-center">
+                          <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-900 font-bold text-xs flex items-center justify-center">
                             {ldr.initials || (ldr.fullName ? ldr.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'LD')}
                           </div>
                           <div>
                             <p className="text-xs font-bold text-slate-900">{ldr.fullName}</p>
-                            <p className="text-[10px] text-amber-700 font-mono">{ldr.leaderType} • {ldr.cellOrPcfName}</p>
+                            <p className="text-xs text-blue-700">{ldr.leaderType} • {ldr.cellOrPcfName}</p>
                           </div>
                         </div>
-                        <span className="font-mono text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">
+                        <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">
                           {ldr.church}
                         </span>
                       </div>
@@ -537,10 +537,10 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
           {/* Authentication Code Gate */}
           <div className="p-4 bg-slate-900 text-white rounded-2xl space-y-2">
             <div className="flex justify-between items-center">
-              <label className="block font-mono text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-blue-500 ">
                 Authentication Code Required *
               </label>
-              <span className="text-[10px] font-mono text-slate-400">Security Protected</span>
+              <span className="text-xs text-slate-400">Security Protected</span>
             </div>
             <input
               type="text"
@@ -548,7 +548,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
               value={authCode}
               onChange={e => setAuthCode(e.target.value)}
               placeholder="Enter Security Code"
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-amber-300 font-mono font-bold tracking-widest outline-none focus:border-amber-400"
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-blue-300 font-bold tracking-widest outline-none focus:border-blue-500"
             />
             {authError && (
               <p className="text-xs text-rose-400 font-semibold">{authError}</p>
@@ -558,7 +558,7 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full mt-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 px-6 rounded-xl transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full mt-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 px-6 rounded-xl transition-all shadow-sm active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
           >
             <span className="material-symbols-outlined text-[20px]">qr_code_2</span>
             <span>Record Attendance & Auto-Generate QR Pass</span>

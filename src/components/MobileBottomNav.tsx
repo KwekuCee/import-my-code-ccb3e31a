@@ -52,7 +52,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-              className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200/90 rounded-t-3xl p-5 md:hidden shadow-2xl text-slate-900 safe-area-bottom"
+              className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200/90 rounded-t-3xl p-5 md:hidden shadow-sm text-slate-900 safe-area-bottom"
             >
               {/* Native Drag Handle */}
               <div className="w-10 h-1.5 bg-slate-300 rounded-full mx-auto mb-4" />
@@ -81,7 +81,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     <span className="material-symbols-outlined text-[22px]">fact_check</span>
                   </div>
                   <span className="font-headline font-bold text-xs text-slate-900">Attendance Log</span>
-                  <span className="text-[10px] text-slate-500 mt-0.5">Sunday Register</span>
+                  <span className="text-xs text-slate-500 mt-0.5">Sunday Register</span>
                 </button>
 
                 <button
@@ -92,7 +92,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     <span className="material-symbols-outlined text-[22px]">analytics</span>
                   </div>
                   <span className="font-headline font-bold text-xs text-slate-900">Analytics</span>
-                  <span className="text-[10px] text-slate-500 mt-0.5">Insights</span>
+                  <span className="text-xs text-slate-500 mt-0.5">Insights</span>
                 </button>
 
                 <button
@@ -103,7 +103,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     <span className="material-symbols-outlined text-[22px]">person_add</span>
                   </div>
                   <span className="font-headline font-bold text-xs text-slate-900">New Registration</span>
-                  <span className="text-[10px] text-slate-500 mt-0.5">Members & Guests</span>
+                  <span className="text-xs text-slate-500 mt-0.5">Members & Guests</span>
                 </button>
 
                 <button
@@ -113,8 +113,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
                     <span className="material-symbols-outlined text-[22px]">military_tech</span>
                   </div>
-                  <span className="font-headline font-bold text-xs text-slate-900">Appoint Leader</span>
-                  <span className="text-[10px] text-slate-500 mt-0.5">PCF & Cell Leads</span>
+                  <span className="font-headline font-bold text-xs text-white">Appoint Leader</span>
+                  <span className="text-xs text-slate-500 mt-0.5">PCF & Cell Leads</span>
                 </button>
 
                 {onOpenAnnouncementModal && (
@@ -163,7 +163,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                       qr_code_scanner
                     </span>
                   </div>
-                  <span className="text-[10px] font-headline font-bold text-blue-700 mt-0.5">
+                  <span className="text-xs font-headline font-bold text-blue-700 mt-0.5">
                     Scanner
                   </span>
                 </button>
@@ -181,7 +181,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 <span className={`material-symbols-outlined text-[22px] transition-transform ${isActive ? 'scale-110 icon-fill text-blue-700' : 'text-slate-400'}`}>
                   {tab.icon}
                 </span>
-                <span className={`text-[10px] font-headline font-semibold mt-0.5 ${isActive ? 'font-bold text-blue-700' : 'text-slate-500'}`}>
+                <span className={`text-xs font-headline font-semibold mt-0.5 ${isActive ? 'font-bold text-blue-700' : 'text-slate-500'}`}>
                   {tab.label}
                 </span>
 
@@ -205,7 +205,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             <span className={`material-symbols-outlined text-[22px] ${showMoreMenu ? 'text-blue-700' : 'text-slate-400'}`}>
               widgets
             </span>
-            <span className={`text-[10px] font-headline font-semibold mt-0.5 ${showMoreMenu ? 'font-bold text-blue-700' : 'text-slate-500'}`}>
+            <span className={`text-xs font-headline font-semibold mt-0.5 ${showMoreMenu ? 'font-bold text-blue-700' : 'text-slate-500'}`}>
               More
             </span>
           </button>

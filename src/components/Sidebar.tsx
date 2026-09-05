@@ -75,7 +75,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <aside className={`
         fixed left-0 top-0 h-full w-64 bg-white/95 backdrop-blur-xl text-slate-800 border-r border-slate-200/90 
-        flex flex-col z-50 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none
+        flex flex-col z-50 transition-transform duration-300 ease-in-out shadow-sm md:shadow-none
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         {/* Header / Brand */}
@@ -89,15 +89,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
               />
             </div>
             <div>
-              <h1 className="font-headline text-base font-bold text-slate-900 tracking-tight leading-tight">
+              <h1 className="font-headline text-base font-bold text-white tracking-tight leading-tight">
                 GCYC
               </h1>
               {isSuperadmin ? (
-                <span className="font-label-mono text-[9px] text-blue-700 font-bold uppercase tracking-wider bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                <span className="font-label-mono text-[9px] text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
                   Superadmin HQ
                 </span>
               ) : (
-                <span className="font-label-mono text-[9px] text-blue-700 font-bold uppercase tracking-wider bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 truncate max-w-[120px] block">
+                <span className="font-label-mono text-[9px] text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 truncate max-w-[120px] block">
                   {user?.church || 'Church Admin'}
                 </span>
               )}
@@ -119,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <>
               <button
                 onClick={handleExportSystemData}
-                className="w-full flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs py-2 px-3 rounded-xl transition-all shadow-xs active:scale-98 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-2 px-3 rounded-xl transition-all shadow-xs active:scale-98 cursor-pointer"
                 title="Export multi-sheet report with total members per church, attendance per service, and new members per service"
               >
                 <span className="material-symbols-outlined text-[18px]">download</span>
@@ -157,7 +157,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Navigation Links */}
         <div className="flex-1 overflow-y-auto px-3 py-1 space-y-1">
-          <div className="px-2 pb-1 font-label-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+          <div className="px-2 pb-1 font-label-mono text-xs font-bold text-slate-400 ">
             Menu Navigation
           </div>
           {navItems.map((item) => {
@@ -203,7 +203,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span>Sign Out</span>
           </button>
 
-          <div className="pt-2 text-center text-[10px] text-slate-400 font-mono">
+          <div className="pt-2 text-center text-xs text-slate-400">
             Developed by{' '}
             <a
               href="https://primehaven.tech"

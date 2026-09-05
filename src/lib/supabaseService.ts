@@ -101,10 +101,31 @@ export async function fetchMembersFromSupabase(): Promise<Member[] | null> {
       foundationClass: row.foundation_class || 0,
       status: row.status || 'First Timer',
       invitedBy: row.invited_by_name || 'Self Check-In',
+      invitedByLeaderId: row.invited_by_leader_id || undefined,
       gender: row.gender || 'Male'
+
     }));
   } catch (err) {
     console.error('Error in fetchMembersFromSupabase:', err);
+    return null;
+  }
+}
+
+// Resolves a church branch name to its database id so records route to the right branch.
+const churchIdCache = new Map<string, string | null>();
+export async function resolveChurchId(churchName?: string): Promise<string | null> {
+  const name = (churchName || '').trim();
+  if (!name) return null;
+  const key = name.toLowerCase();
+  if (churchIdCache.has(key)) return churchIdCache.get(key) || null;
+  const client = getSupabase();
+  if (!client) return null;
+  try {
+    const { data } = await client.from('churches').select('id').ilike('name', name).maybeSingle();
+    const id = (data as any)?.id || null;
+    churchIdCache.set(key, id);
+    return id;
+  } catch {
     return null;
   }
 }
@@ -124,8 +145,12 @@ export async function saveMemberToSupabase(member: Member): Promise<boolean> {
       occupation: member.occupation,
       education_level: member.education,
       location: member.location,
+      church_id: await resolveChurchId(member.church),
       church_name: member.church,
       invited_by_name: member.invitedBy,
+      invited_by_leader_id: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test((member as any).invitedByLeaderId || '')
+        ? (member as any).invitedByLeaderId
+        : null,
       service_count: member.serviceCount,
       foundation_class: member.foundationClass,
       status: member.status,
@@ -206,8 +231,12 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
   if (!client) return false;
 
   try {
-    const payload = {
-      id: leader.id,
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(leader.id || '');
+
+    // Route the leader to the church branch they belong to
+    const churchId = await resolveChurchId(leader.church);
+
+    const payload: any = {
       full_name: leader.fullName,
       email: leader.email,
       contact: leader.contact,
@@ -215,17 +244,30 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
       location: leader.location || null,
       leader_type: leader.leaderType,
       cell_or_pcf_name: leader.cellOrPcfName,
-      parent_leader_id: leader.parentLeaderId || null,
+      parent_leader_id: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(leader.parentLeaderId || '')
+        ? leader.parentLeaderId
+        : null,
       is_appointed: leader.isAppointed || false,
       downstream_count: leader.downstreamCount || 0,
+      church_id: churchId,
       church_name: leader.church,
       promotion_status: leader.promotionStatus || 'None'
     };
+    if (isUuid) payload.id = leader.id;
 
-    const { error } = await client.from('leaders').upsert(payload, { onConflict: 'id' });
+    const { data, error } = isUuid
+      ? await client.from('leaders').upsert(payload, { onConflict: 'id' }).select('id').maybeSingle()
+      : await client.from('leaders').insert(payload).select('id').maybeSingle();
+
     if (error) {
       console.warn('Supabase saveLeader error:', error.message);
       return false;
+    }
+
+    // Keep the in-app record aligned with the database identifier
+    const newId = (data as any)?.id;
+    if (newId && newId !== leader.id) {
+      leader.id = newId;
     }
     return true;
   } catch (err) {
@@ -233,6 +275,7 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
     return false;
   }
 }
+
 
 export async function deleteLeaderFromSupabase(leaderId: string): Promise<boolean> {
   const client = getSupabase();
@@ -299,6 +342,7 @@ export async function saveAttendanceToSupabase(record: AttendanceRecord): Promis
       member_name: record.memberName,
       member_role: record.memberRole,
       service_type: record.serviceType,
+      church_id: await resolveChurchId(record.church),
       church_name: record.church,
       check_in_method: record.checkInMethod,
       verified_by: record.verifiedBy,

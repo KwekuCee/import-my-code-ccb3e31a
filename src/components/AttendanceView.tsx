@@ -154,7 +154,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full mb-1.5 border border-emerald-200">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full mb-1.5 border border-emerald-200">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             {isChurchAdmin ? `${targetChurch} Service Station` : 'Group Network Service Station'}
           </div>
@@ -170,7 +170,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
         <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={() => setShowFinalizeModal(true)}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
           >
             <span className="material-symbols-outlined text-[18px]">verified</span>
             <span>Finalize & Archive Day</span>
@@ -178,7 +178,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
           <button
             onClick={handleExportExcel}
-            className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs py-2.5 px-4 rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+            className="bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
           >
             <span className="material-symbols-outlined text-[18px]">file_download</span>
             <span>Export Excel</span>
@@ -188,9 +188,9 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
       {/* Stats Summary Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
           <div>
-            <p className="font-mono text-[10px] font-bold text-slate-400 uppercase">Verified Attendees ({selectedDate})</p>
+            <p className="text-xs font-bold text-slate-400 uppercase">Verified Attendees ({selectedDate})</p>
             <p className="font-display text-2xl font-extrabold text-slate-900 mt-0.5">{totalAttended}</p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -198,19 +198,19 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
           <div>
-            <p className="font-mono text-[10px] font-bold text-slate-400 uppercase">First Timers / Converts</p>
-            <p className="font-display text-2xl font-extrabold text-amber-600 mt-0.5">{firstTimersCount}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase">First Timers / Converts</p>
+            <p className="font-display text-2xl font-extrabold text-blue-700 mt-0.5">{firstTimersCount}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
             <span className="material-symbols-outlined text-[20px]">person_add</span>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
           <div>
-            <p className="font-mono text-[10px] font-bold text-slate-400 uppercase">Regular Members & Leaders</p>
+            <p className="text-xs font-bold text-slate-400 uppercase">Regular Members & Leaders</p>
             <p className="font-display text-2xl font-extrabold text-blue-600 mt-0.5">{regularMembersCount}</p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -218,10 +218,10 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
           <div>
-            <p className="font-mono text-[10px] font-bold text-slate-400 uppercase">Service Date Selected</p>
-            <p className="font-display text-sm font-extrabold text-slate-800 mt-1 font-mono">{selectedDate}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase">Service Date Selected</p>
+            <p className="font-display text-sm font-extrabold text-slate-800 mt-1">{selectedDate}</p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
             <span className="material-symbols-outlined text-[20px]">event</span>
@@ -230,7 +230,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
       </div>
 
       {/* Main Filter & Table Container */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xs p-4 md:p-6 space-y-4">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm p-4 md:p-6 space-y-4">
 
         {/* Filter Controls Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pb-4 border-b border-slate-100">
@@ -251,7 +251,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
           {/* Service Date Selector */}
           <div>
-            <label className="block font-mono text-[9px] font-bold uppercase text-slate-400 mb-1">Service Date</label>
+            <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1">Service Date</label>
             <select
               value={selectedDate}
               onChange={e => setSelectedDate(e.target.value)}
@@ -267,7 +267,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
           {/* Service Type Filter */}
           <div>
-            <label className="block font-mono text-[9px] font-bold uppercase text-slate-400 mb-1">Service Type</label>
+            <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1">Service Type</label>
             <select
               value={filterService}
               onChange={e => setFilterService(e.target.value)}
@@ -282,7 +282,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
           {/* Leader / PCF Leader Filter */}
           <div>
-            <label className="block font-mono text-[9px] font-bold uppercase text-slate-400 mb-1">Filter by Leader</label>
+            <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1">Filter by Leader</label>
             <select
               value={filterLeader}
               onChange={e => setFilterLeader(e.target.value)}
@@ -298,7 +298,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           {/* Church Filter (if Superadmin) */}
           {!isChurchAdmin ? (
             <div>
-              <label className="block font-mono text-[9px] font-bold uppercase text-slate-400 mb-1">Church Branch</label>
+              <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1">Church Branch</label>
               <select
                 value={filterChurch}
                 onChange={e => setFilterChurch(e.target.value)}
@@ -314,7 +314,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
             </div>
           ) : (
             <div>
-              <label className="block font-mono text-[9px] font-bold uppercase text-slate-400 mb-1">Branch Scope</label>
+              <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1">Branch Scope</label>
               <div className="border border-slate-200 bg-slate-100 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-700 truncate">
                 {targetChurch}
               </div>
@@ -328,13 +328,13 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           <table className="w-full text-left border-collapse min-w-[850px]">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Attendee Name & ID</th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Leader / PCF Leader</th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Role</th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Service & Date</th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Time & Station</th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Status</th>
-                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase text-right">Actions</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 uppercase">Attendee Name & ID</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 uppercase">Leader / PCF Leader</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 uppercase">Role</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 uppercase">Service & Date</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 uppercase">Time & Station</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 uppercase">Status</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-400 uppercase text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="font-body text-xs divide-y divide-slate-100">
@@ -345,21 +345,21 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                     <td className="py-3.5 px-4">
                       <p className="font-bold text-slate-900">{r.memberName}</p>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="font-mono text-[10px] text-slate-400">{r.memberId}</span>
-                        <span className="text-[10px] text-slate-500 font-medium">• {r.church}</span>
+                        <span className="text-xs text-slate-400">{r.memberId}</span>
+                        <span className="text-xs text-slate-500 font-medium">• {r.church}</span>
                       </div>
                     </td>
 
                     {/* Member's Leader / PCF Leader */}
                     <td className="py-3.5 px-4">
                       <p className="font-semibold text-slate-800">{r.leaderName || 'Direct / Self'}</p>
-                      <p className="text-[11px] text-slate-400">{r.pcfName || 'General PCF'}</p>
+                      <p className="text-xs text-slate-400">{r.pcfName || 'General PCF'}</p>
                     </td>
 
                     {/* Role */}
                     <td className="py-3.5 px-4">
-                      <span className={`inline-block px-2 py-0.5 rounded-md font-mono text-[10px] font-bold ${r.memberRole === 'Leader' ? 'bg-amber-100 text-amber-900 border border-amber-200' :
-                          r.memberRole === 'First Timer' ? 'bg-amber-50 text-amber-800 border border-amber-200' :
+                      <span className={`inline-block px-2 py-0.5 rounded-md text-xs font-bold ${r.memberRole === 'Leader' ? 'bg-blue-100 text-blue-900 border border-blue-100' :
+                          r.memberRole === 'First Timer' ? 'bg-blue-50 text-blue-800 border border-blue-100' :
                             r.memberRole === 'Deacon' ? 'bg-purple-100 text-purple-900 border border-purple-200' :
                               'bg-emerald-50 text-emerald-800 border border-emerald-200'
                         }`}>
@@ -370,18 +370,18 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                     {/* Service & Date */}
                     <td className="py-3.5 px-4">
                       <p className="text-slate-900 font-semibold">{r.serviceType}</p>
-                      <p className="font-mono text-[10px] text-slate-400">{r.date || selectedDate}</p>
+                      <p className="text-xs text-slate-400">{r.date || selectedDate}</p>
                     </td>
 
                     {/* Time & Station */}
                     <td className="py-3.5 px-4">
-                      <p className="font-mono font-medium text-slate-700">{r.timestamp}</p>
-                      <p className="text-[11px] text-slate-400">{r.verifiedBy} ({r.checkInMethod})</p>
+                      <p className="font-medium text-slate-700">{r.timestamp}</p>
+                      <p className="text-xs text-slate-400">{r.verifiedBy} ({r.checkInMethod})</p>
                     </td>
 
                     {/* Status */}
                     <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 font-bold font-mono text-[10px] border border-emerald-200">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 font-bold text-xs border border-emerald-200">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         Confirmed
                       </span>
@@ -421,7 +421,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
       {/* Finalize & Refresh Modal */}
       {showFinalizeModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-md w-full shadow-sm space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
               <span className="material-symbols-outlined text-[28px]">verified</span>
             </div>
@@ -433,7 +433,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
               </p>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 font-mono text-xs space-y-1">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs space-y-1">
               <div className="flex justify-between text-slate-600">
                 <span>Total Attendees Recorded:</span>
                 <span className="font-bold text-slate-900">{totalAttended}</span>
@@ -453,7 +453,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
               </button>
               <button
                 onClick={handleConfirmFinalizeService}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition-colors cursor-pointer shadow-md"
+                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition-colors cursor-pointer shadow-sm"
               >
                 Yes, Save & Refresh
               </button>
