@@ -770,6 +770,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_leader_growth_rules: { Args: never; Returns: undefined }
       confirm_leader_promotion: {
         Args: { p_promotion_id: string }
         Returns: boolean
