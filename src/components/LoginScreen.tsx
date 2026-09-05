@@ -55,7 +55,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         {/* Header */}
         <div className="text-center mb-8">
           <ChurchLogo className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm mx-auto mb-3" alt="GCYC Logo" />
-          <h1 className="font-display text-2xl md:text-3xl text-white font-extrabold tracking-tight mb-1">
+          <h1 className="font-display text-2xl md:text-3xl text-slate-900 font-extrabold tracking-tight mb-1">
             GCYC Group
           </h1>
           <p className="font-body text-xs text-slate-500 font-medium">

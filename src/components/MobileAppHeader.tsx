@@ -91,7 +91,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="font-headline font-extrabold text-sm text-white tracking-tight truncate leading-tight">
+                <span className="font-headline font-extrabold text-sm text-slate-900 tracking-tight truncate leading-tight">
                   {getPageTitle(currentView)}
                 </span>
                 {user?.role === 'Superadmin' ? (

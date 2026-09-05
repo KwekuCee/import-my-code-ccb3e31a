@@ -205,7 +205,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
                 {notifications.map(n => (
                   <div key={n.id} className="p-3 hover:bg-slate-50 transition-colors">
                     <div className="flex justify-between items-start">
-                      <p className="font-semibold text-xs text-white">{n.title}</p>
+                      <p className="font-semibold text-xs text-slate-900">{n.title}</p>
                       <span className="text-xs text-slate-400">{n.time}</span>
                     </div>
                     <p className="text-xs text-slate-500 mt-1">{n.desc}</p>

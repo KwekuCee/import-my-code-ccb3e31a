@@ -189,15 +189,15 @@ export const NewRegistration: React.FC<NewRegistrationProps> = ({
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left text-xs space-y-2 font-body">
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Service Checked-In:</span>
-              <span className="font-bold text-white">{serviceType}</span>
+              <span className="font-bold text-slate-900">{serviceType}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Phone Contact:</span>
-              <span className="font-bold text-white">{registeredMember.phone}</span>
+              <span className="font-bold text-slate-900">{registeredMember.phone}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Auto-Assigned Church:</span>
-              <span className="font-bold text-white">{registeredMember.church}</span>
+              <span className="font-bold text-slate-900">{registeredMember.church}</span>
             </div>
             <div className="flex justify-between py-1">
               <span className="text-slate-500">Invited By:</span>

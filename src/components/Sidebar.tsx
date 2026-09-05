@@ -89,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               />
             </div>
             <div>
-              <h1 className="font-headline text-base font-bold text-white tracking-tight leading-tight">
+              <h1 className="font-headline text-base font-bold text-slate-900 tracking-tight leading-tight">
                 GCYC
               </h1>
               {isSuperadmin ? (
