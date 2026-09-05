@@ -177,16 +177,26 @@ export const portalDb = {
 
   async rpc(fn: string, params: Record<string, unknown>) {
     if (fn === 'verify_user_login') {
-      const res = await callPortal<any>({
-        action: 'login',
-        identifier: params.p_identifier,
-        password: params.p_password,
-        role: params.p_role,
-      });
-      return { data: null, error: res.error || { message: 'Login unavailable.' } };
+      const res = await fetch(FUNCTIONS_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` },
+        body: JSON.stringify({
+          action: 'login',
+          identifier: params.p_identifier,
+          password: params.p_password,
+          role: params.p_role,
+        }),
+      })
+        .then((r) => r.json())
+        .catch(() => null);
+
+      if (!res) return { data: null, error: { message: 'Could not reach the sign-in service.' } };
+      if (res.success && res.token) setPortalToken(res.token);
+      return { data: { success: !!res.success, user: res.user, error: res.error }, error: null };
     }
     return { data: null, error: { message: 'Not available from the browser.' } };
   },
+
 
   auth: {
     async signOut() {
