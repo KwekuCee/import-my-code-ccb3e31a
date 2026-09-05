@@ -1101,54 +1101,15 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               )}
             </div>
 
-            {/* Birthdays Widget */}
-            <div className="lg:col-span-5 bg-white border border-slate-200/80 rounded-2xl p-6 space-y-3 shadow-2xs">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                <div>
-                  <h3 className="font-headline font-bold text-base text-slate-900 flex items-center gap-1.5">
-                    <span>Upcoming Birthdays</span>
-                    <span>🎂</span>
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Members celebrating birthdays in {new Date().toLocaleString('default', { month: 'long' })}
-                  </p>
-                </div>
-                <span className="font-mono text-[10px] bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded-lg border border-amber-200/60">
-                  {new Date().toLocaleString('default', { month: 'long' })} ({currentMonthBirthdays.length})
-                </span>
-              </div>
-
-              <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto pr-1">
-                {currentMonthBirthdays.length > 0 ? (
-                  currentMonthBirthdays.map((m) => (
-                    <div key={m.id} className="py-3 flex items-center justify-between text-xs hover:bg-slate-50/80 px-2 rounded-xl transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-amber-100 text-amber-900 font-bold text-xs flex items-center justify-center border border-amber-200/60 shrink-0">
-                          {m.initials || (m.fullName ? m.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'MB')}
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-900">{m.fullName}</p>
-                          <p className="font-mono text-[10px] text-amber-700 font-semibold">
-                            {formatBirthdayDisplay(m.dob)} • {m.phone}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => triggerToast(`Birthday SMS Greeting dispatched to ${m.fullName} (${m.phone})!`)}
-                        className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-[10px] px-3 py-1.5 rounded-lg shadow-2xs transition-all cursor-pointer shrink-0"
-                      >
-                        Send SMS Wish
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <div className="py-8 text-center text-xs text-slate-400 font-mono space-y-1">
-                    <p>No member birthdays recorded for {new Date().toLocaleString('default', { month: 'long' })} in this branch database.</p>
-                    <p className="text-[10px] text-slate-300">Birthdays will appear automatically as members register.</p>
-                  </div>
-                )}
-              </div>
+            {/* Birthdays */}
+            <div className="lg:col-span-5">
+              <BirthdaysPanel
+                members={branchMembers}
+                scopeLabel={isSuperadmin ? 'all churches' : currentChurchName}
+                onWish={(m) => triggerToast(`Birthday wish sent to ${m.fullName}`)}
+              />
             </div>
+
           </div>
         </div>
       )}
