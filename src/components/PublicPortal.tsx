@@ -3,7 +3,7 @@ import QRCode from 'qrcode';
 import { motion } from 'motion/react';
 import { Member, Leader, ChurchBranch, ChurchAdminAccount, AttendanceRecord } from '../types';
 import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClassNumber, getFoundationClassLabel } from '../data/constants';
-import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin } from '../lib/supabaseService';
+import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin, uploadMemberPhoto } from '../lib/supabaseService';
 import { ChurchLogo } from './ChurchLogo';
 
 interface PublicPortalProps {
