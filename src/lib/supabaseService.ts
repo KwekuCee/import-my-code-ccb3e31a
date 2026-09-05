@@ -222,6 +222,7 @@ export async function fetchLeadersFromSupabase(): Promise<Leader[] | null> {
       downstreamCount: row.downstream_count || 0,
       church: row.church_name || 'Unassigned',
       promotionStatus: row.promotion_status || 'None',
+      photoUrl: row.photo_url || undefined,
       joinedDate: row.created_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
       initials: (row.full_name || 'LD').split(' ').filter(Boolean).map((n: string) => n ? n[0] : '').join('').toUpperCase().slice(0, 2) || 'LD'
     }));
@@ -256,7 +257,8 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
       downstream_count: leader.downstreamCount || 0,
       church_id: churchId,
       church_name: leader.church,
-      promotion_status: leader.promotionStatus || 'None'
+      promotion_status: leader.promotionStatus || 'None',
+      photo_url: leader.photoUrl || null
     };
     if (isUuid) payload.id = leader.id;
 
@@ -1518,6 +1520,28 @@ export async function pushAllLocalDataToSupabase(
 // ---------- Member photos (optional profile picture) ----------
 // The bucket is private, so we store the object path on the member row and
 // mint short-lived signed URLs when a photo needs to be shown.
+export async function uploadProfilePhoto(folder: string, file: File): Promise<string | null> {
+  const client = getSupabase();
+  if (!client) return null;
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const safeFolder = (folder || 'profile').replace(/[^a-zA-Z0-9._-]/g, '-');
+    const path = `${safeFolder}/${Date.now()}.${ext}`;
+    const { error } = await client.storage.from('member-photos').upload(path, file, {
+      upsert: true,
+      contentType: file.type || undefined
+    });
+    if (error) {
+      console.warn('uploadProfilePhoto error:', error.message);
+      return null;
+    }
+    return path;
+  } catch (err) {
+    console.error('Error in uploadProfilePhoto:', err);
+    return null;
+  }
+}
+
 export async function uploadMemberPhoto(memberId: string, file: File): Promise<string | null> {
   const client = getSupabase();
   if (!client) return null;
