@@ -229,6 +229,15 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2.5">
+          {onConfirmAttendance && (
+            <button
+              onClick={() => setShowManualPanel(v => !v)}
+              className="bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+            >
+              <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
+              <span>Record attendance</span>
+            </button>
+          )}
           <button
             onClick={() => setShowFinalizeModal(true)}
             className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
