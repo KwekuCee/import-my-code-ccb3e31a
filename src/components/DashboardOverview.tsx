@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ViewType, TopLeader, Member, Leader, ChurchBranch, ChurchAdminAccount, AttendanceRecord } from '../types';
-import { isBirthdayInCurrentMonth, getBirthdayDayOfMonth, formatBirthdayDisplay } from '../utils/analyticsUtils';
-import { FOUNDATION_SCHOOL_CLASSES } from '../data/constants';
+import { isBirthdayInCurrentMonth, getBirthdayDayOfMonth } from '../utils/analyticsUtils';
+import { BirthdaysPanel } from './BirthdaysPanel';
+import { ClassGroupsPanel } from './ClassGroupsPanel';
 
 
 interface DashboardOverviewProps {
