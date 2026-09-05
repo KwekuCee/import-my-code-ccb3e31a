@@ -623,6 +623,10 @@ export default function App() {
                   onNavigate={setCurrentView}
                   onOpenAnnouncement={() => setShowAnnouncementModal(true)}
                   onAddChurch={handleAddChurch}
+                  onUpdateChurch={handleUpdateChurch}
+                  onDeleteChurch={handleDeleteChurch}
+                  onUpdateChurchAdmin={handleUpdateChurchAdmin}
+                  onDeleteChurchAdmin={handleDeleteChurchAdmin}
                 />
               )}
 
@@ -630,6 +634,8 @@ export default function App() {
                 <ChurchAdminsDirectory
                   churchAdmins={churchAdmins}
                   onNavigate={setCurrentView}
+                  onUpdateChurchAdmin={handleUpdateChurchAdmin}
+                  onDeleteChurchAdmin={handleDeleteChurchAdmin}
                 />
               )}
 
@@ -638,8 +644,11 @@ export default function App() {
                   leaders={leaders}
                   promotionQueue={promotionQueue}
                   user={user}
+                  churches={churches}
                   onConfirmPromotion={handleConfirmPromotion}
                   onNavigate={setCurrentView}
+                  onUpdateLeader={handleUpdateLeader}
+                  onDeleteLeader={handleDeleteLeader}
                 />
               )}
 
@@ -658,8 +667,11 @@ export default function App() {
                 <MemberDatabase
                   members={members}
                   user={user}
+                  churches={churches}
                   onNavigate={setCurrentView}
                   onSelectMemberForCard={setSelectedMemberForCard}
+                  onUpdateMember={handleUpdateMember}
+                  onDeleteMember={handleDeleteMember}
                 />
               )}
 
@@ -678,10 +690,14 @@ export default function App() {
                 <AttendanceView
                   attendanceRecords={attendanceRecords}
                   user={user}
+                  serviceTypes={serviceTypes}
                   onNavigate={setCurrentView}
+                  onUpdateAttendance={handleUpdateAttendance}
+                  onDeleteAttendance={handleDeleteAttendance}
                   onClearTodayAttendance={() => setAttendanceRecords(prev => prev.filter(r => r.date && r.date !== new Date().toISOString().slice(0, 10)))}
                 />
               )}
+
 
               {currentView === 'qr_scanner' && user?.role !== 'Superadmin' && (
                 <QRScannerModal
