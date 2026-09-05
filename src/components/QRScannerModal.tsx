@@ -288,7 +288,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
               {/* Member Card */}
               <div className="flex items-center gap-3.5 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                <div className="w-12 h-12 rounded-2xl bg-blue-700 text-slate-950 flex items-center justify-center font-display text-lg font-extrabold shrink-0 shadow-sm">
+                <div className="w-12 h-12 rounded-2xl bg-blue-700 text-white flex items-center justify-center font-display text-lg font-extrabold shrink-0 shadow-sm">
                   {selectedMember.initials || selectedMember.fullName?.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'MB'}
                 </div>
                 <div className="flex-1">
