@@ -13,3 +13,7 @@
 - [x] QR scan records attendance instantly ("Scan Next Member")
 - [x] Leader registration: member dropdown with autofill + DB-driven church list
 - [x] Admin dashboard shows attendance per leader plus total attendance
+- [x] Attendance grouped by PCF, cell and every leader (rolled up through the structure) on both dashboards
+- [x] QR scanner really reads the passes the app creates (camera decoding, records instantly, blocks repeats)
+- [x] Member roles narrowed to Leader, Member, First Timer (legacy roles read as Member)
+- [x] Leader self-registration lists every registered church branch

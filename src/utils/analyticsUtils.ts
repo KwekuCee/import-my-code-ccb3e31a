@@ -1,4 +1,4 @@
-import { AttendanceRecord, Member } from '../types';
+import { AttendanceRecord, Member, Leader, LeaderType } from '../types';
 
 /**
  * Robustly checks if a given date of birth (DOB) string falls in the current calendar month.
@@ -212,4 +212,130 @@ export function formatBirthdayWithMonth(dob?: string): string {
     }
   };
   return `${MONTH_NAMES[month]} ${day}${suffix(day)}`;
+}
+
+/* ============================================================
+   Attendance grouped through the leader structure
+   Bible study teacher -> Cell -> PCF -> Coordinator
+   ============================================================ */
+
+
+export interface LeaderAttendanceNode {
+  id: string;
+  name: string;
+  role: LeaderType;
+  groupName: string;
+  church: string;
+  parentId?: string;
+  /** Members registered directly under this leader */
+  directMembers: number;
+  /** Members registered under this leader and everyone below */
+  groupMembers: number;
+  directTotal: number;
+  directToday: number;
+  groupTotal: number;
+  groupToday: number;
+  children: LeaderAttendanceNode[];
+}
+
+/**
+ * Builds attendance and membership counts for every leader, rolling numbers up
+ * through the structure so a PCF total also contains its cells and their
+ * Bible study classes.
+ */
+export function buildLeaderAttendanceTree(
+  members: Member[],
+  leaders: Leader[],
+  attendance: AttendanceRecord[],
+  todayStr: string = new Date().toISOString().slice(0, 10)
+): { nodes: LeaderAttendanceNode[]; roots: LeaderAttendanceNode[]; unassigned: { total: number; today: number; members: number } } {
+  const nodeById = new Map<string, LeaderAttendanceNode>();
+  const byName = new Map<string, LeaderAttendanceNode>();
+
+  (leaders || []).forEach(l => {
+    if (!l || !l.id) return;
+    const node: LeaderAttendanceNode = {
+      id: l.id,
+      name: l.fullName || 'Leader',
+      role: l.leaderType || 'BSCT',
+      groupName: l.cellOrPcfName || '—',
+      church: l.church || 'Unassigned',
+      parentId: l.parentLeaderId || undefined,
+      directMembers: 0,
+      groupMembers: 0,
+      directTotal: 0,
+      directToday: 0,
+      groupTotal: 0,
+      groupToday: 0,
+      children: []
+    };
+    nodeById.set(l.id, node);
+    if (node.name) byName.set(node.name.trim().toLowerCase(), node);
+  });
+
+  // link children
+  nodeById.forEach(node => {
+    if (node.parentId && nodeById.has(node.parentId) && node.parentId !== node.id) {
+      nodeById.get(node.parentId)!.children.push(node);
+    }
+  });
+  const roots = Array.from(nodeById.values()).filter(
+    n => !n.parentId || !nodeById.has(n.parentId) || n.parentId === n.id
+  );
+
+  // registered members per leader
+  const memberLeader = new Map<string, LeaderAttendanceNode>();
+  (members || []).forEach(m => {
+    if (!m) return;
+    let node = m.invitedByLeaderId ? nodeById.get(m.invitedByLeaderId) : undefined;
+    if (!node && m.invitedBy) node = byName.get(m.invitedBy.trim().toLowerCase());
+    if (node) {
+      node.directMembers += 1;
+      memberLeader.set(m.id, node);
+    }
+  });
+
+  const unassigned = { total: 0, today: 0, members: 0 };
+  unassigned.members = (members || []).filter(m => m && !memberLeader.has(m.id)).length;
+
+  (attendance || []).forEach(a => {
+    if (!a) return;
+    const isToday = !a.date || a.date.slice(0, 10) === todayStr;
+    let node = a.memberId ? memberLeader.get(a.memberId) : undefined;
+    if (!node && a.leaderName) node = byName.get(a.leaderName.trim().toLowerCase());
+    if (!node) {
+      unassigned.total += 1;
+      if (isToday) unassigned.today += 1;
+      return;
+    }
+    node.directTotal += 1;
+    if (isToday) node.directToday += 1;
+  });
+
+  const roll = (node: LeaderAttendanceNode, seen = new Set<string>()): void => {
+    if (seen.has(node.id)) return;
+    seen.add(node.id);
+    node.groupTotal = node.directTotal;
+    node.groupToday = node.directToday;
+    node.groupMembers = node.directMembers;
+    node.children.forEach(child => {
+      roll(child, seen);
+      node.groupTotal += child.groupTotal;
+      node.groupToday += child.groupToday;
+      node.groupMembers += child.groupMembers;
+    });
+  };
+  roots.forEach(r => roll(r));
+
+  return { nodes: Array.from(nodeById.values()), roots, unassigned };
+}
+
+/** Flattens every leader below a node (self excluded). */
+export function flattenLeaderNode(node: LeaderAttendanceNode): LeaderAttendanceNode[] {
+  const out: LeaderAttendanceNode[] = [];
+  const walk = (n: LeaderAttendanceNode) => {
+    n.children.forEach(c => { out.push(c); walk(c); });
+  };
+  walk(node);
+  return out;
 }

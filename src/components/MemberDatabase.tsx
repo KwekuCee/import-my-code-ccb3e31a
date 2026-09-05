@@ -225,8 +225,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                     <option value="Leader">Leader</option>
                     <option value="Member">Member</option>
                     <option value="First Timer">First Timer</option>
-                    <option value="Deacon">Deacon</option>
-                    <option value="Visitor">Visitor</option>
+
                   </select>
                 </div>
 
@@ -419,24 +418,14 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                                 Leader
                               </span>
                             )}
-                            {member.role === 'Deacon' && (
-                              <span className="bg-purple-100 text-purple-900 text-xs font-bold px-2 py-0.5 rounded-md border border-purple-200">
-                                Deacon
-                              </span>
-                            )}
-                            {member.role === 'Pastor' && (
-                              <span className="bg-indigo-100 text-indigo-900 text-xs font-bold px-2 py-0.5 rounded-md border border-indigo-200">
-                                Pastor
-                              </span>
-                            )}
                             {member.role === 'Member' && (
                               <span className="bg-emerald-50 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded-md border border-emerald-200">
                                 Member
                               </span>
                             )}
-                            {member.role === 'Visitor' && (
-                              <span className="bg-slate-100 text-slate-700 text-xs font-bold px-2 py-0.5 rounded-md border border-slate-200">
-                                Visitor
+                            {member.role === 'First Timer' && (
+                              <span className="bg-amber-50 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-md border border-amber-200">
+                                First Timer
                               </span>
                             )}
                           </div>
@@ -587,7 +576,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
             { key: 'phone', label: 'Phone', type: 'tel' },
             { key: 'email', label: 'Email', type: 'email' },
             { key: 'dob', label: 'Date of Birth', type: 'date' },
-            { key: 'role', label: 'Role', type: 'select', options: ['Member', 'Leader', 'Visitor', 'Deacon', 'First Timer', 'Pastor'] },
+            { key: 'role', label: 'Role', type: 'select', options: ['Member', 'Leader', 'First Timer'] },
             { key: 'gender', label: 'Gender', type: 'select', options: ['Male', 'Female'] },
             { key: 'maritalStatus', label: 'Marital Status', type: 'select', options: ['Single', 'Married', 'Engaged', 'Divorced', 'Widowed'] },
             { key: 'occupation', label: 'Occupation' },

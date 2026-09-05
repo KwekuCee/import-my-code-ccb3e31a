@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import jsQR from 'jsqr';
 import { Member, AttendanceRecord, ViewType } from '../types';
 import { useToast } from '../context/ToastContext';
+
 
 interface QRScannerModalProps {
   members: Member[];
@@ -39,8 +41,12 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [serviceType, setServiceType] = useState(serviceOptions[0]);
   const [flashlightOn, setFlashlightOn] = useState(false);
-  const [useRealCamera, setUseRealCamera] = useState(false);
+  const [useRealCamera, setUseRealCamera] = useState(true);
+  const [cameraError, setCameraError] = useState('');
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const scanLockRef = useRef(false);
+  const handleCodeRef = useRef<(value: string) => void>(() => { });
 
   useEffect(() => {
     if (!serviceOptions.includes(serviceType)) {
@@ -50,26 +56,31 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
   const bgImageUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAiyCmtx-XHebXJST5E1hExdoWCfkgB34IaY-mKBw36293DZ6MIwhbnexnGkUqdlqAaNKZudX4bT2zO3x95HvA-lTaU15gsuAMZV2jZZsFMFrfQui0ziSX_Xq-qFRxnT-29EqDgNZ-a99tcqQH2nGsrH--n68U7Ndv-C3YH7gI22HeUbpQeFNlmO6MqYpPNO377VPx8sE_d-iyvVmQqOkQ4R_Yh8tljgZHrf6dVgucORLA2AJzEiJby7c5Jl8SG4n76cJ_XEGpCt7o';
 
-  // Toggle webcam if user clicks camera mode
+  // Camera stream on/off
   useEffect(() => {
+    let activeStream: MediaStream | null = null;
     if (useRealCamera) {
       navigator.mediaDevices?.getUserMedia({ video: { facingMode: 'environment' } })
         .then((stream) => {
+          activeStream = stream;
+          setCameraError('');
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
+            videoRef.current.play().catch(() => { });
           }
         })
-        .catch((err) => {
-          console.warn('Camera access error or rejected:', err);
+        .catch(() => {
+          setCameraError('Camera is blocked or unavailable. Allow camera access, or find the member by name below.');
           setUseRealCamera(false);
         });
-    } else {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
     }
+    return () => {
+      const stream = activeStream || (videoRef.current?.srcObject as MediaStream | null);
+      stream?.getTracks().forEach(track => track.stop());
+      if (videoRef.current) videoRef.current.srcObject = null;
+    };
   }, [useRealCamera]);
+
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -119,9 +130,85 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     }
   };
 
+  // Reads the member ID out of a scanned pass. The passes this app creates hold
+  // a small block of details; plain member IDs and short links also work.
+  const extractMemberId = (raw: string): string | null => {
+    const value = (raw || '').trim();
+    if (!value) return null;
+    try {
+      const parsed = JSON.parse(value);
+      if (parsed && typeof parsed === 'object') {
+        const id = parsed.id || parsed.memberId || parsed.member_id;
+        if (id) return String(id).trim();
+      }
+    } catch {
+      // not a details block — fall through
+    }
+    const urlMatch = value.match(/[?&](?:id|member|memberId)=([^&\s]+)/i);
+    if (urlMatch) return decodeURIComponent(urlMatch[1]).trim();
+    const idMatch = value.match(/\b([A-Za-z]{2,4}-\d{2,6})\b/);
+    if (idMatch) return idMatch[1];
+    if (value.length <= 40 && !value.includes('\n')) return value;
+    return null;
+  };
+
+  const handleScannedValue = useCallback((raw: string) => {
+    const memberId = extractMemberId(raw);
+    if (!memberId) {
+      setScannerState('error');
+      toast.showError('Pass not readable', 'That code does not hold a member ID.');
+      return;
+    }
+    handleSimulateScan(memberId);
+  }, [members, attendance, serviceType, user?.church]);
+
+  handleCodeRef.current = handleScannedValue;
+
+  // Continuously look for a pass in the camera picture while scanning
+  useEffect(() => {
+    if (!useRealCamera || scannerState !== 'scanning') return;
+    let frame = 0;
+    scanLockRef.current = false;
+
+    const tick = () => {
+      const video = videoRef.current;
+      if (video && video.readyState === video.HAVE_ENOUGH_DATA && !scanLockRef.current) {
+        const canvas = canvasRef.current || (canvasRef.current = document.createElement('canvas'));
+        const w = video.videoWidth;
+        const h = video.videoHeight;
+        if (w && h) {
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D | null;
+          if (ctx) {
+            ctx.drawImage(video, 0, 0, w, h);
+            try {
+              const image = ctx.getImageData(0, 0, w, h);
+              const result = jsQR(image.data, image.width, image.height, { inversionAttempts: 'attemptBoth' });
+              if (result && result.data) {
+                scanLockRef.current = true;
+                handleCodeRef.current(result.data);
+                return;
+              }
+            } catch {
+              // ignore a bad frame and try the next one
+            }
+          }
+        }
+      }
+      frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [useRealCamera, scannerState]);
+
   const handleScanNext = () => {
+    scanLockRef.current = false;
     setScannerState('scanning');
   };
+
+
 
 
 
@@ -169,7 +256,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
         <div className="flex-1 bg-slate-950/70 backdrop-blur-xs flex flex-col items-center pt-6">
           <span className="text-xs font-bold text-amber-300 bg-slate-900/90 px-4 py-1.5 rounded-full border border-amber-500/30 shadow-lg">
-            Position QR Code Pass Inside Frame
+            Hold the pass inside the frame — it records on its own
           </span>
 
           {/* Service picker + manual lookup */}
@@ -216,6 +303,12 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                   <p className="px-3 py-3 text-xs text-slate-400">No member found.</p>
                 )}
               </div>
+            )}
+
+            {cameraError && (
+              <p className="text-xs font-semibold text-amber-300 bg-slate-900/80 border border-amber-500/30 rounded-xl px-3 py-2">
+                {cameraError}
+              </p>
             )}
 
             <button
@@ -397,7 +490,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
               </button>
 
               <button
-                onClick={() => setScannerState('scanning')}
+                onClick={handleScanNext}
                 className="w-full text-slate-600 font-bold text-xs py-2 rounded-xl flex items-center justify-center hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 Retry Scanner

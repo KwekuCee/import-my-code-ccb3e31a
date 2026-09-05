@@ -47,7 +47,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   const maleCount = filteredMembers.filter(m => m && m.gender === 'Male').length;
   const femaleCount = filteredMembers.filter(m => m && m.gender === 'Female').length;
 
-  const firstTimersCount = filteredMembers.filter(m => m && (m.status === 'First Timer' || m.role === 'Visitor' || m.role === 'First Timer')).length;
+  const firstTimersCount = filteredMembers.filter(m => m && (m.status === 'First Timer' || m.role === 'First Timer')).length;
   const generalMembersCount = total - firstTimersCount;
 
   // Occupations Map
