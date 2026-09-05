@@ -70,21 +70,19 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const fromAddress = Deno.env.get('RESEND_FROM_EMAIL') || 'GCYC Attendance <onboarding@resend.dev>';
-
     const attachments = qrPassBase64
       ? [
           {
             filename: `${memberId}_QR_Pass.png`,
-            // Resend expects raw base64 content, without the data URL prefix.
+            mimeType: 'image/png',
             content: qrPassBase64.replace(/^data:image\/\w+;base64,/, ''),
           },
         ]
       : undefined;
 
-    const emailPayload = {
-      from: fromAddress,
-      to: [adminRow.admin_email],
+    const sendResult = await sendGmail({
+      to: adminRow.admin_email,
+      fromName: 'GCYC Attendance',
       subject: `Self Check-In: ${memberName} — ${churchName}`,
       html: `
         <div style="font-family: sans-serif; color: #0f172a;">
@@ -98,31 +96,21 @@ Deno.serve(async (req: Request) => {
           ${qrPassBase64 ? '<p style="margin-top:16px; color:#475569;">The member\'s digital QR pass is attached.</p>' : ''}
         </div>
       `,
-      ...(attachments ? { attachments } : {}),
-    };
-
-    const resendResp = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(emailPayload),
+      attachments,
     });
 
-    const resendData = await resendResp.json();
-
-    if (!resendResp.ok) {
+    if (!sendResult.ok) {
       return new Response(
-        JSON.stringify({ success: false, error: resendData?.message || 'Resend API rejected the request.' }),
-        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: false, error: sendResult.error || 'Gmail rejected the request.' }),
+        { status: sendResult.status || 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
-      JSON.stringify({ success: true, id: resendData?.id, sentTo: adminRow.admin_email }),
+      JSON.stringify({ success: true, id: sendResult.id, sentTo: adminRow.admin_email }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+
   } catch (err) {
     return new Response(
       JSON.stringify({ success: false, error: err instanceof Error ? err.message : 'Unknown error' }),
