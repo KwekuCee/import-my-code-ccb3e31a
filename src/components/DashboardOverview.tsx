@@ -4,6 +4,7 @@ import { isBirthdayInCurrentMonth, getBirthdayDayOfMonth } from '../utils/analyt
 import { BirthdaysPanel } from './BirthdaysPanel';
 import { ClassGroupsPanel } from './ClassGroupsPanel';
 import { AbsenteesPanel } from './AbsenteesPanel';
+import { HierarchyAttendancePanel } from './HierarchyAttendancePanel';
 
 
 interface DashboardOverviewProps {
@@ -789,6 +790,15 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               </div>
             )}
           </div>
+
+          {/* 4c. Attendance grouped by PCF / cell / leader */}
+          <HierarchyAttendancePanel
+            members={members}
+            leaders={leaders}
+            attendance={attendanceRecords}
+            churchScope={isSuperadmin ? undefined : currentChurchName}
+            showChurchLabel={isSuperadmin}
+          />
 
           {/* 5. Recent Service Attendance Log (First 5 records from First Signup Form or QR Scan) */}
 
