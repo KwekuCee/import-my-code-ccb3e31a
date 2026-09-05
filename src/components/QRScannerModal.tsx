@@ -272,6 +272,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
           <video
             ref={videoRef}
             autoPlay
+            muted
             playsInline
             className="w-full h-full object-cover"
           />
@@ -361,6 +362,16 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                 {cameraError}
               </p>
             )}
+
+            <label className="block w-full text-xs font-bold bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl border border-white/10 cursor-pointer text-center">
+              Upload a picture of the pass
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => { handleImageFile(e.target.files?.[0] || null); e.target.value = ''; }}
+              />
+            </label>
 
             <button
               onClick={() => setUseRealCamera(!useRealCamera)}
