@@ -139,3 +139,77 @@ export function calculatePeakArrivalStats(records: AttendanceRecord[]) {
     latePercent
   };
 }
+
+export const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+/**
+ * Extracts the birth month (0-11) from a loosely formatted date of birth string.
+ * Returns null when no month can be determined.
+ */
+export function getBirthMonthIndex(dob?: string): number | null {
+  if (!dob || typeof dob !== 'string') return null;
+  const clean = dob.trim();
+  if (!clean) return null;
+
+  const lower = clean.toLowerCase();
+  for (let i = 0; i < MONTH_NAMES.length; i++) {
+    const full = MONTH_NAMES[i].toLowerCase();
+    if (lower.includes(full) || lower.includes(full.slice(0, 3))) return i;
+  }
+
+  const ymd = clean.match(/^\d{4}[-/.](\d{1,2})[-/.]\d{1,2}/);
+  if (ymd) {
+    const m = parseInt(ymd[1], 10);
+    if (m >= 1 && m <= 12) return m - 1;
+  }
+
+  const dmy = clean.match(/^(\d{1,2})[-/.](\d{1,2})[-/.]\d{4}/);
+  if (dmy) {
+    const m = parseInt(dmy[2], 10);
+    if (m >= 1 && m <= 12) return m - 1;
+  }
+
+  const parsed = new Date(clean);
+  if (!isNaN(parsed.getTime())) return parsed.getMonth();
+
+  return null;
+}
+
+/**
+ * Days until the next occurrence of a birthday, ignoring the birth year.
+ * 0 means today. Returns null when the date cannot be read.
+ */
+export function getDaysUntilBirthday(dob?: string, from: Date = new Date()): number | null {
+  const month = getBirthMonthIndex(dob);
+  const day = getBirthdayDayOfMonth(dob);
+  if (month === null || day === 99) return null;
+
+  const today = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  let next = new Date(today.getFullYear(), month, day);
+  if (next.getTime() < today.getTime()) {
+    next = new Date(today.getFullYear() + 1, month, day);
+  }
+  return Math.round((next.getTime() - today.getTime()) / 86400000);
+}
+
+/**
+ * Formats a birthday as "August 14th" using the member's real birth month.
+ */
+export function formatBirthdayWithMonth(dob?: string): string {
+  const month = getBirthMonthIndex(dob);
+  const day = getBirthdayDayOfMonth(dob);
+  if (month === null || day === 99) return dob ? dob.trim() : 'Date unknown';
+  const suffix = (d: number) => {
+    if (d > 3 && d < 21) return 'th';
+    switch (d % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  };
+  return `${MONTH_NAMES[month]} ${day}${suffix(day)}`;
+}
