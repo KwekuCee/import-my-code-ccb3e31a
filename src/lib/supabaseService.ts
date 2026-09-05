@@ -90,7 +90,7 @@ export async function fetchMembersFromSupabase(): Promise<Member[] | null> {
       phone: row.phone || '',
       email: row.email || '',
       dob: row.dob || '',
-      role: row.role || 'Member',
+      role: (row.role === 'Leader' || row.role === 'First Timer') ? row.role : 'Member',
       occupation: row.occupation || 'General',
       education: row.education_level || 'Tertiary',
       location: row.location || 'Korle Bu',
