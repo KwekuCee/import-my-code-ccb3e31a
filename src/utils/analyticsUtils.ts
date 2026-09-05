@@ -219,7 +219,6 @@ export function formatBirthdayWithMonth(dob?: string): string {
    Bible study teacher -> Cell -> PCF -> Coordinator
    ============================================================ */
 
-import type { Member, Leader, AttendanceRecord, LeaderType } from '../types';
 
 export interface LeaderAttendanceNode {
   id: string;

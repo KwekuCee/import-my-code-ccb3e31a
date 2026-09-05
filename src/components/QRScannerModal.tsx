@@ -179,7 +179,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
         if (w && h) {
           canvas.width = w;
           canvas.height = h;
-          const ctx = canvas.getContext('2d', { willReadFrequently: true } as any);
+          const ctx = canvas.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D | null;
           if (ctx) {
             ctx.drawImage(video, 0, 0, w, h);
             try {
