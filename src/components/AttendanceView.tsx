@@ -47,6 +47,9 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   const [editingRecord, setEditingRecord] = useState<AttendanceRecord | null>(null);
   const [deletingRecord, setDeletingRecord] = useState<AttendanceRecord | null>(null);
   const [savedArchives, setSavedArchives] = useState<string[]>([]);
+  const [showManualPanel, setShowManualPanel] = useState<boolean>(false);
+  const [manualSearch, setManualSearch] = useState<string>('');
+  const [manualService, setManualService] = useState<string>('');
 
   const isChurchAdmin = user?.role === 'Church Admin';
   const targetChurch = user?.church || '';
