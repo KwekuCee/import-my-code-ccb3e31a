@@ -1,7 +1,7 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { sendGmail } from '../_shared/gmail.ts';
 
-const FROM_ADDRESS = 'GCYC Group <onboarding@resend.dev>';
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
