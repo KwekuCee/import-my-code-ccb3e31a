@@ -609,7 +609,22 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
           ]}
           onCancel={() => setEditingMember(null)}
           onSave={(vals) => {
-            onUpdateMember?.({ ...editingMember, ...vals } as Member);
+            const next = { ...editingMember, ...vals } as Member;
+            // Turn the "Name — Church" choice back into a real leader link
+            const chosen = String((vals as any).invitedBy || '');
+            if (chosen === 'Self-Walkin / Self Invited') {
+              next.invitedBy = 'Self-Walkin / Self Invited';
+              next.invitedByLeaderId = undefined;
+            } else if (chosen) {
+              const cleanName = chosen.split(' — ')[0].trim();
+              const match = (leaders || []).find(l => `${l.fullName} — ${l.church || 'Unassigned'}` === chosen)
+                || (leaders || []).find(l => l.fullName === cleanName);
+              next.invitedBy = cleanName;
+              next.invitedByLeaderId = match?.id;
+              // Moving a member to a leader also moves them to that leader's church
+              if (match?.church && !(vals as any).church) next.church = match.church;
+            }
+            onUpdateMember?.(next);
             setEditingMember(null);
           }}
         />
