@@ -78,7 +78,7 @@ export const AbsenteesPanel: React.FC<AbsenteesPanelProps> = ({
   const handleSave = async (member: Member) => {
     const draft = drafts[member.id] || { reason: '', note: '' };
     if (!draft.reason) {
-      toast.error('Pick a reason first.');
+      toast.showError('Pick a reason first.');
       return;
     }
     setSavingId(member.id);
@@ -94,10 +94,10 @@ export const AbsenteesPanel: React.FC<AbsenteesPanelProps> = ({
     });
     setSavingId(null);
     if (ok) {
-      toast.success(`Reason saved for ${member.fullName}.`);
+      toast.showSuccess(`Reason saved for ${member.fullName}.`);
       setAbsences(await fetchAbsenceRecords());
     } else {
-      toast.error('Could not save the reason. Please try again.');
+      toast.showError('Could not save the reason. Please try again.');
     }
   };
 
