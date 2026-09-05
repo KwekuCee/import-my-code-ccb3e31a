@@ -256,7 +256,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
         <div className="flex-1 bg-slate-950/70 backdrop-blur-xs flex flex-col items-center pt-6">
           <span className="text-xs font-bold text-amber-300 bg-slate-900/90 px-4 py-1.5 rounded-full border border-amber-500/30 shadow-lg">
-            Position QR Code Pass Inside Frame
+            Hold the pass inside the frame — it records on its own
           </span>
 
           {/* Service picker + manual lookup */}
@@ -303,6 +303,12 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                   <p className="px-3 py-3 text-xs text-slate-400">No member found.</p>
                 )}
               </div>
+            )}
+
+            {cameraError && (
+              <p className="text-xs font-semibold text-amber-300 bg-slate-900/80 border border-amber-500/30 rounded-xl px-3 py-2">
+                {cameraError}
+              </p>
             )}
 
             <button
@@ -484,7 +490,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
               </button>
 
               <button
-                onClick={() => setScannerState('scanning')}
+                onClick={handleScanNext}
                 className="w-full text-slate-600 font-bold text-xs py-2 rounded-xl flex items-center justify-center hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 Retry Scanner
