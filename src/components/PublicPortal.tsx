@@ -202,6 +202,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [isResetting, setIsResetting] = useState(false);
+  const [resetLink, setResetLink] = useState<string | null>(null);
   const [resetFeedback, setResetFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const handleSendResetEmail = async (e: React.FormEvent) => {
@@ -213,6 +214,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       const res = await sendPasswordResetEmail(resetEmail.trim());
       if (res.success) {
         setResetFeedback({ type: 'success', message: res.message });
+        setResetLink(res.link || null);
       } else {
         setResetFeedback({ type: 'error', message: res.message });
       }
