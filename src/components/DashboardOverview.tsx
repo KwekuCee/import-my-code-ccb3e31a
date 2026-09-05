@@ -1102,22 +1102,20 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               )}
             </div>
 
-            {/* Birthdays */}
-            <div className="lg:col-span-5">
-              <BirthdaysPanel
-                members={branchMembers}
-                scopeLabel={isSuperadmin ? 'all churches' : currentChurchName}
-                onWish={(m) => triggerToast(`Birthday wish sent to ${m.fullName}`)}
-              />
-            </div>
 
           </div>
         </div>
       )}
 
       {/* ===================================================================== */}
-      {/* STUDENT GROUPS (FOUNDATION SCHOOL)                                    */}
+      {/* BIRTHDAYS + STUDENT GROUPS                                            */}
       {/* ===================================================================== */}
+      <BirthdaysPanel
+        members={branchMembers}
+        scopeLabel={isSuperadmin ? 'all churches' : currentChurchName}
+        onWish={(m) => triggerToast(`Birthday wish sent to ${m.fullName}`)}
+      />
+
       <ClassGroupsPanel
         members={branchMembers}
         leaders={branchLeaders}
