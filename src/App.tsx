@@ -668,6 +668,7 @@ export default function App() {
               {currentView === 'members' && (
                 <MemberDatabase
                   members={members}
+                  leaders={leaders}
                   user={user}
                   churches={churches}
                   onNavigate={setCurrentView}

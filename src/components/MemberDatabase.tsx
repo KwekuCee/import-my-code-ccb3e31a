@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Member, RoleType, ViewType, ChurchBranch } from '../types';
+import { Member, RoleType, ViewType, ChurchBranch, Leader } from '../types';
 import { MemberPhoto } from './MemberPhoto';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
@@ -15,6 +15,7 @@ interface MemberDatabaseProps {
   onDeleteMember?: (id: string) => void;
   onUpdateMember?: (member: Member) => void;
   churches?: ChurchBranch[];
+  leaders?: Leader[];
 }
 
 export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
@@ -24,7 +25,8 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
   onSelectMemberForCard,
   onDeleteMember,
   onUpdateMember,
-  churches
+  churches,
+  leaders = []
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<RoleType | 'All'>('All');
@@ -452,6 +454,12 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                     <td className="py-3.5 px-4">
                       <div className="font-semibold text-slate-800">{member.occupation}</div>
                       <div className="text-slate-400 text-xs">{member.education}</div>
+                    </td>
+
+                    {/* Gender & marital status */}
+                    <td className="py-3.5 px-4">
+                      <div className="font-semibold text-slate-800">{member.gender || '—'}</div>
+                      <div className="text-slate-400 text-xs">{member.maritalStatus || '—'}</div>
                     </td>
 
                     {/* Location */}
