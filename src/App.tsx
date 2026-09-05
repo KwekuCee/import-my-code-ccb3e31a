@@ -61,6 +61,7 @@ import { AnnouncementModal } from './components/AnnouncementModal';
 import { AttendanceView } from './components/AttendanceView';
 import { LeaderDirectory } from './components/LeaderDirectory';
 import { LeaderRegistration } from './components/LeaderRegistration';
+import { ResetPasswordScreen } from './components/ResetPasswordScreen';
 import { AnalyticsView } from './components/AnalyticsView';
 import { DatabaseSchemaView } from './components/DatabaseSchemaView';
 import { SettingsView } from './components/SettingsView';
