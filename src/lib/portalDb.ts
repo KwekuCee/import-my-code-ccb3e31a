@@ -7,6 +7,8 @@
 const FUNCTIONS_BASE = `${import.meta.env.VITE_SUPABASE_URL || ''}/functions/v1/portal-db`;
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
 
+import { supabase as cloudClient } from '../integrations/supabase/client';
+
 const TOKEN_KEY = 'gcyc_portal_token';
 
 export function setPortalToken(token: string | null): void {
@@ -197,6 +199,12 @@ export const portalDb = {
     return { data: null, error: { message: 'Not available from the browser.' } };
   },
 
+
+  functions: {
+    invoke(name: string, options?: { body?: unknown }) {
+      return (cloudClient as any).functions.invoke(name, options);
+    },
+  },
 
   auth: {
     async signOut() {
