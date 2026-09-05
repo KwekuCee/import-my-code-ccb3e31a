@@ -1,18 +1,25 @@
 import React, { useState } from 'react';
 import { ChurchAdminAccount, ViewType } from '../types';
 import { motion } from 'motion/react';
+import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
 interface ChurchAdminsDirectoryProps {
   churchAdmins: ChurchAdminAccount[];
   onNavigate: (view: ViewType) => void;
+  onUpdateChurchAdmin?: (admin: ChurchAdminAccount) => void;
+  onDeleteChurchAdmin?: (adminId: string) => void;
 }
 
 export const ChurchAdminsDirectory: React.FC<ChurchAdminsDirectoryProps> = ({
   churchAdmins,
-  onNavigate
+  onNavigate,
+  onUpdateChurchAdmin,
+  onDeleteChurchAdmin
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'All' | 'Active' | 'Pending Verification'>('All');
+  const [editingAdmin, setEditingAdmin] = useState<ChurchAdminAccount | null>(null);
+  const [deletingAdmin, setDeletingAdmin] = useState<ChurchAdminAccount | null>(null);
 
   const cleanQuery = (searchQuery || '').trim().toLowerCase();
   const filteredAdmins = churchAdmins.filter(admin => {
@@ -161,15 +168,23 @@ export const ChurchAdminsDirectory: React.FC<ChurchAdminsDirectoryProps> = ({
                 </div>
               </div>
 
-              {/* Action Button */}
-              <button
-                onClick={() => {
-                  // Could navigate to admin detail view in future
-                }}
-                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs py-2 rounded-lg transition-colors"
-              >
-                View Details
-              </button>
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setEditingAdmin(admin)}
+                  className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs py-2 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px]">edit</span>
+                  Edit
+                </button>
+                <button
+                  onClick={() => setDeletingAdmin(admin)}
+                  className="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs py-2 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px]">delete</span>
+                  Delete
+                </button>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -186,6 +201,40 @@ export const ChurchAdminsDirectory: React.FC<ChurchAdminsDirectoryProps> = ({
           <strong>{filteredAdmins.length}</strong> of <strong>{churchAdmins.length}</strong> admins shown
         </p>
       </div>
+
+      {editingAdmin && (
+        <EditRecordModal
+          title="Edit Church Admin"
+          subtitle={`${editingAdmin.adminName} • ${editingAdmin.churchName}`}
+          icon="manage_accounts"
+          values={editingAdmin as any}
+          fields={[
+            { key: 'adminName', label: 'Admin Name', required: true },
+            { key: 'adminEmail', label: 'Email', type: 'email' },
+            { key: 'adminPhone', label: 'Phone', type: 'tel' },
+            { key: 'churchName', label: 'Church Branch' },
+            { key: 'zone', label: 'Zone' },
+            { key: 'status', label: 'Status', type: 'select', options: ['Active', 'Pending Verification'] }
+          ]}
+          onCancel={() => setEditingAdmin(null)}
+          onSave={(vals) => {
+            onUpdateChurchAdmin?.({ ...editingAdmin, ...vals } as ChurchAdminAccount);
+            setEditingAdmin(null);
+          }}
+        />
+      )}
+
+      {deletingAdmin && (
+        <ConfirmDeleteDialog
+          title="Delete Church Admin"
+          message={`This removes the admin account for ${deletingAdmin.adminName}.`}
+          onCancel={() => setDeletingAdmin(null)}
+          onConfirm={() => {
+            onDeleteChurchAdmin?.(deletingAdmin.id);
+            setDeletingAdmin(null);
+          }}
+        />
+      )}
     </div>
   );
 };
