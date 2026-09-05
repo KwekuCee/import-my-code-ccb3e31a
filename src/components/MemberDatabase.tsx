@@ -480,7 +480,6 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
         </div>
       </div>
 
-    </div>
 
       {editingMember && (
         <EditRecordModal
@@ -521,5 +520,6 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
           }}
         />
       )}
+    </div>
   );
 };
