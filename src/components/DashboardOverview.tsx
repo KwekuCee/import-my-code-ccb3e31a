@@ -420,7 +420,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 <h3 className="font-headline font-bold text-base text-blue-900">
                   Superadmin System Security & Backup Controls
                 </h3>
-                <p className="text-xs text-slate-500">Manage data backups, audit logs, and Supabase synchronization</p>
+                <p className="text-xs text-slate-500">Manage data backups, audit logs, and cloud synchronisation</p>
               </div>
               <span className="material-symbols-outlined text-blue-700">security</span>
             </div>
@@ -430,7 +430,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 <p className="font-bold text-xs text-white">Database Backup & Restoration</p>
                 <p className="text-xs text-slate-500">Create instant cloud snapshot of members, attendance, and leadership structure.</p>
                 <button
-                  onClick={() => triggerToast('Cloud Backup Snapshot created successfully in Supabase!')}
+                  onClick={() => triggerToast('Cloud backup snapshot created successfully!')}
                   className="bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-xs"
                 >
                   Trigger Instant Backup

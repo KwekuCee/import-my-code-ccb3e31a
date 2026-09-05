@@ -619,7 +619,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   </div>
                   <div>
                     <h3 className="font-headline font-bold text-lg text-slate-900">
-                      Supabase Cloud Database Connection
+                      Cloud Database Connection
                     </h3>
                     <p className="text-xs text-slate-500">
                       Direct connection credentials for real-time PostgreSQL database synchronization

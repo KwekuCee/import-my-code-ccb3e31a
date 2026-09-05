@@ -1528,7 +1528,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
               </div>
               <div>
                 <h3 className="font-display font-extrabold text-base text-slate-900">Admin Password Recovery</h3>
-                <p className="text-xs text-slate-500">Supabase Auth Secure Reset</p>
+                <p className="text-xs text-slate-500">Secure Password Reset</p>
               </div>
             </div>
 

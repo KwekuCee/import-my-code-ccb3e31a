@@ -26,10 +26,10 @@ export const DatabaseSchemaView: React.FC<DatabaseSchemaViewProps> = () => {
         <div>
           <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full mb-1 border border-emerald-200">
             <span className="material-symbols-outlined text-[14px]">database</span>
-            Supabase Relational Database Architecture
+            Database Architecture
           </div>
           <h1 className="font-display text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Relational DB & Supabase RLS Schema
+            Database & Security Schema
           </h1>
           <p className="font-body text-xs md:text-sm text-slate-500 mt-1">
             Production PostgreSQL migration DDL with multi-tenancy Row Level Security policies for GCYC Group.
@@ -43,7 +43,7 @@ export const DatabaseSchemaView: React.FC<DatabaseSchemaViewProps> = () => {
           <span className="material-symbols-outlined text-[18px]">
             {copied ? 'check' : 'content_copy'}
           </span>
-          <span>{copied ? 'SQL Copied!' : 'Copy Supabase DDL'}</span>
+          <span>{copied ? 'SQL Copied!' : 'Copy Database DDL'}</span>
         </button>
       </div>
 
@@ -90,7 +90,7 @@ export const DatabaseSchemaView: React.FC<DatabaseSchemaViewProps> = () => {
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
           <h3 className="font-headline font-bold text-lg text-slate-900">Multi-Tenancy Security Model</h3>
           <p className="text-xs text-slate-600 leading-relaxed font-body">
-            Row Level Security (RLS) is enforced directly at the database level using Supabase custom JWT claims (<code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700">church_id</code> and <code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700">is_superadmin</code>).
+            Row Level Security (RLS) is enforced directly at the database level using secure database claims (<code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700">church_id</code> and <code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700">is_superadmin</code>).
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
