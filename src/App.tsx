@@ -645,6 +645,8 @@ export default function App() {
                   promotionQueue={promotionQueue}
                   user={user}
                   churches={churches}
+                  members={members}
+
                   onConfirmPromotion={handleConfirmPromotion}
                   onNavigate={setCurrentView}
                   onUpdateLeader={handleUpdateLeader}
