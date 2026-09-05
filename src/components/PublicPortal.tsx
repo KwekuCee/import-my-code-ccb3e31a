@@ -1631,8 +1631,21 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   error
                 </span>
                 <div className="flex-1">
-                  <p className="font-bold text-xs text-rose-900">Authentication Failed</p>
+                  <p className="font-bold text-xs text-rose-900">{unverifiedEmail ? 'Email not confirmed yet' : 'Authentication Failed'}</p>
                   <p className="mt-0.5 text-xs leading-relaxed">{loginError}</p>
+                  {unverifiedEmail && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleResendVerification}
+                        disabled={isResendingVerify}
+                        className="mt-2 bg-blue-700 hover:bg-blue-800 disabled:opacity-60 text-white font-bold text-xs px-3 py-2 rounded-xl"
+                      >
+                        {isResendingVerify ? 'Sending…' : 'Resend confirmation link'}
+                      </button>
+                      {verifyFeedback && <p className="mt-1.5 text-xs text-slate-700">{verifyFeedback}</p>}
+                    </>
+                  )}
                 </div>
               </div>
             )}
