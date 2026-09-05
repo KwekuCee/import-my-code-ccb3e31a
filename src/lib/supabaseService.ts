@@ -222,6 +222,7 @@ export async function fetchLeadersFromSupabase(): Promise<Leader[] | null> {
       downstreamCount: row.downstream_count || 0,
       church: row.church_name || 'Unassigned',
       promotionStatus: row.promotion_status || 'None',
+      photoUrl: row.photo_url || undefined,
       joinedDate: row.created_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
       initials: (row.full_name || 'LD').split(' ').filter(Boolean).map((n: string) => n ? n[0] : '').join('').toUpperCase().slice(0, 2) || 'LD'
     }));
@@ -256,7 +257,8 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
       downstream_count: leader.downstreamCount || 0,
       church_id: churchId,
       church_name: leader.church,
-      promotion_status: leader.promotionStatus || 'None'
+      promotion_status: leader.promotionStatus || 'None',
+      photo_url: leader.photoUrl || null
     };
     if (isUuid) payload.id = leader.id;
 
@@ -573,7 +575,7 @@ export async function fetchChurchAdminsFromSupabase(): Promise<ChurchAdminAccoun
             zone: row.zone || 'Zone 1 (Korle Bu)',
             joinedDate: row.created_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
             status: 'Active',
-            password: 'CEKBU@2026'
+            photoUrl: row.photo_url || undefined
           });
         }
       });
@@ -599,7 +601,7 @@ export async function fetchChurchAdminsFromSupabase(): Promise<ChurchAdminAccoun
             zone: row.zone || existing?.zone || 'Zone 1 (Korle Bu)',
             joinedDate: row.created_at?.slice(0, 10) || existing?.joinedDate || new Date().toISOString().slice(0, 10),
             status: 'Active',
-            password: row.password_hash || existing?.password || 'CEKBU@2026'
+            photoUrl: row.avatar_url || existing?.photoUrl
           });
         }
       });
@@ -615,6 +617,7 @@ export async function fetchChurchAdminsFromSupabase(): Promise<ChurchAdminAccoun
 export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Promise<boolean> {
   const email = (admin.adminEmail || '').trim().toLowerCase();
   const passwordToStore = admin.password?.trim() || 'CEKBU@2026';
+  // Passwords are never cached on the device; the server scrambles them on save.
 
   // 1. Immediately cache in localStorage for instant persistence
   try {
@@ -623,7 +626,7 @@ export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Prom
     const enrichedAdmin: ChurchAdminAccount = {
       ...admin,
       adminEmail: email,
-      password: passwordToStore
+      password: undefined
     };
     localStorage.setItem('cekbu_church_admins', JSON.stringify([enrichedAdmin, ...filtered]));
   } catch (e) {
@@ -658,7 +661,8 @@ export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Prom
       full_name: admin.adminName,
       role: 'Church Admin',
       church_name: admin.churchName,
-      zone: admin.zone || 'Zone 1 (Korle Bu)'
+      zone: admin.zone || 'Zone 1 (Korle Bu)',
+      avatar_url: admin.photoUrl || null
     };
     if (churchId) {
       userPayload.church_id = churchId;
@@ -694,7 +698,9 @@ export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Prom
       admin_email: email,
       admin_phone: admin.adminPhone || '+233 24 000 0000',
       zone: admin.zone || 'Zone 1 (Korle Bu)',
-      role: 'Church Admin'
+      role: 'Church Admin',
+      password: passwordToStore,
+      photo_url: admin.photoUrl || null
     };
 
     const { error: adminErr } = await client.from('church_admin_accounts').upsert(adminPayload, { onConflict: 'id' });
@@ -828,181 +834,23 @@ export async function authenticateUserWithDatabase(
         }
       }
 
-      // Option B: Direct Table Query on user_profiles
-      const { data: profiles, error: profileErr } = await client
-        .from('user_profiles')
-        .select('*')
-        .or(`email.ilike.${trimmedId},username.ilike.${trimmedId}`);
-
-      if (!profileErr && profiles && profiles.length > 0) {
-        const profile = profiles[0];
-
-        // Check Role Permission if specified
-        if (selectedRole === 'Superadmin' && profile.role !== 'Superadmin') {
-          return {
-            success: false,
-            error: 'Access Denied: This account is not provisioned with Superadmin (Group Pastor) privileges.'
-          };
-        }
-
-        // Validate Password (plain match, default seed, or password_hash)
-        const passwordMatches =
-          profile.password_hash === trimmedPassword ||
-          profile.password_hash === 'CEKBU@2026' ||
-          trimmedPassword === 'CEKBU@2026';
-
-        if (!passwordMatches) {
-          return { success: false, error: 'Incorrect password. Please verify your credentials and try again.' };
-        }
-
-        const resolvedRole: 'Superadmin' | 'Church Admin' =
-          profile.role === 'Superadmin' ? 'Superadmin' : 'Church Admin';
-
-        const resolvedChurch: string =
-          profile.church_name || (resolvedRole === 'Superadmin' ? 'GCYC Group HQ' : '');
-
-        // Log successful authentication in audit logs
-        await saveAuditLogToSupabase({
-          id: `log-${Date.now()}`,
-          action: `User signed in: ${profile.full_name} (${resolvedRole})`,
-          timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
-          icon: 'lock_open',
-          user: profile.full_name || 'Admin',
-          church: resolvedChurch,
-          category: 'System'
-        });
-
-        const authenticatedUser: AuthSessionUser = {
-          id: profile.id || `usr-${Date.now()}`,
-          name: profile.full_name || (resolvedRole === 'Superadmin' ? 'Group Pastor' : 'Church Admin'),
-          role: resolvedRole,
-          church: resolvedChurch,
-          zone: profile.zone || 'Zone 1 (Korle Bu)',
-          avatar: profile.avatar_url || (resolvedRole === 'Superadmin'
-            ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200'
-            : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200'),
-          email: profile.email || trimmedId,
-          phone: profile.phone || '+233 24 123 4567'
-        };
-        saveStoredSession(authenticatedUser);
-
-        return {
-          success: true,
-          user: authenticatedUser
-        };
-      }
-
-      // Option C: Query church_admin_accounts table
-      const { data: admins, error: adminErr } = await client
-        .from('church_admin_accounts')
-        .select('*')
-        .or(`admin_email.ilike.${trimmedId},admin_name.ilike.${trimmedId}`);
-
-      if (!adminErr && admins && admins.length > 0) {
-        const adm = admins[0];
-
-        if (selectedRole === 'Superadmin') {
-          return { success: false, error: 'Access Denied: Branch admin accounts cannot access Group Pastor HQ.' };
-        }
-
-        const expectedPass = adm.password || 'CEKBU@2026';
-
-        if (trimmedPassword !== expectedPass && trimmedPassword !== 'CEKBU@2026') {
-          return { success: false, error: 'Incorrect password for this Church Administrator.' };
-        }
-
-        const authenticatedUser: AuthSessionUser = {
-          id: adm.id,
-          name: adm.admin_name,
-          role: 'Church Admin',
-          church: adm.church_name || '',
-          zone: adm.zone || 'Zone 1 (Korle Bu)',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
-          email: adm.admin_email
-        };
-        saveStoredSession(authenticatedUser);
-
-        return {
-          success: true,
-          user: authenticatedUser
-        };
+      if (rpcError) {
+        console.warn('Sign-in check failed:', rpcError.message);
       }
     } catch (dbErr: any) {
-      console.warn('Database auth check error, testing fallback accounts:', dbErr?.message);
+      console.warn('Sign-in check error:', dbErr?.message);
+      return { success: false, error: 'We could not reach the sign-in service. Please try again.' };
     }
   }
 
-  // 2. Strict Validated Match for Superadmin Group Pastor
-  const isSuperadminId =
-    trimmedId.toLowerCase() === 'group.pastor@cekorlebu.org' ||
-    trimmedId.toLowerCase() === 'group.pastor' ||
-    trimmedId.toLowerCase() === 'pastor.joseph';
-
-  if (isSuperadminId || selectedRole === 'Superadmin') {
-    if (!isSuperadminId) {
-      return {
-        success: false,
-        error: 'Account not found. Group Pastor email is group.pastor@cekorlebu.org.'
-      };
-    }
-
-    if (trimmedPassword !== 'CEKBU@2026' && trimmedPassword !== 'admin123' && trimmedPassword !== 'PastorJoseph2026') {
-      return { success: false, error: 'Incorrect password for Group Pastor Superadmin.' };
-    }
-
-    const authenticatedUser: AuthSessionUser = {
-      id: 'usr-superadmin',
-      name: 'Group Pastor',
-      role: 'Superadmin',
-      church: '',
-      zone: 'Zone 1 (Korle Bu)',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
-      email: 'group.pastor@cekorlebu.org'
-    };
-    saveStoredSession(authenticatedUser);
-
-    return {
-      success: true,
-      user: authenticatedUser
-    };
-  }
-
-  // 3. Local Church Admin Accounts (from active state)
-  const localAdminsList: ChurchAdminAccount[] = localFallbackAdmins || [];
-  const localMatch = localAdminsList.find(
-    (a) =>
-      a &&
-      (((a.adminEmail || '').toLowerCase() === (trimmedId || '').toLowerCase()) ||
-       ((a.adminName || '').toLowerCase() === (trimmedId || '').toLowerCase()))
-  );
-
-  if (localMatch) {
-    if (localMatch.password && localMatch.password !== trimmedPassword && trimmedPassword !== 'CEKBU@2026') {
-      return { success: false, error: 'Incorrect password for this church administrator.' };
-    }
-
-    const authenticatedUser: AuthSessionUser = {
-      id: localMatch.id,
-      name: localMatch.adminName,
-      role: 'Church Admin',
-      church: localMatch.churchName,
-      zone: localMatch.zone || 'Zone 1 (Korle Bu)',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
-      email: localMatch.adminEmail
-    };
-    saveStoredSession(authenticatedUser);
-
-    return {
-      success: true,
-      user: authenticatedUser
-    };
-  }
-
+  // Passwords are stored scrambled and only checked on the server, so there is
+  // no offline fallback: a wrong email or password always ends here.
   return {
     success: false,
-    error: 'Account not found in database. Please verify your credentials or register.'
+    error: 'Incorrect email or password. Please check your details and try again.'
   };
 }
+
 
 // ============================================================================
 // 6. PROMOTION QUEUE CRUD
@@ -1672,6 +1520,28 @@ export async function pushAllLocalDataToSupabase(
 // ---------- Member photos (optional profile picture) ----------
 // The bucket is private, so we store the object path on the member row and
 // mint short-lived signed URLs when a photo needs to be shown.
+export async function uploadProfilePhoto(folder: string, file: File): Promise<string | null> {
+  const client = getSupabase();
+  if (!client) return null;
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const safeFolder = (folder || 'profile').replace(/[^a-zA-Z0-9._-]/g, '-');
+    const path = `${safeFolder}/${Date.now()}.${ext}`;
+    const { error } = await client.storage.from('member-photos').upload(path, file, {
+      upsert: true,
+      contentType: file.type || undefined
+    });
+    if (error) {
+      console.warn('uploadProfilePhoto error:', error.message);
+      return null;
+    }
+    return path;
+  } catch (err) {
+    console.error('Error in uploadProfilePhoto:', err);
+    return null;
+  }
+}
+
 export async function uploadMemberPhoto(memberId: string, file: File): Promise<string | null> {
   const client = getSupabase();
   if (!client) return null;

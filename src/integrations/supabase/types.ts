@@ -279,6 +279,7 @@ export type Database = {
           id: string
           joined_date: string | null
           password: string | null
+          photo_url: string | null
           role: string | null
           status: string | null
           zone: string | null
@@ -293,6 +294,7 @@ export type Database = {
           id: string
           joined_date?: string | null
           password?: string | null
+          photo_url?: string | null
           role?: string | null
           status?: string | null
           zone?: string | null
@@ -307,6 +309,7 @@ export type Database = {
           id?: string
           joined_date?: string | null
           password?: string | null
+          photo_url?: string | null
           role?: string | null
           status?: string | null
           zone?: string | null
@@ -370,6 +373,7 @@ export type Database = {
           leader_type: Database["public"]["Enums"]["leader_type_enum"]
           location: string | null
           parent_leader_id: string | null
+          photo_url: string | null
           promotion_status: Database["public"]["Enums"]["promotion_status_enum"]
           updated_at: string
         }
@@ -388,6 +392,7 @@ export type Database = {
           leader_type?: Database["public"]["Enums"]["leader_type_enum"]
           location?: string | null
           parent_leader_id?: string | null
+          photo_url?: string | null
           promotion_status?: Database["public"]["Enums"]["promotion_status_enum"]
           updated_at?: string
         }
@@ -406,6 +411,7 @@ export type Database = {
           leader_type?: Database["public"]["Enums"]["leader_type_enum"]
           location?: string | null
           parent_leader_id?: string | null
+          photo_url?: string | null
           promotion_status?: Database["public"]["Enums"]["promotion_status_enum"]
           updated_at?: string
         }

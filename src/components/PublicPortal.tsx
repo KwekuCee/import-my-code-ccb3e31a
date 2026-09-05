@@ -3,7 +3,7 @@ import QRCode from 'qrcode';
 import { motion } from 'motion/react';
 import { Member, Leader, ChurchBranch, ChurchAdminAccount, AttendanceRecord } from '../types';
 import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClassNumber, getFoundationClassLabel } from '../data/constants';
-import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin, uploadMemberPhoto } from '../lib/supabaseService';
+import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin, uploadMemberPhoto, uploadProfilePhoto } from '../lib/supabaseService';
 import { ChurchLogo } from './ChurchLogo';
 
 interface PublicPortalProps {
@@ -163,6 +163,8 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const [ldrLocation, setLdrLocation] = useState('');
   const [ldrRole, setLdrRole] = useState<'BSCT' | 'Cell Leader' | 'PCF Leader' | 'Church Coordinator'>('Cell Leader');
   const [ldrChurch, setLdrChurch] = useState(adminRegisteredChurches[0]?.name || '');
+  const [ldrPhotoFile, setLdrPhotoFile] = useState<File | null>(null);
+  const [ldrPhotoPreview, setLdrPhotoPreview] = useState('');
   const [ldrAuthCode, setLdrAuthCode] = useState('');
   const [ldrError, setLdrError] = useState('');
   const [ldrSuccessMsg, setLdrSuccessMsg] = useState('');
@@ -192,6 +194,8 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const [admPastorName, setAdmPastorName] = useState('');
   const [admPhone, setAdmPhone] = useState('');
   const [admPassword, setAdmPassword] = useState('');
+  const [admPhotoFile, setAdmPhotoFile] = useState<File | null>(null);
+  const [admPhotoPreview, setAdmPhotoPreview] = useState('');
   const [admAuthCode, setAdmAuthCode] = useState('');
   const [admError, setAdmError] = useState('');
   const [admSuccessMsg, setAdmSuccessMsg] = useState('');
@@ -245,18 +249,15 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const generateAndDownloadQrPass = async (member: Member, churchName: string, serviceType: string, timestamp: string) => {
     try {
       setIsGeneratingQr(true);
-      const qrContent = JSON.stringify({
-        id: member.id,
-        name: member.fullName,
-        church: churchName,
-        phone: member.phone,
-        service: serviceType
-      });
+      // Keep the code content as short as possible so phone cameras read it
+      // easily: the member ID alone is enough to look everything else up.
+      const qrContent = member.id;
 
       const qrDataUrl = await QRCode.toDataURL(qrContent, {
-        width: 300,
-        margin: 1,
-        color: { dark: '#020617', light: '#ffffff' }
+        width: 720,
+        margin: 3,
+        errorCorrectionLevel: 'H',
+        color: { dark: '#000000', light: '#ffffff' }
       });
 
       // Canvas element for Digital Member Pass Badge
@@ -296,14 +297,14 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       // White QR Container Box
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.roundRect(160, 140, 280, 280, 20);
+      ctx.roundRect(140, 130, 320, 320, 20);
       ctx.fill();
 
       // Draw QR Code Image
       const img = new Image();
       img.src = qrDataUrl;
       await new Promise((resolve) => { img.onload = resolve; });
-      ctx.drawImage(img, 175, 155, 250, 250);
+      ctx.drawImage(img, 150, 140, 300, 300);
 
       // Member Details Frame
       ctx.fillStyle = '#0f172a';
@@ -471,7 +472,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
     }).catch(() => {});
   };
 
-  const handleLeaderSelfReg = (e: React.FormEvent) => {
+  const handleLeaderSelfReg = async (e: React.FormEvent) => {
     e.preventDefault();
     setLdrError('');
     setLdrSuccessMsg('');
@@ -487,8 +488,14 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       return;
     }
 
+    let leaderPhotoPath: string | undefined;
+    if (ldrPhotoFile) {
+      leaderPhotoPath = (await uploadProfilePhoto(`leaders/${ldrEmail.trim().toLowerCase() || Date.now()}`, ldrPhotoFile)) || undefined;
+    }
+
     const newLeader: Leader = {
       id: `LDR-${Math.floor(200 + Math.random() * 800)}`,
+      photoUrl: leaderPhotoPath,
       fullName: ldrName.trim(),
       email: ldrEmail.trim(),
       contact: ldrPhone.trim(),
@@ -511,10 +518,12 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
     setLdrPhone('');
     setLdrCellName('');
     setLdrLocation('');
+    setLdrPhotoFile(null);
+    setLdrPhotoPreview('');
     setLdrAuthCode('');
   };
 
-  const handleAdminSignUp = (e: React.FormEvent) => {
+  const handleAdminSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setAdmError('');
     setAdmSuccessMsg('');
@@ -548,7 +557,13 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       bsctCount: 0,
     };
 
+    let adminPhotoPath: string | undefined;
+    if (admPhotoFile) {
+      adminPhotoPath = (await uploadProfilePhoto(`admins/${admRequiredEmail.trim().toLowerCase()}`, admPhotoFile)) || undefined;
+    }
+
     const newAdmin: ChurchAdminAccount = {
+      photoUrl: adminPhotoPath,
       id: `ADM-${Math.floor(100 + Math.random() * 900)}`,
       adminName: admFullName.trim(),
       adminEmail: admRequiredEmail.trim(),
@@ -1200,6 +1215,32 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                    Profile Photo (Optional)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    {ldrPhotoPreview ? (
+                      <img src={ldrPhotoPreview} alt="Selected profile photo" className="w-14 h-14 rounded-xl object-cover border border-slate-200" />
+                    ) : (
+                      <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+                        <span className="material-symbols-outlined text-[22px]">person</span>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        setLdrPhotoFile(file);
+                        setLdrPhotoPreview(file ? URL.createObjectURL(file) : '');
+                      }}
+                      className="text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-800 file:text-xs file:font-bold cursor-pointer"
+                    />
+                  </div>
+                </div>
+
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1423,6 +1464,32 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                    Profile Photo (Optional)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    {admPhotoPreview ? (
+                      <img src={admPhotoPreview} alt="Selected profile photo" className="w-14 h-14 rounded-xl object-cover border border-slate-200" />
+                    ) : (
+                      <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+                        <span className="material-symbols-outlined text-[22px]">person</span>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        setAdmPhotoFile(file);
+                        setAdmPhotoPreview(file ? URL.createObjectURL(file) : '');
+                      }}
+                      className="text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-800 file:text-xs file:font-bold cursor-pointer"
+                    />
+                  </div>
+                </div>
+
               </div>
 
               {/* 7. AUTHENTICATION CODE - CLEAN EMPTY PLACEHOLDER */}
