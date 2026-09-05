@@ -60,7 +60,14 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
   useEffect(() => {
     let activeStream: MediaStream | null = null;
     if (useRealCamera) {
-      navigator.mediaDevices?.getUserMedia({ video: { facingMode: 'environment' } })
+      navigator.mediaDevices?.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        },
+        audio: false
+      })
         .then((stream) => {
           activeStream = stream;
           setCameraError('');
@@ -109,7 +116,9 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
   };
 
   const handleSimulateScan = (memberId: string) => {
-    const found = scopedMembers.find(m => m.id === memberId) || members.find(m => m.id === memberId);
+    const wanted = (memberId || '').trim().toLowerCase();
+    const matches = (m: Member) => (m.id || '').trim().toLowerCase() === wanted;
+    const found = scopedMembers.find(matches) || members.find(matches);
     if (found) {
       setSelectedMember(found);
       if (isChurchAdmin && (found.church || '').toLowerCase() !== (user?.church || '').toLowerCase()) {
@@ -183,12 +192,21 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
           if (ctx) {
             ctx.drawImage(video, 0, 0, w, h);
             try {
-              const image = ctx.getImageData(0, 0, w, h);
-              const result = jsQR(image.data, image.width, image.height, { inversionAttempts: 'attemptBoth' });
-              if (result && result.data) {
-                scanLockRef.current = true;
-                handleCodeRef.current(result.data);
-                return;
+              const attempts: Array<{ x: number; y: number; w: number; h: number }> = [
+                { x: 0, y: 0, w, h },
+                // A tighter middle crop helps when the pass fills only part of the picture
+                { x: Math.round(w * 0.15), y: Math.round(h * 0.15), w: Math.round(w * 0.7), h: Math.round(h * 0.7) },
+                { x: Math.round(w * 0.3), y: Math.round(h * 0.3), w: Math.round(w * 0.4), h: Math.round(h * 0.4) }
+              ];
+              for (const area of attempts) {
+                if (area.w < 40 || area.h < 40) continue;
+                const image = ctx.getImageData(area.x, area.y, area.w, area.h);
+                const result = jsQR(image.data, image.width, image.height, { inversionAttempts: 'attemptBoth' });
+                if (result && result.data) {
+                  scanLockRef.current = true;
+                  handleCodeRef.current(result.data);
+                  return;
+                }
               }
             } catch {
               // ignore a bad frame and try the next one
@@ -202,6 +220,39 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
   }, [useRealCamera, scannerState]);
+
+  // Fallback: read a saved picture of the pass (screenshot or download)
+  const handleImageFile = async (file: File | null) => {
+    if (!file) return;
+    try {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = url;
+      });
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(1400 / Math.max(img.width, img.height), 1);
+      canvas.width = Math.round(img.width * (scale || 1));
+      canvas.height = Math.round(img.height * (scale || 1));
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const result = jsQR(image.data, image.width, image.height, { inversionAttempts: 'attemptBoth' });
+      if (result?.data) {
+        handleScannedValue(result.data);
+      } else {
+        setScannerState('error');
+        toast.showError('Pass not readable', 'We could not read a code in that picture. Try a clearer, closer photo.');
+      }
+    } catch {
+      setScannerState('error');
+      toast.showError('Pass not readable', 'That file could not be opened.');
+    }
+  };
 
   const handleScanNext = () => {
     scanLockRef.current = false;
