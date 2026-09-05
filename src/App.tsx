@@ -22,14 +22,19 @@ import {
 import {
   fetchMembersFromSupabase,
   saveMemberToSupabase,
+  deleteMemberFromSupabase,
   fetchLeadersFromSupabase,
   saveLeaderToSupabase,
+  deleteLeaderFromSupabase,
   fetchAttendanceFromSupabase,
   saveAttendanceToSupabase,
+  deleteAttendanceFromSupabase,
   fetchChurchesFromSupabase,
   saveChurchToSupabase,
+  deleteChurchFromSupabase,
   fetchChurchAdminsFromSupabase,
   saveChurchAdminToSupabase,
+  deleteChurchAdminFromSupabase,
   fetchAuditLogsFromSupabase,
   saveAuditLogToSupabase,
   fetchSuperadminProfileFromSupabase,
@@ -38,6 +43,7 @@ import {
   clearStoredSession,
   signOutFromSupabase
 } from './lib/supabaseService';
+
 
 import { Sidebar } from './components/Sidebar';
 import { TopHeader } from './components/TopHeader';
