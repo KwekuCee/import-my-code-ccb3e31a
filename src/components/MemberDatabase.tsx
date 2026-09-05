@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Member, RoleType, ViewType } from '../types';
+import { Member, RoleType, ViewType, ChurchBranch } from '../types';
+import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
 interface MemberDatabaseProps {
   members: Member[];
@@ -11,6 +12,8 @@ interface MemberDatabaseProps {
   onNavigate: (view: ViewType) => void;
   onSelectMemberForCard: (member: Member) => void;
   onDeleteMember?: (id: string) => void;
+  onUpdateMember?: (member: Member) => void;
+  churches?: ChurchBranch[];
 }
 
 export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
@@ -18,13 +21,17 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
   user,
   onNavigate,
   onSelectMemberForCard,
-  onDeleteMember
+  onDeleteMember,
+  onUpdateMember,
+  churches
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<RoleType | 'All'>('All');
   const [churchFilter, setChurchFilter] = useState<string>('All');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingMember, setEditingMember] = useState<Member | null>(null);
+  const [deletingMember, setDeletingMember] = useState<Member | null>(null);
   const itemsPerPage = 8;
 
   const isChurchAdmin = user?.role === 'Church Admin';
@@ -388,6 +395,20 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                         <span className="material-symbols-outlined text-[16px]">badge</span>
                         <span>Pass</span>
                       </button>
+                      <button
+                        onClick={() => setEditingMember(member)}
+                        className="ml-1.5 inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                        title="Edit member"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">edit</span>
+                      </button>
+                      <button
+                        onClick={() => setDeletingMember(member)}
+                        className="ml-1.5 inline-flex items-center gap-1 px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                        title="Delete member"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -461,6 +482,48 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
         </div>
       </div>
 
+
+      {editingMember && (
+        <EditRecordModal
+          title="Edit Member"
+          subtitle={`${editingMember.fullName} • ${editingMember.id}`}
+          icon="person"
+          values={editingMember as any}
+          fields={[
+            { key: 'fullName', label: 'Full Name', required: true },
+            { key: 'phone', label: 'Phone', type: 'tel' },
+            { key: 'email', label: 'Email', type: 'email' },
+            { key: 'dob', label: 'Date of Birth', type: 'date' },
+            { key: 'role', label: 'Role', type: 'select', options: ['Member', 'Leader', 'Visitor', 'Deacon', 'First Timer', 'Pastor'] },
+            { key: 'gender', label: 'Gender', type: 'select', options: ['Male', 'Female'] },
+            { key: 'occupation', label: 'Occupation' },
+            { key: 'education', label: 'Education' },
+            { key: 'location', label: 'Location' },
+            (churches && churches.length > 0
+              ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
+              : { key: 'church', label: 'Church Branch' }),
+            { key: 'serviceCount', label: 'Service Count', type: 'number' },
+            { key: 'foundationClass', label: 'Foundation Class', type: 'number' }
+          ]}
+          onCancel={() => setEditingMember(null)}
+          onSave={(vals) => {
+            onUpdateMember?.({ ...editingMember, ...vals } as Member);
+            setEditingMember(null);
+          }}
+        />
+      )}
+
+      {deletingMember && (
+        <ConfirmDeleteDialog
+          title="Delete Member"
+          message={`This permanently removes ${deletingMember.fullName} and their attendance history from the database.`}
+          onCancel={() => setDeletingMember(null)}
+          onConfirm={() => {
+            onDeleteMember?.(deletingMember.id);
+            setDeletingMember(null);
+          }}
+        />
+      )}
     </div>
   );
 };

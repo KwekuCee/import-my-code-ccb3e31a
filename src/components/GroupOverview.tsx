@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChurchBranch, AuditLogItem, ViewType, ChurchAdminAccount } from '../types';
+import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
 interface GroupOverviewProps {
   churches: ChurchBranch[];
@@ -8,6 +9,10 @@ interface GroupOverviewProps {
   onNavigate: (view: ViewType) => void;
   onOpenAnnouncement: () => void;
   onAddChurch: (church: ChurchBranch, admin?: ChurchAdminAccount) => void;
+  onUpdateChurch?: (church: ChurchBranch) => void;
+  onDeleteChurch?: (churchId: string) => void;
+  onUpdateChurchAdmin?: (admin: ChurchAdminAccount) => void;
+  onDeleteChurchAdmin?: (adminId: string) => void;
 }
 
 export const GroupOverview: React.FC<GroupOverviewProps> = ({
@@ -16,9 +21,17 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
   auditLogs,
   onNavigate,
   onOpenAnnouncement,
-  onAddChurch
+  onAddChurch,
+  onUpdateChurch,
+  onDeleteChurch,
+  onUpdateChurchAdmin,
+  onDeleteChurchAdmin
 }) => {
   const [activeTab, setActiveTab] = useState<'branches' | 'admins'>('branches');
+  const [editingChurch, setEditingChurch] = useState<ChurchBranch | null>(null);
+  const [deletingChurch, setDeletingChurch] = useState<ChurchBranch | null>(null);
+  const [editingAdmin, setEditingAdmin] = useState<ChurchAdminAccount | null>(null);
+  const [deletingAdmin, setDeletingAdmin] = useState<ChurchAdminAccount | null>(null);
   const [serviceTypes, setServiceTypes] = useState<string[]>([
     'Sunday Service', 'Midweek Service', 'Special Service'
   ]);
@@ -241,6 +254,9 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                     <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
                       Status
                     </th>
+                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 text-right">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="font-body text-xs divide-y divide-slate-100">
@@ -279,11 +295,28 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                             </span>
                           )}
                         </td>
+
+                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                          <button
+                            onClick={() => setEditingChurch(church)}
+                            className="inline-flex items-center px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold cursor-pointer"
+                            title="Edit"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">edit</span>
+                          </button>
+                          <button
+                            onClick={() => setDeletingChurch(church)}
+                            className="ml-1.5 inline-flex items-center px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold cursor-pointer"
+                            title="Delete"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">delete</span>
+                          </button>
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="py-12 text-center text-xs text-slate-400">
+                      <td colSpan={6} className="py-12 text-center text-xs text-slate-400">
                         No church branches registered yet in the database.
                       </td>
                     </tr>
@@ -311,6 +344,9 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                     <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
                       Account Status
                     </th>
+                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 text-right">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="font-body text-xs divide-y divide-slate-100">
@@ -336,11 +372,28 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                             <span>{adm.status}</span>
                           </span>
                         </td>
+
+                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                          <button
+                            onClick={() => setEditingAdmin(adm)}
+                            className="inline-flex items-center px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold cursor-pointer"
+                            title="Edit"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">edit</span>
+                          </button>
+                          <button
+                            onClick={() => setDeletingAdmin(adm)}
+                            className="ml-1.5 inline-flex items-center px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold cursor-pointer"
+                            title="Delete"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">delete</span>
+                          </button>
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="py-12 text-center text-xs text-slate-400">
+                      <td colSpan={6} className="py-12 text-center text-xs text-slate-400">
                         No church admin accounts registered yet in the database.
                       </td>
                     </tr>
@@ -599,6 +652,73 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
         </div>
       )}
 
+
+      {editingChurch && (
+        <EditRecordModal
+          title="Edit Church Branch"
+          subtitle={editingChurch.name}
+          icon="church"
+          values={editingChurch as any}
+          fields={[
+            { key: 'name', label: 'Branch Name', required: true },
+            { key: 'pastor', label: 'Pastor in Charge' },
+            { key: 'zone', label: 'Zone' },
+            { key: 'membersCount', label: 'Members Count', type: 'number' },
+            { key: 'status', label: 'Status', type: 'select', options: ['Healthy', 'Review', 'Growing'] }
+          ]}
+          onCancel={() => setEditingChurch(null)}
+          onSave={(vals) => {
+            onUpdateChurch?.({ ...editingChurch, ...vals } as ChurchBranch);
+            setEditingChurch(null);
+          }}
+        />
+      )}
+
+      {deletingChurch && (
+        <ConfirmDeleteDialog
+          title="Delete Church Branch"
+          message={`This permanently removes ${deletingChurch.name} and unlinks its records.`}
+          onCancel={() => setDeletingChurch(null)}
+          onConfirm={() => {
+            onDeleteChurch?.(deletingChurch.id);
+            setDeletingChurch(null);
+          }}
+        />
+      )}
+
+      {editingAdmin && (
+        <EditRecordModal
+          title="Edit Church Admin"
+          subtitle={`${editingAdmin.adminName} • ${editingAdmin.churchName}`}
+          icon="manage_accounts"
+          values={editingAdmin as any}
+          fields={[
+            { key: 'adminName', label: 'Admin Name', required: true },
+            { key: 'adminEmail', label: 'Email', type: 'email' },
+            { key: 'adminPhone', label: 'Phone', type: 'tel' },
+            { key: 'churchName', label: 'Church Branch' },
+            { key: 'zone', label: 'Zone' },
+            { key: 'status', label: 'Status', type: 'select', options: ['Active', 'Pending Verification'] }
+          ]}
+          onCancel={() => setEditingAdmin(null)}
+          onSave={(vals) => {
+            onUpdateChurchAdmin?.({ ...editingAdmin, ...vals } as ChurchAdminAccount);
+            setEditingAdmin(null);
+          }}
+        />
+      )}
+
+      {deletingAdmin && (
+        <ConfirmDeleteDialog
+          title="Delete Church Admin"
+          message={`This removes the admin account for ${deletingAdmin.adminName}.`}
+          onCancel={() => setDeletingAdmin(null)}
+          onConfirm={() => {
+            onDeleteChurchAdmin?.(deletingAdmin.id);
+            setDeletingAdmin(null);
+          }}
+        />
+      )}
     </div>
   );
 };
