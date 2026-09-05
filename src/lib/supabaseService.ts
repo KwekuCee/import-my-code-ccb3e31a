@@ -206,8 +206,20 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
   if (!client) return false;
 
   try {
-    const payload = {
-      id: leader.id,
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(leader.id || '');
+
+    // Route the leader to the church branch they belong to
+    let churchId: string | null = null;
+    if (leader.church) {
+      const { data: churchRow } = await client
+        .from('churches')
+        .select('id')
+        .ilike('name', leader.church)
+        .maybeSingle();
+      churchId = (churchRow as any)?.id || null;
+    }
+
+    const payload: any = {
       full_name: leader.fullName,
       email: leader.email,
       contact: leader.contact,
@@ -215,17 +227,30 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
       location: leader.location || null,
       leader_type: leader.leaderType,
       cell_or_pcf_name: leader.cellOrPcfName,
-      parent_leader_id: leader.parentLeaderId || null,
+      parent_leader_id: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(leader.parentLeaderId || '')
+        ? leader.parentLeaderId
+        : null,
       is_appointed: leader.isAppointed || false,
       downstream_count: leader.downstreamCount || 0,
+      church_id: churchId,
       church_name: leader.church,
       promotion_status: leader.promotionStatus || 'None'
     };
+    if (isUuid) payload.id = leader.id;
 
-    const { error } = await client.from('leaders').upsert(payload, { onConflict: 'id' });
+    const { data, error } = isUuid
+      ? await client.from('leaders').upsert(payload, { onConflict: 'id' }).select('id').maybeSingle()
+      : await client.from('leaders').insert(payload).select('id').maybeSingle();
+
     if (error) {
       console.warn('Supabase saveLeader error:', error.message);
       return false;
+    }
+
+    // Keep the in-app record aligned with the database identifier
+    const newId = (data as any)?.id;
+    if (newId && newId !== leader.id) {
+      leader.id = newId;
     }
     return true;
   } catch (err) {
@@ -233,6 +258,7 @@ export async function saveLeaderToSupabase(leader: Leader): Promise<boolean> {
     return false;
   }
 }
+
 
 export async function deleteLeaderFromSupabase(leaderId: string): Promise<boolean> {
   const client = getSupabase();
