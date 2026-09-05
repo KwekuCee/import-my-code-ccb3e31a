@@ -12,6 +12,7 @@ interface AttendanceViewProps {
   };
   onNavigate: (view: ViewType) => void;
   onClearTodayAttendance?: () => void;
+  serviceTypes?: { id: string; name: string; active: boolean }[];
   onUpdateAttendance?: (record: AttendanceRecord) => void;
   onDeleteAttendance?: (recordId: string) => void;
 }
@@ -21,6 +22,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   user,
   onNavigate,
   onClearTodayAttendance,
+  serviceTypes,
   onUpdateAttendance,
   onDeleteAttendance
 }) => {
@@ -470,7 +472,9 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           fields={[
             { key: 'memberName', label: 'Member Name', required: true },
             { key: 'memberId', label: 'Member ID', disabled: true },
-            { key: 'serviceType', label: 'Service Type' },
+            (serviceTypes && serviceTypes.length > 0
+              ? { key: 'serviceType', label: 'Service Type', type: 'select' as const, options: serviceTypes.filter(st => st.active).map(st => st.name) }
+              : { key: 'serviceType', label: 'Service Type' }),
             { key: 'date', label: 'Date', type: 'date' },
             { key: 'timestamp', label: 'Check-in Time' },
             { key: 'church', label: 'Church Branch' },
@@ -481,7 +485,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           onCancel={() => setEditingRecord(null)}
           onSave={(vals) => {
             onUpdateAttendance?.({ ...editingRecord, ...vals } as AttendanceRecord);
-            toast.success('Attendance entry updated');
+            toast.showSuccess('Attendance Updated', 'The check-in entry was saved.');
             setEditingRecord(null);
           }}
         />
@@ -494,7 +498,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           onCancel={() => setDeletingRecord(null)}
           onConfirm={() => {
             onDeleteAttendance?.(deletingRecord.id);
-            toast.success('Attendance entry deleted');
+            toast.showSuccess('Attendance Deleted', 'The check-in entry was removed.');
             setDeletingRecord(null);
           }}
         />

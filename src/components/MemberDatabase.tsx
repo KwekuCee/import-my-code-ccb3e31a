@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Member, RoleType, ViewType } from '../types';
+import { Member, RoleType, ViewType, ChurchBranch } from '../types';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
 interface MemberDatabaseProps {
@@ -13,6 +13,8 @@ interface MemberDatabaseProps {
   onSelectMemberForCard: (member: Member) => void;
   onDeleteMember?: (id: string) => void;
   onUpdateMember?: (member: Member) => void;
+  onChurches?: never;
+  churches?: ChurchBranch[];
 }
 
 export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
@@ -21,7 +23,8 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
   onNavigate,
   onSelectMemberForCard,
   onDeleteMember,
-  onUpdateMember
+  onUpdateMember,
+  churches
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<RoleType | 'All'>('All');
@@ -497,7 +500,9 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
             { key: 'occupation', label: 'Occupation' },
             { key: 'education', label: 'Education' },
             { key: 'location', label: 'Location' },
-            { key: 'church', label: 'Church Branch' },
+            (churches && churches.length > 0
+              ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
+              : { key: 'church', label: 'Church Branch' }),
             { key: 'serviceCount', label: 'Service Count', type: 'number' },
             { key: 'foundationClass', label: 'Foundation Class', type: 'number' }
           ]}

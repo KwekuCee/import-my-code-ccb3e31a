@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Leader, LeaderType, PromotionQueueItem, ViewType } from '../types';
+import { Leader, LeaderType, PromotionQueueItem, ViewType, ChurchBranch } from '../types';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
 interface LeaderDirectoryProps {
@@ -12,6 +12,7 @@ interface LeaderDirectoryProps {
   };
   onConfirmPromotion: (promotionId: string) => void;
   onNavigate: (view: ViewType) => void;
+  churches?: ChurchBranch[];
   onUpdateLeader?: (leader: Leader) => void;
   onDeleteLeader?: (leaderId: string) => void;
 }
@@ -22,6 +23,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
   user,
   onConfirmPromotion,
   onNavigate,
+  churches,
   onUpdateLeader,
   onDeleteLeader
 }) => {
@@ -304,7 +306,9 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
             { key: 'dob', label: 'Date of Birth', type: 'date' },
             { key: 'location', label: 'Location' },
             { key: 'cellOrPcfName', label: 'Cell / PCF Name' },
-            { key: 'church', label: 'Church Branch' },
+            (churches && churches.length > 0
+              ? { key: 'church', label: 'Church Branch', type: 'select' as const, options: churches.map(c => c.name) }
+              : { key: 'church', label: 'Church Branch' }),
             { key: 'leaderType', label: 'Leader Type', type: 'select', options: ['BSCT', 'Cell Leader', 'PCF Leader', 'Church Coordinator'] }
           ]}
           onCancel={() => setEditingLeader(null)}
