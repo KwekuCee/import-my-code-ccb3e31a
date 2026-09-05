@@ -1660,3 +1660,44 @@ export async function pushAllLocalDataToSupabase(
     };
   }
 }
+
+// ---------- Member photos (optional profile picture) ----------
+// The bucket is private, so we store the object path on the member row and
+// mint short-lived signed URLs when a photo needs to be shown.
+export async function uploadMemberPhoto(memberId: string, file: File): Promise<string | null> {
+  const client = getSupabase();
+  if (!client) return null;
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `${memberId}/${Date.now()}.${ext}`;
+    const { error } = await client.storage.from('member-photos').upload(path, file, {
+      upsert: true,
+      contentType: file.type || undefined
+    });
+    if (error) {
+      console.warn('uploadMemberPhoto error:', error.message);
+      return null;
+    }
+    return path;
+  } catch (err) {
+    console.error('Error in uploadMemberPhoto:', err);
+    return null;
+  }
+}
+
+const signedPhotoCache = new Map<string, string>();
+export async function getMemberPhotoUrl(path?: string): Promise<string | null> {
+  if (!path) return null;
+  if (path.startsWith('http') || path.startsWith('data:')) return path;
+  if (signedPhotoCache.has(path)) return signedPhotoCache.get(path)!;
+  const client = getSupabase();
+  if (!client) return null;
+  try {
+    const { data } = await client.storage.from('member-photos').createSignedUrl(path, 60 * 60);
+    const url = (data as any)?.signedUrl || null;
+    if (url) signedPhotoCache.set(path, url);
+    return url;
+  } catch {
+    return null;
+  }
+}
