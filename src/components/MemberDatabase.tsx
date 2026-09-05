@@ -458,7 +458,7 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                       {member.location}
                     </td>
 
-                    {/* Church Tag */}
+                    {/* Church Tag + group names */}
                     <td className="py-3.5 px-4">
                       {member.church === 'Unassigned' ? (
                         <span className="text-slate-400 italic">Unassigned</span>
@@ -467,6 +467,16 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
                           {member.church}
                         </span>
                       )}
+                      {(() => {
+                        const g = groupNamesForMember(member);
+                        const parts = [g.className, g.cellName, g.pcfName].filter(Boolean);
+                        if (parts.length === 0) return null;
+                        return (
+                          <div className="text-[11px] text-slate-500 mt-1 leading-snug">
+                            {parts.join(' • ')}
+                          </div>
+                        );
+                      })()}
                     </td>
 
                     {/* Actions Menu */}
