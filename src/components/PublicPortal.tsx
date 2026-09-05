@@ -3,7 +3,7 @@ import QRCode from 'qrcode';
 import { motion } from 'motion/react';
 import { Member, Leader, ChurchBranch, ChurchAdminAccount, AttendanceRecord } from '../types';
 import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClassNumber, getFoundationClassLabel } from '../data/constants';
-import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin, uploadMemberPhoto, uploadProfilePhoto } from '../lib/supabaseService';
+import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin, uploadMemberPhoto, uploadProfilePhoto, sendAdminVerificationEmail, syncLeaderAsMember, generateLeaderCode } from '../lib/supabaseService';
 import { ChurchLogo } from './ChurchLogo';
 
 interface PublicPortalProps {
@@ -206,6 +206,9 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+  const [isResendingVerify, setIsResendingVerify] = useState(false);
+  const [verifyFeedback, setVerifyFeedback] = useState('');
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [isResetting, setIsResetting] = useState(false);
@@ -493,8 +496,11 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       leaderPhotoPath = (await uploadProfilePhoto(`leaders/${ldrEmail.trim().toLowerCase() || Date.now()}`, ldrPhotoFile)) || undefined;
     }
 
+    const leaderCode = generateLeaderCode();
+
     const newLeader: Leader = {
-      id: `LDR-${Math.floor(200 + Math.random() * 800)}`,
+      id: leaderCode,
+      leaderCode,
       photoUrl: leaderPhotoPath,
       fullName: ldrName.trim(),
       email: ldrEmail.trim(),
@@ -512,7 +518,36 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
     };
 
     onAddLeader(newLeader);
-    setLdrSuccessMsg(`Hallelujah! Leader registration successful for ${newLeader.fullName} (${newLeader.leaderType} - ${newLeader.church}).`);
+
+    // Every leader is also a member: keep the membership records in step and
+    // tag them with their leader role.
+    const memberId = (await syncLeaderAsMember(newLeader)) || leaderCode;
+
+    // Give the leader their own scan pass so the branch admin can record
+    // their attendance the same way as any member.
+    const leaderAsMember: Member = {
+      id: memberId,
+      fullName: newLeader.fullName,
+      phone: newLeader.contact,
+      email: newLeader.email,
+      dob: newLeader.dob,
+      role: 'Leader',
+      occupation: 'General',
+      education: 'Tertiary',
+      location: newLeader.location,
+      church: newLeader.church,
+      invitedBy: newLeader.parentLeaderName || 'Leader Registration',
+      joinDate: newLeader.joinedDate,
+      initials: newLeader.initials,
+      serviceCount: 0,
+      foundationClass: 0,
+      status: 'General Member',
+      photoUrl: newLeader.photoUrl,
+    };
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    await generateAndDownloadQrPass(leaderAsMember, newLeader.church, `${newLeader.leaderType} Pass`, timestamp);
+
+    setLdrSuccessMsg(`Registration complete for ${newLeader.fullName} (${newLeader.leaderType} - ${newLeader.church}). Leader code: ${leaderCode}. Your scan pass has been downloaded — show it to your branch admin at every service.`);
     setLdrName('');
     setLdrEmail('');
     setLdrPhone('');
@@ -576,16 +611,21 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
     };
 
     onAddChurchAdmin(newAdmin, newBranch);
-    setAdmSuccessMsg(`Church Branch "${newBranch.name}" & Admin Account for "${newAdmin.adminName}" registered successfully! Redirecting to dashboard...`);
+    setAdmSuccessMsg(`Church branch "${newBranch.name}" and the admin account for "${newAdmin.adminName}" were created. We are sending a confirmation link to ${newAdmin.adminEmail}…`);
 
-    setTimeout(() => {
-      onLoginSuccess('Church Admin', newBranch.name, newAdmin.adminName, newAdmin.adminEmail);
-    }, 1500);
+    const res = await sendAdminVerificationEmail(newAdmin.adminEmail, newAdmin.adminName);
+    setAdmSuccessMsg(
+      res.success
+        ? `Almost done! We sent a confirmation link to ${newAdmin.adminEmail}. Open it to confirm your email, then sign in. The link lasts 24 hours.`
+        : `Your account was created, but we could not send the confirmation email (${res.message}). Use "Resend confirmation" on the sign-in page.`
+    );
   };
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
+    setUnverifiedEmail('');
+    setVerifyFeedback('');
     setIsLoggingIn(true);
 
     try {
@@ -598,7 +638,12 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       );
 
       if (!result.success || !result.user) {
-        setLoginError(result.error || 'Authentication failed. Please verify your credentials and try again.');
+        if ((result.error || '') === 'email_unverified') {
+          setUnverifiedEmail(loginIdentifier.trim());
+          setLoginError('Please confirm your email address before signing in. Check your inbox for the confirmation link.');
+        } else {
+          setLoginError(result.error || 'Authentication failed. Please verify your credentials and try again.');
+        }
         setIsLoggingIn(false);
         return;
       }
@@ -614,6 +659,15 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
     } finally {
       setIsLoggingIn(false);
     }
+  };
+
+  const handleResendVerification = async () => {
+    if (!unverifiedEmail) return;
+    setIsResendingVerify(true);
+    setVerifyFeedback('');
+    const res = await sendAdminVerificationEmail(unverifiedEmail);
+    setVerifyFeedback(res.message);
+    setIsResendingVerify(false);
   };
 
   return (
