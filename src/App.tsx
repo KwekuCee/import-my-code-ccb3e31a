@@ -704,10 +704,14 @@ export default function App() {
               {currentView === 'qr_scanner' && user?.role !== 'Superadmin' && (
                 <QRScannerModal
                   members={members}
+                  attendance={attendance}
+                  serviceTypes={serviceTypes}
+                  user={user}
                   onConfirmAttendance={handleConfirmAttendance}
                   onClose={() => setCurrentView('dashboard')}
                   onNavigate={setCurrentView}
                 />
+
               )}
 
               {currentView === 'analytics' && (
