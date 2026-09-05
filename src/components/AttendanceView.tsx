@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AttendanceRecord, ViewType } from '../types';
 import { useToast } from '../context/ToastContext';
+import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
 interface AttendanceViewProps {
   attendanceRecords: AttendanceRecord[];
@@ -11,13 +12,17 @@ interface AttendanceViewProps {
   };
   onNavigate: (view: ViewType) => void;
   onClearTodayAttendance?: () => void;
+  onUpdateAttendance?: (record: AttendanceRecord) => void;
+  onDeleteAttendance?: (recordId: string) => void;
 }
 
 export const AttendanceView: React.FC<AttendanceViewProps> = ({
   attendanceRecords,
   user,
   onNavigate,
-  onClearTodayAttendance
+  onClearTodayAttendance,
+  onUpdateAttendance,
+  onDeleteAttendance
 }) => {
   const toast = useToast();
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -28,6 +33,8 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   const [filterChurch, setFilterChurch] = useState<string>('All');
   const [searchMember, setSearchMember] = useState<string>('');
   const [showFinalizeModal, setShowFinalizeModal] = useState<boolean>(false);
+  const [editingRecord, setEditingRecord] = useState<AttendanceRecord | null>(null);
+  const [deletingRecord, setDeletingRecord] = useState<AttendanceRecord | null>(null);
   const [savedArchives, setSavedArchives] = useState<string[]>([]);
 
   const isChurchAdmin = user?.role === 'Church Admin';
@@ -325,6 +332,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                 <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Service & Date</th>
                 <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Time & Station</th>
                 <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase">Verification</th>
+                <th className="py-3.5 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="font-body text-xs divide-y divide-slate-100">
@@ -376,11 +384,28 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                         Confirmed
                       </span>
                     </td>
+
+                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                      <button
+                        onClick={() => setEditingRecord(r)}
+                        className="inline-flex items-center px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold cursor-pointer"
+                        title="Edit attendance entry"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">edit</span>
+                      </button>
+                      <button
+                        onClick={() => setDeletingRecord(r)}
+                        className="ml-1.5 inline-flex items-center px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold cursor-pointer"
+                        title="Delete attendance entry"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-xs text-slate-400">
+                  <td colSpan={7} className="py-12 text-center text-xs text-slate-400">
                     No attendance logs found for date <strong className="text-slate-700">{selectedDate}</strong> with current filters.
                   </td>
                 </tr>
@@ -435,6 +460,45 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
         </div>
       )}
 
+
+      {editingRecord && (
+        <EditRecordModal
+          title="Edit Attendance Entry"
+          subtitle={`${editingRecord.memberName} • ${editingRecord.serviceType}`}
+          icon="event_available"
+          values={editingRecord as any}
+          fields={[
+            { key: 'memberName', label: 'Member Name', required: true },
+            { key: 'memberId', label: 'Member ID', disabled: true },
+            { key: 'serviceType', label: 'Service Type' },
+            { key: 'date', label: 'Date', type: 'date' },
+            { key: 'timestamp', label: 'Check-in Time' },
+            { key: 'church', label: 'Church Branch' },
+            { key: 'leaderName', label: 'Leader' },
+            { key: 'pcfName', label: 'PCF / Cell' },
+            { key: 'verifiedBy', label: 'Verified By' }
+          ]}
+          onCancel={() => setEditingRecord(null)}
+          onSave={(vals) => {
+            onUpdateAttendance?.({ ...editingRecord, ...vals } as AttendanceRecord);
+            toast.success('Attendance entry updated');
+            setEditingRecord(null);
+          }}
+        />
+      )}
+
+      {deletingRecord && (
+        <ConfirmDeleteDialog
+          title="Delete Attendance Entry"
+          message={`This removes the check-in for ${deletingRecord.memberName} on ${deletingRecord.date || selectedDate}.`}
+          onCancel={() => setDeletingRecord(null)}
+          onConfirm={() => {
+            onDeleteAttendance?.(deletingRecord.id);
+            toast.success('Attendance entry deleted');
+            setDeletingRecord(null);
+          }}
+        />
+      )}
     </div>
   );
 };
