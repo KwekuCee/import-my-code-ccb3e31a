@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ViewType, Member, AttendanceRecord, ChurchBranch, ChurchAdminAccount } from '../types';
 import { exportMultiSheetExcel, exportMultiSectionCSV } from '../utils/exportUtils';
+import { SupportChat } from './SupportChat';
 
 interface SidebarProps {
   currentView: ViewType;
@@ -32,6 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile
 }) => {
   const logoUrl = '/church-logo.png';
+  const [showSupportChat, setShowSupportChat] = useState(false);
 
   const isSuperadmin = user?.role === 'Superadmin';
 
@@ -216,6 +218,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
       </aside>
+
+      {showSupportChat && <SupportChat onClose={() => setShowSupportChat(false)} />}
     </>
   );
 };
