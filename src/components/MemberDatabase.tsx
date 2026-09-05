@@ -42,6 +42,12 @@ export const MemberDatabase: React.FC<MemberDatabaseProps> = ({
   const isChurchAdmin = user?.role === 'Church Admin';
   const targetChurch = user?.church || '';
 
+  // Bible study class / cell / PCF names a member belongs to, via their leader
+  const groupNamesForMember = (m: Member) => {
+    const leaderId = m.invitedByLeaderId || findLeaderByName(m.invitedBy, leaders)?.id;
+    return getGroupNamesForLeader(leaderId, leaders);
+  };
+
   // Restrict pool to branch members if Church Admin
   const scopedMembers = isChurchAdmin
     ? members.filter(m => m.church === targetChurch)
