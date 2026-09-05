@@ -582,15 +582,15 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
       {/* Top Portal Banner Bar */}
-      <header className="border-b border-slate-200/90 bg-white/95 backdrop-blur-md sticky top-0 z-40 px-4 md:px-8 py-3.5 flex items-center justify-between shadow-2xs">
+      <header className="border-b border-slate-200/90 bg-white/95 backdrop-blur-md sticky top-0 z-40 px-4 md:px-8 py-3.5 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
-          <ChurchLogo className="w-10 h-10 rounded-2xl overflow-hidden shadow-md shadow-blue-700/20 shrink-0" alt="GCYC Logo" />
+          <ChurchLogo className="w-10 h-10 rounded-2xl overflow-hidden shadow-sm shadow-blue-700/20 shrink-0" alt="GCYC Logo" />
           <div>
             <h1 className="font-display font-extrabold text-base md:text-lg text-slate-900 tracking-tight flex items-center gap-2">
               GCYC Group
 
             </h1>
-            <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
+            <p className="text-xs text-slate-500 font-medium hidden sm:block">
               Grace City Youth Church Attendance System
             </p>
           </div>
@@ -600,7 +600,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
           <button
             onClick={() => setActiveTab('login')}
             className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${activeTab === 'login'
-              ? 'bg-blue-700 text-white shadow-md shadow-blue-700/20'
+              ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
               }`}
           >
@@ -631,7 +631,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
               setAttSuccessPass(null);
             }}
             className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'attendance'
-              ? 'bg-blue-700 text-white shadow-md shadow-blue-700/20'
+              ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
               }`}
           >
@@ -642,7 +642,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
           <button
             onClick={() => setActiveTab('leader_reg')}
             className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'leader_reg'
-              ? 'bg-blue-700 text-white shadow-md shadow-blue-700/20'
+              ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
               }`}
           >
@@ -653,7 +653,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
           <button
             onClick={() => setActiveTab('admin_signup')}
             className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'admin_signup'
-              ? 'bg-blue-700 text-white shadow-md shadow-blue-700/20'
+              ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
               }`}
           >
@@ -664,7 +664,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
           <button
             onClick={() => setActiveTab('login')}
             className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'login'
-              ? 'bg-blue-700 text-white shadow-md shadow-blue-700/20'
+              ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
               }`}
           >
@@ -675,7 +675,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
         {/* TAB 1: SELF ATTENDANCE RECORDING */}
         {activeTab === 'attendance' && (
-          <div className="max-w-2xl mx-auto bg-white border border-slate-200/90 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+          <div className="max-w-2xl mx-auto bg-white border border-slate-200/90 rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
             <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
               <div className="p-2.5 rounded-2xl bg-blue-50 text-blue-700 border border-blue-200">
                 <span className="material-symbols-outlined text-[24px]">fact_check</span>
@@ -692,13 +692,13 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-blue-50/50 border border-blue-200 rounded-3xl p-6 text-center space-y-5 shadow-xs"
+                className="bg-blue-50/50 border border-blue-200 rounded-2xl p-6 text-center space-y-5 shadow-xs"
               >
                 <div className="w-16 h-16 bg-blue-700 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-blue-700/20">
                   <span className="material-symbols-outlined text-[36px]">verified</span>
                 </div>
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-900 font-mono text-[11px] font-bold rounded-full border border-blue-300 mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-900 text-xs font-bold rounded-full border border-blue-300 mb-2">
                     <span className="material-symbols-outlined text-[14px]">download_done</span>
                     <span>QR CODE AUTOMATICALLY DOWNLOADED</span>
                   </div>
@@ -713,19 +713,19 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 {/* QR Pass Preview Card */}
                 {attPassImageDataUrl && (
                   <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3 shadow-xs">
-                    <p className="text-[11px] font-mono font-bold text-slate-500 uppercase">Your Digital Member Pass</p>
+                    <p className="text-xs font-bold text-slate-500 uppercase">Your Digital Member Pass</p>
                     <img
                       src={attPassImageDataUrl}
                       alt="Digital Member QR Pass"
-                      className="max-w-[280px] mx-auto rounded-xl border border-blue-200 shadow-md"
+                      className="max-w-[280px] mx-auto rounded-xl border border-blue-200 shadow-sm"
                     />
-                    <p className="text-[10px] text-slate-500 italic">
+                    <p className="text-xs text-slate-500 italic">
                       Show this QR Code to the usher on your phone or print out every time you attend church for fast scan!
                     </p>
                   </div>
                 )}
 
-                <div className="bg-white p-4 rounded-xl border border-slate-200 text-left font-mono text-xs space-y-1.5 shadow-2xs">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 text-left text-xs space-y-1.5 shadow-sm">
                   <div className="flex justify-between text-slate-600">
                     <span>Member ID:</span>
                     <span className="text-blue-700 font-bold">{attSuccessPass.memberId}</span>
@@ -756,7 +756,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                         downloadLink.remove();
                       }
                     }}
-                    className="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-blue-700/20"
+                    className="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-blue-700/20"
                   >
                     <span className="material-symbols-outlined text-[18px]">download</span>
                     <span>Re-Download QR Pass PNG</span>
@@ -782,7 +782,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
               <form onSubmit={handleSelfAttendanceSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                       Full Name *
                     </label>
                     <input
@@ -796,7 +796,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                       Contact / Phone *
                     </label>
                     <input
@@ -812,7 +812,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                       Email Address (Optional)
                     </label>
                     <input
@@ -825,14 +825,14 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                       Date of Birth (DOB)
                     </label>
                     <input
                       type="date"
                       value={attDob}
                       onChange={(e) => setAttDob(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-mono transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
                     />
                   </div>
                 </div>
@@ -840,7 +840,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 {/* Location, Occupation, Educational Level, Foundation Class */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                       Location / Area *
                     </label>
                     <input
@@ -854,7 +854,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                       Occupation *
                     </label>
                     <select
@@ -876,7 +876,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
                     {attOccupation === 'Other' && (
                       <div className="mt-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
-                        <label className="block font-mono text-[10px] font-bold text-blue-700 uppercase mb-1">
+                        <label className="block text-xs font-bold text-blue-700 uppercase mb-1">
                           Specify Your Occupation *
                         </label>
                         <input
@@ -894,7 +894,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                       Educational Level *
                     </label>
                     <select
@@ -912,7 +912,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                       Foundation School Class *
                     </label>
                     <select
@@ -936,7 +936,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Church Branch Selection (first — leaders below are filtered by it) */}
                   <div>
-                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                       Select Your Church *
                     </label>
                     <select
@@ -954,7 +954,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
                   {/* Leader / Inviter Selection — only leaders from the selected church */}
                   <div>
-                    <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                       Who Invited You / Name of Leader? *
                     </label>
                     <select
@@ -971,7 +971,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                           </option>
                         ))}
                     </select>
-                    <p className="text-[10px] text-slate-500 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       Choose your church first — only leaders from that church are shown.
                     </p>
                   </div>
@@ -979,7 +979,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
                 {/* Service Type Selection */}
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     Service Type *
                   </label>
                   <select
@@ -998,7 +998,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 <button
                   type="submit"
                   disabled={isGeneratingQr}
-                  className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-4 rounded-xl transition-all shadow-md shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer mt-4 active:scale-98 disabled:opacity-50"
+                  className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-4 rounded-xl transition-all shadow-sm shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer mt-4 active:scale-98 disabled:opacity-50"
                 >
                   <span className="material-symbols-outlined text-[20px]">qr_code_2</span>
                   <span>{isGeneratingQr ? 'Generating QR Pass...' : 'Confirm Attendance & Download Digital QR Pass'}</span>
@@ -1010,7 +1010,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
         {/* TAB 2: LEADER SELF-REGISTRATION */}
         {activeTab === 'leader_reg' && (
-          <div className="max-w-2xl mx-auto bg-white border border-slate-200/90 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+          <div className="max-w-2xl mx-auto bg-white border border-slate-200/90 rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-2xl bg-blue-50 text-blue-700 border border-blue-200">
@@ -1043,7 +1043,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
             <form onSubmit={handleLeaderSelfReg} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     Full Names *
                   </label>
                   <input
@@ -1057,7 +1057,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     Email *
                   </label>
                   <input
@@ -1073,7 +1073,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     Contact Phone *
                   </label>
                   <input
@@ -1087,7 +1087,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     Cell or PCF Names *
                   </label>
                   <input
@@ -1103,19 +1103,19 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     Date of Birth (DOB)
                   </label>
                   <input
                     type="date"
                     value={ldrDob}
                     onChange={(e) => setLdrDob(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-mono transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     Location
                   </label>
                   <input
@@ -1130,7 +1130,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     Type of Leader *
                   </label>
                   <select
@@ -1146,7 +1146,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     Select Your Church *
                   </label>
                   <select
@@ -1169,7 +1169,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
               {/* AUTH CODE REQUIREMENT - CLEAN EMPTY PLACEHOLDER */}
               <div className="p-4 bg-blue-50/70 border border-blue-200 rounded-2xl space-y-2">
-                <label className="block font-mono text-[10px] font-black text-blue-800 uppercase tracking-wider">
+                <label className="block text-xs font-black text-blue-800 ">
                   Authentication Code Required *
                 </label>
                 <div className="relative">
@@ -1182,17 +1182,17 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     placeholder="Enter Authentication Code"
                     value={ldrAuthCode}
                     onChange={(e) => setLdrAuthCode(e.target.value)}
-                    className="w-full bg-white border border-blue-300 rounded-xl pl-9 pr-3 py-2.5 text-xs text-blue-950 font-mono font-bold tracking-widest placeholder:text-slate-400 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20"
+                    className="w-full bg-white border border-blue-300 rounded-xl pl-9 pr-3 py-2.5 text-xs text-blue-950 font-bold tracking-widest placeholder:text-slate-400 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20"
                   />
                 </div>
-                <p className="text-[11px] text-slate-600">
+                <p className="text-xs text-slate-600">
                   Enter your official group authorization code to register as an active leader.
                 </p>
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3.5 rounded-xl transition-all shadow-md shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3.5 rounded-xl transition-all shadow-sm shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
                 <span>Submit Official Leader Registration</span>
@@ -1203,7 +1203,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
         {/* TAB 3: CHURCH ADMIN SIGN UP */}
         {activeTab === 'admin_signup' && (
-          <div className="max-w-2xl mx-auto bg-white border border-slate-200/90 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+          <div className="max-w-2xl mx-auto bg-white border border-slate-200/90 rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-2xl bg-blue-700 text-white font-black">
@@ -1236,7 +1236,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
             <form onSubmit={handleAdminSignUp} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     1. Full Name *
                   </label>
                   <input
@@ -1250,7 +1250,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     2. Email (Required) *
                   </label>
                   <input
@@ -1266,7 +1266,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     3. Church Branch Name *
                   </label>
                   <input
@@ -1280,7 +1280,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     4. Pastor or Coordinator's Full Name *
                   </label>
                   <input
@@ -1296,7 +1296,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     5. Admin Phone Number *
                   </label>
                   <input
@@ -1310,7 +1310,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                     6. Password *
                   </label>
                   <input
@@ -1326,7 +1326,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
               {/* 7. AUTHENTICATION CODE - CLEAN EMPTY PLACEHOLDER */}
               <div className="p-4 bg-blue-50/70 border border-blue-200 rounded-2xl space-y-2">
-                <label className="block font-mono text-[10px] font-black text-blue-800 uppercase tracking-wider">
+                <label className="block text-xs font-black text-blue-800 ">
                   7. Authentication Code Required *
                 </label>
                 <div className="relative">
@@ -1339,17 +1339,17 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     placeholder="Enter Authentication Code"
                     value={admAuthCode}
                     onChange={(e) => setAdmAuthCode(e.target.value)}
-                    className="w-full bg-white border border-blue-300 rounded-xl pl-9 pr-3 py-2.5 text-xs text-blue-950 font-mono font-bold tracking-widest placeholder:text-slate-400 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20"
+                    className="w-full bg-white border border-blue-300 rounded-xl pl-9 pr-3 py-2.5 text-xs text-blue-950 font-bold tracking-widest placeholder:text-slate-400 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20"
                   />
                 </div>
-                <p className="text-[11px] text-slate-600">
+                <p className="text-xs text-slate-600">
                   Required security code to provision a church admin account on the platform.
                 </p>
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3.5 rounded-xl transition-all shadow-md shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3.5 rounded-xl transition-all shadow-sm shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px]">add_business</span>
                 <span>Register Church Account & Create Admin Account</span>
@@ -1360,9 +1360,9 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
         {/* TAB 4: ADMIN LOGIN PAGE */}
         {activeTab === 'login' && (
-          <div className="max-w-md mx-auto bg-white border border-slate-200/90 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+          <div className="max-w-md mx-auto bg-white border border-slate-200/90 rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
             <div className="text-center space-y-1">
-              <div className="w-12 h-12 rounded-2xl bg-blue-700 text-white font-black text-xl flex items-center justify-center mx-auto mb-2 shadow-md shadow-blue-700/20">
+              <div className="w-12 h-12 rounded-2xl bg-blue-700 text-white font-black text-xl flex items-center justify-center mx-auto mb-2 shadow-sm shadow-blue-700/20">
                 KB
               </div>
               <h3 className="font-display font-extrabold text-xl text-slate-900">Platform Admin Sign In</h3>
@@ -1409,15 +1409,15 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   error
                 </span>
                 <div className="flex-1">
-                  <p className="font-bold text-[11px] uppercase tracking-wider text-rose-900">Authentication Failed</p>
-                  <p className="mt-0.5 text-[11px] leading-relaxed">{loginError}</p>
+                  <p className="font-bold text-xs text-rose-900">Authentication Failed</p>
+                  <p className="mt-0.5 text-xs leading-relaxed">{loginError}</p>
                 </div>
               </div>
             )}
 
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <div>
-                <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                   {loginRole === 'Superadmin' ? 'Group Pastor Email / Username *' : 'Branch Admin Email / Username *'}
                 </label>
                 <div className="relative">
@@ -1440,7 +1440,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase">
+                  <label className="block text-xs font-bold text-slate-600 uppercase">
                     Password *
                   </label>
                   <button
@@ -1450,7 +1450,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                       setResetFeedback(null);
                       setShowForgotModal(true);
                     }}
-                    className="text-[11px] text-blue-700 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                    className="text-xs text-blue-700 font-bold hover:underline cursor-pointer flex items-center gap-1"
                   >
                     <span className="material-symbols-outlined text-[13px]">lock_reset</span>
                     <span>Forgot Password?</span>
@@ -1477,7 +1477,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
               <button
                 type="submit"
                 disabled={isLoggingIn}
-                className="w-full font-bold text-xs py-3.5 rounded-xl transition-all shadow-md bg-blue-700 hover:bg-blue-800 text-white shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 active:scale-[0.99]"
+                className="w-full font-bold text-xs py-3.5 rounded-xl transition-all shadow-sm bg-blue-700 hover:bg-blue-800 text-white shadow-blue-700/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 active:scale-[0.99]"
               >
                 {isLoggingIn ? (
                   <span className="flex items-center gap-2">
@@ -1493,7 +1493,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
               </button>
             </form>
 
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-center text-slate-500 font-mono text-[11px]">
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-center text-slate-500 text-xs">
               <span className="material-symbols-outlined text-emerald-600 text-[16px]">verified_user</span>
               <span>Direct Database Verification • Supabase PostgreSQL Auth</span>
             </div>
@@ -1502,7 +1502,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-500 font-mono flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3">
+      <footer className="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3">
         <span>Grace City Youth Church • All Rights Reserved © 2026</span>
         <span className="hidden sm:inline text-slate-300">•</span>
         <span>
@@ -1521,14 +1521,14 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       {/* Forgot Password Recovery Modal */}
       {showForgotModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full border border-slate-200 shadow-2xl animate-fadeIn">
+          <div className="bg-white rounded-2xl p-6 md:p-8 max-w-sm w-full border border-slate-200 shadow-sm animate-fadeIn">
             <div className="flex items-center gap-2.5 mb-2">
               <div className="w-9 h-9 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center shadow-xs">
                 <span className="material-symbols-outlined text-[20px]">lock_reset</span>
               </div>
               <div>
                 <h3 className="font-display font-extrabold text-base text-slate-900">Admin Password Recovery</h3>
-                <p className="text-[11px] text-slate-500">Supabase Auth Secure Reset</p>
+                <p className="text-xs text-slate-500">Supabase Auth Secure Reset</p>
               </div>
             </div>
 
@@ -1547,7 +1547,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 <span className="material-symbols-outlined text-[18px] shrink-0 mt-0.5">
                   {resetFeedback.type === 'success' ? 'check_circle' : 'error'}
                 </span>
-                <div className="text-[11px] leading-relaxed font-medium">
+                <div className="text-xs leading-relaxed font-medium">
                   {resetFeedback.message}
                 </div>
               </div>
@@ -1555,7 +1555,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
             <form onSubmit={handleSendResetEmail} className="space-y-4">
               <div>
-                <label className="block font-mono text-[10px] font-bold text-slate-600 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                   Administrator Email *
                 </label>
                 <div className="relative">
@@ -1587,7 +1587,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 <button
                   type="submit"
                   disabled={isResetting}
-                  className="px-4 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-blue-700/20 cursor-pointer disabled:opacity-60 flex items-center gap-1.5"
+                  className="px-4 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm shadow-blue-700/20 cursor-pointer disabled:opacity-60 flex items-center gap-1.5"
                 >
                   {isResetting && <span className="material-symbols-outlined text-[15px] animate-spin">sync</span>}
                   <span>{isResetting ? 'Dispatching...' : 'Send Reset Link'}</span>

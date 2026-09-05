@@ -31,7 +31,7 @@ export const MemberCardModal: React.FC<MemberCardModalProps> = ({ member, onClos
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 350 }}
-        className="bg-white/90 backdrop-blur-2xl rounded-3xl max-w-sm w-full border border-white/60 shadow-2xl overflow-hidden"
+        className="bg-white/90 backdrop-blur-2xl rounded-2xl max-w-sm w-full border border-white/60 shadow-sm overflow-hidden"
       >
 
         {/* Header Badge */}
@@ -53,53 +53,53 @@ export const MemberCardModal: React.FC<MemberCardModalProps> = ({ member, onClos
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 font-display font-extrabold text-2xl flex items-center justify-center mx-auto border-4 border-white shadow-lg">
               {memberInitials}
             </div>
-            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-slate-950 text-amber-300 text-[9px] font-mono font-bold px-2.5 py-0.5 rounded-full border border-amber-400/30 whitespace-nowrap shadow-xs">
+            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-slate-950 text-amber-300 text-[9px] font-bold px-2.5 py-0.5 rounded-full border border-amber-400/30 whitespace-nowrap shadow-xs">
               {member.role || 'Member'}
             </span>
           </div>
 
           <div className="pt-1">
             <h2 className="font-headline font-extrabold text-lg text-slate-900">{member.fullName}</h2>
-            <div className="inline-flex items-center gap-1.5 mt-1 bg-blue-50/80 backdrop-blur-xs text-blue-700 px-2.5 py-0.5 rounded-md font-mono text-xs font-bold border border-blue-100">
+            <div className="inline-flex items-center gap-1.5 mt-1 bg-blue-50/80 backdrop-blur-xs text-blue-700 px-2.5 py-0.5 rounded-md text-xs font-bold border border-blue-100">
               <span>ID: {member.id}</span>
             </div>
             <p className="text-xs font-medium text-slate-500 mt-1">{member.church}</p>
           </div>
 
           {/* QR Code Graphic */}
-          <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-slate-200/80 inline-block shadow-sm">
+          <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-slate-200 inline-block shadow-sm">
             <img
               src={qrPlaceholderUrl}
               alt={`QR Code for ${member.id}`}
               className="w-36 h-36 mx-auto object-contain rounded-lg"
             />
-            <p className="font-mono text-[10px] text-slate-400 font-semibold mt-2">Scan for Sunday Check-In</p>
+            <p className="text-xs text-slate-400 font-semibold mt-2">Scan for Sunday Check-In</p>
           </div>
 
           {/* Metadata Grid */}
           <div className="text-left bg-white/70 backdrop-blur-md p-3.5 rounded-xl text-xs space-y-1.5 font-body border border-slate-200/60 text-slate-800">
             <div className="flex justify-between">
-              <span className="text-slate-400 font-mono text-[10px]">PHONE</span>
-              <span className="font-mono font-bold">{member.phone}</span>
+              <span className="text-slate-400 text-xs">PHONE</span>
+              <span className="font-bold">{member.phone}</span>
             </div>
             {member.email && (
               <div className="flex justify-between">
-                <span className="text-slate-400 font-mono text-[10px]">EMAIL</span>
+                <span className="text-slate-400 text-xs">EMAIL</span>
                 <span className="font-semibold text-slate-700 truncate max-w-[180px]">{member.email}</span>
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-slate-400 font-mono text-[10px]">LOCATION</span>
+              <span className="text-slate-400 text-xs">LOCATION</span>
               <span className="font-semibold">{member.location}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-400 font-mono text-[10px]">FOUNDATION SCHOOL</span>
+              <span className="text-slate-400 text-xs">FOUNDATION SCHOOL</span>
               <span className="font-bold text-amber-700 text-xs text-right max-w-[200px]">
                 {getFoundationClassLabel(member.foundationClass)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400 font-mono text-[10px]">OCCUPATION</span>
+              <span className="text-slate-400 text-xs">OCCUPATION</span>
               <span className="font-semibold">{member.occupation}</span>
             </div>
           </div>

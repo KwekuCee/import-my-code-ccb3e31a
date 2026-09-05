@@ -78,7 +78,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full mb-1 border border-blue-200">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full mb-1 border border-blue-200">
             <span className="material-symbols-outlined text-[14px]">diversity_3</span>
             Leaders
           </div>
@@ -92,7 +92,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
 
         <button
           onClick={() => onNavigate('leader_registration')}
-          className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all flex items-center gap-2 shadow-md cursor-pointer shrink-0"
+          className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all flex items-center gap-2 shadow-sm cursor-pointer shrink-0"
         >
           <span className="material-symbols-outlined text-[18px]">person_add</span>
           <span>Register New Leader</span>
@@ -101,13 +101,13 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
 
       {/* Auto-Flagged Promotion Queue Panel */}
       {promotionQueue.length > 0 && (
-        <div className="bg-gradient-to-r from-amber-500/10 via-amber-50 to-white border border-amber-300 rounded-3xl p-5 md:p-6 shadow-sm space-y-4">
+        <div className="bg-gradient-to-r from-amber-500/10 via-amber-50 to-white border border-amber-300 rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-amber-900 font-headline font-bold text-sm">
               <span className="material-symbols-outlined text-[20px] text-amber-600 icon-fill">military_tech</span>
               <span>Ready for promotion ({promotionQueue.length})</span>
             </div>
-            <span className="font-mono text-[10px] font-bold bg-amber-200/80 text-amber-900 px-2.5 py-0.5 rounded-full">
+            <span className="text-xs font-bold bg-amber-200/80 text-amber-900 px-2.5 py-0.5 rounded-full">
               Action Required by Group Pastor
             </span>
           </div>
@@ -118,13 +118,13 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {promotionQueue.map(item => (
-              <div key={item.id} className="bg-white p-4 rounded-2xl border border-amber-200 shadow-2xs space-y-3">
+              <div key={item.id} className="bg-white p-4 rounded-2xl border border-amber-200 shadow-sm space-y-3">
                 <div className="flex justify-between items-start">
                   <div>
                     <h4 className="font-headline font-bold text-sm text-slate-900">{item.leaderName}</h4>
-                    <p className="font-mono text-[10px] text-slate-500">{item.church}</p>
+                    <p className="text-xs text-slate-500">{item.church}</p>
                   </div>
-                  <span className="bg-amber-100 text-amber-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md">
+                  <span className="bg-amber-100 text-amber-900 font-bold text-xs px-2 py-0.5 rounded-md">
                     {item.currentRole} ➔ {item.targetRole}
                   </span>
                 </div>
@@ -134,7 +134,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
                 </p>
 
                 <div className="flex items-center justify-between pt-1">
-                  <span className="font-mono text-[10px] text-slate-400">Flagged: {item.flaggedAt}</span>
+                  <span className="text-xs text-slate-400">Flagged: {item.flaggedAt}</span>
                   <button
                     onClick={() => onConfirmPromotion(item.id)}
                     className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all shadow-xs flex items-center gap-1 cursor-pointer"
@@ -150,7 +150,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
       )}
 
       {/* Filter Controls */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col md:flex-row items-center gap-3">
+      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-3">
         <div className="relative flex-1 w-full">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
             search
@@ -193,7 +193,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
       </div>
 
       {/* Leaders Table */}
-      <div className="bg-white border border-slate-200/80 rounded-3xl overflow-hidden shadow-2xs">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         <div className="p-4 md:p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
           <div>
             <h3 className="font-headline text-base font-bold text-slate-900">All leaders</h3>
@@ -204,7 +204,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50/60 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
+              <tr className="bg-slate-50/60 text-xs font-bold text-slate-400 border-b border-slate-200">
                 <th className="py-3 px-4">Leader Name</th>
                 <th className="py-3 px-4">Type</th>
                 <th className="py-3 px-4">Cell / PCF</th>
@@ -226,14 +226,14 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
                         </div>
                         <div>
                           <p className="font-bold text-slate-900">{ldr.fullName}</p>
-                          <p className="font-mono text-[10px] text-slate-400">{ldr.contact}</p>
+                          <p className="text-xs text-slate-400">{ldr.contact}</p>
                         </div>
                       </div>
                     </td>
 
                     <td className="py-3.5 px-4">
                       <span className={`
-                        px-2.5 py-1 rounded-full text-[10px] font-bold font-mono border
+                        px-2.5 py-1 rounded-full text-xs font-bold border
                         ${ldr.leaderType === 'Church Coordinator' ? 'bg-purple-50 text-purple-800 border-purple-200' : ''}
                         ${ldr.leaderType === 'PCF Leader' ? 'bg-blue-50 text-blue-800 border-blue-200' : ''}
                         ${ldr.leaderType === 'Cell Leader' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : ''}
@@ -267,11 +267,11 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
 
                     <td className="py-3.5 px-4 text-center">
                       {ldr.isAppointed ? (
-                        <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                        <span className="text-xs font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
                           Appointed
                         </span>
                       ) : (
-                        <span className="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
+                        <span className="text-xs font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
                           Growth Cycle
                         </span>
                       )}
@@ -310,7 +310,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
 
       {viewingLeader && (
         <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg border border-slate-200 shadow-xl overflow-hidden">
+          <div className="bg-white rounded-2xl w-full max-w-lg border border-slate-200 shadow-sm overflow-hidden">
             <div className="flex items-start justify-between p-5 border-b border-slate-100">
               <div>
                 <h3 className="font-headline font-bold text-base text-slate-900">{viewingLeader.fullName}'s members</h3>

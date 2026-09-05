@@ -50,11 +50,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200/80 shadow-2xl p-8 md:p-10 z-10 relative">
+      <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-sm p-8 md:p-10 z-10 relative">
 
         {/* Header */}
         <div className="text-center mb-8">
-          <ChurchLogo className="w-14 h-14 rounded-2xl overflow-hidden shadow-md mx-auto mb-3" alt="GCYC Logo" />
+          <ChurchLogo className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm mx-auto mb-3" alt="GCYC Logo" />
           <h1 className="font-display text-2xl md:text-3xl text-slate-900 font-extrabold tracking-tight mb-1">
             GCYC Group
           </h1>
@@ -67,7 +67,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email or Phone */}
           <div>
-            <label className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-slate-500 mb-1">
               Email or Phone Number
             </label>
             <div className="relative">
@@ -88,13 +88,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           {/* Password */}
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              <label className="text-xs font-bold text-slate-500 ">
                 Password
               </label>
               <button
                 type="button"
                 onClick={() => setShowForgotModal(true)}
-                className="text-[11px] text-blue-600 font-bold hover:underline cursor-pointer"
+                className="text-xs text-blue-600 font-bold hover:underline cursor-pointer"
               >
                 Forgot Password?
               </button>
@@ -118,7 +118,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full mt-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+            className="w-full mt-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition-all shadow-sm active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
           >
             {isLoading ? (
               <span>Authenticating...</span>
@@ -149,7 +149,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
       {/* Forgot Password Modal */}
       {showForgotModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full border border-slate-200 shadow-2xl">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full border border-slate-200 shadow-sm">
             <div className="flex items-center gap-2.5 mb-2">
               <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
                 <span className="material-symbols-outlined text-[18px]">lock_reset</span>
@@ -177,7 +177,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
 
             <form onSubmit={handleSendResetEmail}>
               <div className="mb-4">
-                <label className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-slate-500 mb-1">
                   Administrator Email *
                 </label>
                 <input

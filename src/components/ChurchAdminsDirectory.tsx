@@ -45,7 +45,7 @@ export const ChurchAdminsDirectory: React.FC<ChurchAdminsDirectoryProps> = ({
     <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full mb-2 border border-blue-200">
+        <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full mb-2 border border-blue-200">
           <span className="material-symbols-outlined text-[14px]">badge</span>
           Registered Church Admins
         </div>
@@ -60,17 +60,17 @@ export const ChurchAdminsDirectory: React.FC<ChurchAdminsDirectoryProps> = ({
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <p className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Admins</p>
+          <p className="text-xs font-bold text-slate-500 ">Total Admins</p>
           <p className="font-display text-2xl font-extrabold text-slate-900 mt-2">{churchAdmins.length}</p>
         </div>
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <p className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">Active</p>
+          <p className="text-xs font-bold text-slate-500 ">Active</p>
           <p className="font-display text-2xl font-extrabold text-emerald-600 mt-2">
             {churchAdmins.filter(a => a.status === 'Active').length}
           </p>
         </div>
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <p className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">Pending Verification</p>
+          <p className="text-xs font-bold text-slate-500 ">Pending Verification</p>
           <p className="font-display text-2xl font-extrabold text-amber-600 mt-2">
             {churchAdmins.filter(a => a.status === 'Pending Verification').length}
           </p>
@@ -81,7 +81,7 @@ export const ChurchAdminsDirectory: React.FC<ChurchAdminsDirectoryProps> = ({
       <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-4 shadow-sm">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
-            <label className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">
+            <label className="text-xs font-bold text-slate-500 mb-1 block">
               Search
             </label>
             <div className="relative">
@@ -96,7 +96,7 @@ export const ChurchAdminsDirectory: React.FC<ChurchAdminsDirectoryProps> = ({
             </div>
           </div>
           <div>
-            <label className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">
+            <label className="text-xs font-bold text-slate-500 mb-1 block">
               Filter Status
             </label>
             <select
@@ -121,16 +121,16 @@ export const ChurchAdminsDirectory: React.FC<ChurchAdminsDirectoryProps> = ({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-blue-300/50 transition-all"
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-sm hover:border-blue-300/50 transition-all"
             >
               {/* Header with Status Badge */}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <h3 className="font-bold text-sm text-slate-900">{admin.adminName}</h3>
-                  <p className="text-[11px] text-slate-500 mt-0.5 font-mono">{admin.churchName}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{admin.churchName}</p>
                 </div>
                 <span
-                  className={`font-mono text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                  className={`text-xs font-bold px-2.5 py-1 rounded-full ${
                     admin.status === 'Active'
                       ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
                       : 'bg-amber-100 text-amber-700 border border-amber-200'
@@ -161,7 +161,7 @@ export const ChurchAdminsDirectory: React.FC<ChurchAdminsDirectoryProps> = ({
               </div>
 
               {/* Dates */}
-              <div className="grid grid-cols-2 gap-2 text-[10px] font-mono mb-4">
+              <div className="grid grid-cols-2 gap-2 text-xs mb-4">
                 <div>
                   <span className="text-slate-400 uppercase block mb-0.5">Joined Date</span>
                   <span className="text-slate-700 font-semibold">{admin.joinedDate}</span>

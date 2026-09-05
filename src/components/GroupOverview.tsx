@@ -125,7 +125,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
       {/* Header & Main Actions */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full mb-1">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full mb-1">
             <span className="material-symbols-outlined text-[14px]">account_tree</span>
             GCYC Network Structure
           </div>
@@ -140,7 +140,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
         <div className="flex items-center gap-3">
           <button
             onClick={handleExportBackup}
-            className="bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 font-bold text-xs py-2.5 px-4 rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
+            className="bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 font-bold text-xs py-2.5 px-4 rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-sm"
           >
             <span className="material-symbols-outlined text-[18px]">backup</span>
             <span>Export Backup JSON</span>
@@ -158,37 +158,37 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
 
       {/* 3 Stat Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs hover:shadow-md transition-all">
-          <p className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-sm transition-all">
+          <p className="text-xs font-bold text-slate-400 mb-2">
             Total Network Membership
           </p>
           <div className="font-display text-3xl font-extrabold text-slate-900">
             0
           </div>
-          <div className="mt-2 text-xs text-emerald-600 font-semibold flex items-center gap-1 font-mono">
+          <div className="mt-2 text-xs text-emerald-600 font-semibold flex items-center gap-1">
             <span className="material-symbols-outlined text-[16px]">trending_up</span>
             <span>+12% group growth MoM</span>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs hover:shadow-md transition-all">
-          <p className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-sm transition-all">
+          <p className="text-xs font-bold text-slate-400 mb-2">
             Active Church Branches
           </p>
           <div className="font-display text-3xl font-extrabold text-slate-900">
             {churches.length}
           </div>
-          <p className="mt-2 text-xs text-slate-500 font-mono">Supervised by Group Pastor</p>
+          <p className="mt-2 text-xs text-slate-500">Supervised by Group Pastor</p>
         </div>
 
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs hover:shadow-md transition-all">
-          <p className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-sm transition-all">
+          <p className="text-xs font-bold text-slate-400 mb-2">
             Avg. Service Attendance
           </p>
           <div className="font-display text-3xl font-extrabold text-slate-900">
             0
           </div>
-          <p className="mt-2 text-xs text-slate-500 font-mono">Combined weekly attendance</p>
+          <p className="mt-2 text-xs text-slate-500">Combined weekly attendance</p>
         </div>
       </div>
 
@@ -196,7 +196,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         {/* Church Network & Admin Summary Table */}
-        <div className="lg:col-span-8 bg-white border border-slate-200/80 rounded-2xl overflow-hidden flex flex-col shadow-2xs">
+        <div className="lg:col-span-8 bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-sm">
           <div className="p-4 md:p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -239,19 +239,19 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50">
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-400 border-b border-slate-200">
                       Church Name
                     </th>
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-400 border-b border-slate-200">
                       Head Pastor / Admin
                     </th>
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-400 border-b border-slate-200">
                       Membership
                     </th>
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-400 border-b border-slate-200">
                       Status
                     </th>
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 text-right">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-400 border-b border-slate-200 text-right">
                       Actions
                     </th>
                   </tr>
@@ -266,24 +266,24 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                         <td className="py-3.5 px-4 text-slate-600 font-medium">
                           {church.pastor}
                         </td>
-                        <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                        <td className="py-3.5 px-4 font-bold text-slate-900">
                           {church.membersCount.toLocaleString()}
                         </td>
                         <td className="py-3.5 px-4">
                           {church.status === 'Healthy' && (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-800 text-[10px] font-bold font-mono border border-blue-200">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-800 text-xs font-bold border border-blue-200">
                               <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
                               <span>Healthy</span>
                             </span>
                           )}
                           {church.status === 'Review' && (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-900 text-[10px] font-bold font-mono border border-amber-200">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-900 text-xs font-bold border border-amber-200">
                               <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                               <span>Review</span>
                             </span>
                           )}
                           {church.status === 'Growing' && (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold font-mono border border-emerald-200">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                               <span>Growing</span>
                             </span>
@@ -323,19 +323,19 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50">
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-400 border-b border-slate-200">
                       Admin Name
                     </th>
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-400 border-b border-slate-200">
                       Church Branch
                     </th>
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-400 border-b border-slate-200">
                       Contact Details
                     </th>
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-400 border-b border-slate-200">
                       Account Status
                     </th>
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 text-right">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-400 border-b border-slate-200 text-right">
                       Actions
                     </th>
                   </tr>
@@ -352,10 +352,10 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                         </td>
                         <td className="py-3.5 px-4">
                           <p className="text-slate-800 font-medium">{adm.adminEmail}</p>
-                          <p className="font-mono text-[10px] text-slate-400">{adm.adminPhone}</p>
+                          <p className="text-xs text-slate-400">{adm.adminPhone}</p>
                         </td>
                         <td className="py-3.5 px-4">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold font-mono border border-emerald-200">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             <span>{adm.status}</span>
                           </span>
@@ -396,7 +396,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
         <div className="lg:col-span-4 flex flex-col gap-6">
 
           {/* Service Types */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-headline text-base font-bold text-slate-900">
                 Service Schedules
@@ -447,7 +447,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
           </div>
 
           {/* System Audit Log */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 flex-1 flex flex-col justify-between shadow-2xs">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 flex-1 flex flex-col justify-between shadow-sm">
             <div>
               <h3 className="font-headline text-base font-bold text-slate-900 mb-4">
                 System Audit Stream
@@ -461,7 +461,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                     </span>
                     <div>
                       <p className="text-slate-800 font-semibold leading-snug">{log.action}</p>
-                      <p className="font-mono text-[10px] text-slate-400 mt-0.5">{log.timestamp}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{log.timestamp}</p>
                     </div>
                   </div>
                 ))}
@@ -483,7 +483,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
       {/* Add Church Modal */}
       {showAddChurchModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <form onSubmit={handleCreateChurch} className="bg-white rounded-3xl p-6 max-w-md w-full border border-slate-200 shadow-2xl space-y-3.5 animate-in fade-in zoom-in-95 duration-150">
+          <form onSubmit={handleCreateChurch} className="bg-white rounded-2xl p-6 max-w-md w-full border border-slate-200 shadow-sm space-y-3.5 animate-in fade-in zoom-in-95 duration-150">
             <h3 className="font-headline font-bold text-lg text-slate-900">Register New Church Branch</h3>
 
             {formError && (
@@ -494,7 +494,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
             )}
 
             <div>
-              <label className="block font-mono text-[10px] font-bold uppercase text-slate-500 mb-1">Church Name *</label>
+              <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Church Name *</label>
               <input
                 type="text"
                 required
@@ -507,7 +507,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block font-mono text-[10px] font-bold uppercase text-slate-500 mb-1">Head Pastor / Admin *</label>
+                <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Head Pastor / Admin *</label>
                 <input
                   type="text"
                   required
@@ -522,7 +522,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block font-mono text-[10px] font-bold uppercase text-slate-500 mb-1">Admin Email</label>
+                <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Admin Email</label>
                 <input
                   type="email"
                   value={newAdminEmail}
@@ -533,7 +533,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
               </div>
 
               <div>
-                <label className="block font-mono text-[10px] font-bold uppercase text-slate-500 mb-1">Admin Phone</label>
+                <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Admin Phone</label>
                 <input
                   type="text"
                   value={newAdminPhone}
@@ -545,7 +545,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
             </div>
 
             <div>
-              <label className="block font-mono text-[10px] font-bold uppercase text-slate-500 mb-1">Initial Membership Count</label>
+              <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Initial Membership Count</label>
               <input
                 type="number"
                 value={newMembersCount}
@@ -556,7 +556,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
 
             {/* Security Code */}
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-1">
-              <label className="block font-mono text-[10px] font-black text-amber-900 uppercase">
+              <label className="block text-xs font-black text-amber-900 uppercase">
                 Auth Code Required *
               </label>
               <input
@@ -565,7 +565,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                 value={authCode}
                 onChange={e => setAuthCode(e.target.value)}
                 placeholder="Enter Security Code"
-                className="w-full border border-amber-300 rounded-lg p-2 text-xs bg-white font-mono font-bold tracking-wider text-amber-950 outline-none focus:border-amber-500"
+                className="w-full border border-amber-300 rounded-lg p-2 text-xs bg-white font-bold tracking-wider text-amber-950 outline-none focus:border-amber-500"
               />
             </div>
 
@@ -591,7 +591,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
       {/* Full Audit Logs Modal */}
       {showFullLogsModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-xl w-full border border-slate-200 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-2xl p-6 max-w-xl w-full border border-slate-200 shadow-sm animate-in fade-in zoom-in-95 duration-150">
             <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
               <h3 className="font-headline font-bold text-lg text-slate-900">Audit Trail History</h3>
               <button onClick={() => setShowFullLogsModal(false)} className="text-slate-400 hover:text-slate-700">
@@ -607,7 +607,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                   </span>
                   <div>
                     <p className="font-semibold text-slate-900">{log.action}</p>
-                    <p className="font-mono text-[10px] text-slate-400">
+                    <p className="text-xs text-slate-400">
                       {log.timestamp} • Executed by {log.user || 'Admin'}
                     </p>
                   </div>

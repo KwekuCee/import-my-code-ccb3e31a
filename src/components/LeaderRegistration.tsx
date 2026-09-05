@@ -121,7 +121,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
 
       {/* Header */}
       <div>
-        <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full mb-1 border border-amber-200">
+        <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full mb-1 border border-amber-200">
           <span className="material-symbols-outlined text-[14px]">military_tech</span>
           GCYC Hierarchy Entry
         </div>
@@ -134,43 +134,43 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
       </div>
 
       {/* Structural Hierarchy Guide Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-5 md:p-6 shadow-lg border border-slate-800 space-y-3">
+      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-5 md:p-6 shadow-lg border border-slate-800 space-y-3">
         <div className="flex items-center gap-2 text-amber-400 font-headline font-bold text-sm">
           <span className="material-symbols-outlined text-[20px]">account_tree</span>
           <span>Church Growth Hierarchy Pipeline</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs font-mono">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
           <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
             <p className="text-amber-400 font-bold">1. BSCT</p>
-            <p className="text-[10px] text-slate-400 mt-0.5">Graduate Foundation + 5 Converts</p>
+            <p className="text-xs text-slate-400 mt-0.5">Graduate Foundation + 5 Converts</p>
           </div>
           <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
             <p className="text-amber-400 font-bold">2. Cell Leader</p>
-            <p className="text-[10px] text-slate-400 mt-0.5">5 BSCTs (25 Members)</p>
+            <p className="text-xs text-slate-400 mt-0.5">5 BSCTs (25 Members)</p>
           </div>
           <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
             <p className="text-amber-400 font-bold">3. PCF Leader</p>
-            <p className="text-[10px] text-slate-400 mt-0.5">160+ Members Network</p>
+            <p className="text-xs text-slate-400 mt-0.5">160+ Members Network</p>
           </div>
           <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
             <p className="text-amber-400 font-bold">4. Coordinator</p>
-            <p className="text-[10px] text-slate-400 mt-0.5">Supervises PCFs & Cells</p>
+            <p className="text-xs text-slate-400 mt-0.5">Supervises PCFs & Cells</p>
           </div>
         </div>
       </div>
 
       {isSubmitted && createdLeader ? (
-        <div className="bg-white border border-emerald-200 rounded-3xl p-6 md:p-8 shadow-xl text-center space-y-5 animate-in fade-in duration-200">
+        <div className="bg-white border border-emerald-200 rounded-2xl p-6 md:p-8 shadow-sm text-center space-y-5 animate-in fade-in duration-200">
           <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto border border-emerald-200">
             <span className="material-symbols-outlined text-[36px]">verified</span>
           </div>
           <div>
-            <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
               Leader Profile Active
             </span>
             <h2 className="font-headline font-bold text-2xl text-slate-900 mt-2">{createdLeader.fullName} Registered!</h2>
             <p className="text-xs text-slate-500 mt-1">
-              Assigned ID <span className="font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">{createdLeader.id}</span> as <strong className="text-slate-900">{createdLeader.leaderType}</strong> for {createdLeader.cellOrPcfName}.
+              Assigned ID <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">{createdLeader.id}</span> as <strong className="text-slate-900">{createdLeader.leaderType}</strong> for {createdLeader.cellOrPcfName}.
             </p>
           </div>
 
@@ -185,7 +185,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
             </div>
             <div className="flex justify-between py-1 border-b border-slate-200">
               <span className="text-slate-500">Contact:</span>
-              <span className="font-mono font-bold">{createdLeader.contact}</span>
+              <span className="font-bold">{createdLeader.contact}</span>
             </div>
             <div className="flex justify-between py-1">
               <span className="text-slate-500">Appointment Method:</span>
@@ -211,13 +211,13 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="bg-white border border-slate-200/80 p-6 md:p-8 rounded-3xl shadow-2xs space-y-5">
+        <form onSubmit={handleSubmit} className="bg-white border border-slate-200 p-6 md:p-8 rounded-2xl shadow-sm space-y-5">
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             {/* Leader Type */}
             <div>
-              <label htmlFor="leaderType" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="leaderType" className="block text-xs font-bold text-slate-500 mb-1">
                 Leader Designation *
               </label>
               <select
@@ -235,7 +235,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
 
             {/* Cell or PCF Name */}
             <div>
-              <label htmlFor="cellOrPcfName" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="cellOrPcfName" className="block text-xs font-bold text-slate-500 mb-1">
                 Cell or PCF Name *
               </label>
               <input
@@ -251,7 +251,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
 
             {/* Full Name — selected from member directory */}
             <div>
-              <label htmlFor="leaderMemberSelect" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="leaderMemberSelect" className="block text-xs font-bold text-slate-500 mb-1">
                 Full Name * {sortedMembers.length > 0 && <span className="text-slate-400 normal-case">(pick from member directory)</span>}
               </label>
               {sortedMembers.length > 0 ? (
@@ -284,7 +284,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
 
             {/* Contact Phone */}
             <div>
-              <label htmlFor="leaderContact" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="leaderContact" className="block text-xs font-bold text-slate-500 mb-1">
                 Phone Contact *
               </label>
               <input
@@ -294,13 +294,13 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
                 value={contact}
                 onChange={e => setContact(e.target.value)}
                 placeholder="e.g. +233 24 123 4567"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-mono outline-none focus:border-blue-600 focus:bg-white"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
               />
             </div>
 
             {/* Email Address */}
             <div>
-              <label htmlFor="leaderEmail" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="leaderEmail" className="block text-xs font-bold text-slate-500 mb-1">
                 Email Address
               </label>
               <input
@@ -315,7 +315,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
 
             {/* Date of Birth */}
             <div>
-              <label htmlFor="leaderDob" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="leaderDob" className="block text-xs font-bold text-slate-500 mb-1">
                 Date of Birth *
               </label>
               <input
@@ -330,7 +330,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
 
             {/* Location */}
             <div>
-              <label htmlFor="leaderLocation" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="leaderLocation" className="block text-xs font-bold text-slate-500 mb-1">
                 Residential Area
               </label>
               <input
@@ -345,7 +345,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
 
             {/* Branch Church */}
             <div>
-              <label htmlFor="leaderChurch" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="leaderChurch" className="block text-xs font-bold text-slate-500 mb-1">
                 Branch Church *
               </label>
               <select
@@ -366,7 +366,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
 
           {/* Parent Leader Link */}
           <div className="pt-3 border-t border-slate-100 space-y-2">
-            <label htmlFor="parentLeaderSelect" className="block font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            <label htmlFor="parentLeaderSelect" className="block text-xs font-bold text-slate-500 ">
               Supervising Parent Leader in Hierarchy
             </label>
             <select
@@ -397,7 +397,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
               <label htmlFor="isAppointed" className="font-bold text-xs text-amber-900 cursor-pointer">
                 Appointed Directly (Bypassed Standard Growth Cycle)
               </label>
-              <p className="text-[11px] text-amber-700/80 mt-0.5">
+              <p className="text-xs text-amber-700/80 mt-0.5">
                 Check this option if the leader was appointed by church leadership without transitioning through BSCT -&gt; Cell -&gt; PCF promotion thresholds.
               </p>
             </div>
@@ -406,10 +406,10 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
           {/* Authentication Code Gate */}
           <div className="p-4 bg-slate-900 text-white rounded-2xl space-y-2">
             <div className="flex justify-between items-center">
-              <label className="block font-mono text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-amber-400 ">
                 Authentication Code Required *
               </label>
-              <span className="text-[10px] font-mono text-slate-400">Security Protected</span>
+              <span className="text-xs text-slate-400">Security Protected</span>
             </div>
             <input
               type="text"
@@ -417,7 +417,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
               value={authCode}
               onChange={e => setAuthCode(e.target.value)}
               placeholder="Enter Security Code"
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-amber-300 font-mono font-bold tracking-widest outline-none focus:border-amber-400"
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-amber-300 font-bold tracking-widest outline-none focus:border-amber-400"
             />
             {authError && (
               <p className="text-xs text-rose-400 font-semibold">{authError}</p>
@@ -427,7 +427,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
           {/* Submit */}
           <button
             type="submit"
-            className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 px-6 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 px-6 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98"
           >
             <span className="material-symbols-outlined text-[18px]">person_add</span>
             <span>Complete Leader Registration</span>
