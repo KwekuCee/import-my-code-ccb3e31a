@@ -13,7 +13,6 @@ interface MemberDatabaseProps {
   onSelectMemberForCard: (member: Member) => void;
   onDeleteMember?: (id: string) => void;
   onUpdateMember?: (member: Member) => void;
-  onChurches?: never;
   churches?: ChurchBranch[];
 }
 
