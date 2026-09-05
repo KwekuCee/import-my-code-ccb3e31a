@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Leader, LeaderType, PromotionQueueItem, ViewType } from '../types';
+import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 
 interface LeaderDirectoryProps {
   leaders: Leader[];
@@ -11,6 +12,8 @@ interface LeaderDirectoryProps {
   };
   onConfirmPromotion: (promotionId: string) => void;
   onNavigate: (view: ViewType) => void;
+  onUpdateLeader?: (leader: Leader) => void;
+  onDeleteLeader?: (leaderId: string) => void;
 }
 
 export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
@@ -18,11 +21,15 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
   promotionQueue,
   user,
   onConfirmPromotion,
-  onNavigate
+  onNavigate,
+  onUpdateLeader,
+  onDeleteLeader
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('All');
   const [selectedChurch, setSelectedChurch] = useState<string>('All');
+  const [editingLeader, setEditingLeader] = useState<Leader | null>(null);
+  const [deletingLeader, setDeletingLeader] = useState<Leader | null>(null);
 
   const isChurchAdmin = user?.role === 'Church Admin';
   const targetChurch = user?.church || '';
@@ -192,6 +199,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
                 <th className="py-3 px-4">Supervising Parent</th>
                 <th className="py-3 px-4 text-center">Downstream Members</th>
                 <th className="py-3 px-4 text-center">Appointment</th>
+                <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="font-body text-xs divide-y divide-slate-100">
@@ -251,11 +259,28 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
                         </span>
                       )}
                     </td>
+
+                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                      <button
+                        onClick={() => setEditingLeader(ldr)}
+                        className="inline-flex items-center px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold cursor-pointer"
+                        title="Edit leader"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">edit</span>
+                      </button>
+                      <button
+                        onClick={() => setDeletingLeader(ldr)}
+                        className="ml-1.5 inline-flex items-center px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold cursor-pointer"
+                        title="Delete leader"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-xs text-slate-400">
+                  <td colSpan={8} className="py-12 text-center text-xs text-slate-400">
                     No leaders found in the database.
                   </td>
                 </tr>
@@ -265,6 +290,42 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
         </div>
       </div>
 
+
+      {editingLeader && (
+        <EditRecordModal
+          title="Edit Leader"
+          subtitle={`${editingLeader.fullName} • ${editingLeader.leaderType}`}
+          icon="diversity_3"
+          values={editingLeader as any}
+          fields={[
+            { key: 'fullName', label: 'Full Name', required: true },
+            { key: 'email', label: 'Email', type: 'email' },
+            { key: 'contact', label: 'Contact', type: 'tel' },
+            { key: 'dob', label: 'Date of Birth', type: 'date' },
+            { key: 'location', label: 'Location' },
+            { key: 'cellOrPcfName', label: 'Cell / PCF Name' },
+            { key: 'church', label: 'Church Branch' },
+            { key: 'leaderType', label: 'Leader Type', type: 'select', options: ['BSCT', 'Cell Leader', 'PCF Leader', 'Church Coordinator'] }
+          ]}
+          onCancel={() => setEditingLeader(null)}
+          onSave={(vals) => {
+            onUpdateLeader?.({ ...editingLeader, ...vals, leaderType: vals.leaderType as LeaderType } as Leader);
+            setEditingLeader(null);
+          }}
+        />
+      )}
+
+      {deletingLeader && (
+        <ConfirmDeleteDialog
+          title="Delete Leader"
+          message={`This permanently removes ${deletingLeader.fullName} from the leadership directory.`}
+          onCancel={() => setDeletingLeader(null)}
+          onConfirm={() => {
+            onDeleteLeader?.(deletingLeader.id);
+            setDeletingLeader(null);
+          }}
+        />
+      )}
     </div>
   );
 };
