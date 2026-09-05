@@ -704,7 +704,7 @@ export default function App() {
               {currentView === 'qr_scanner' && user?.role !== 'Superadmin' && (
                 <QRScannerModal
                   members={members}
-                  attendance={attendance}
+                  attendance={attendanceRecords}
                   serviceTypes={serviceTypes}
                   user={user}
                   onConfirmAttendance={handleConfirmAttendance}
