@@ -544,7 +544,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 </div>
               </div>
               <div className="mt-3 flex items-baseline justify-between">
-                <span className="font-display text-3xl font-extrabold text-white">{branchMembers.length}</span>
+                <span className="font-display text-3xl font-extrabold text-slate-900">{branchMembers.length}</span>
                 <span className="inline-flex items-center text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{currentChurchName}</span>
               </div>
               <p className="text-xs text-slate-400 mt-1">Total database registered members</p>
