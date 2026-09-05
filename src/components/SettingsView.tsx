@@ -860,16 +860,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Zone / Group Affiliation</label>
-                    <input
-                      type="text"
-                      value={hqZone}
-                      onChange={(e) => setHqZone(e.target.value)}
-                      placeholder="Zone 1 (Korle Bu)"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
-                    />
-                  </div>
 
                   <div>
                     <label className="block text-slate-700 font-semibold mb-1">System Authority Role</label>
@@ -1003,16 +993,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Zone / Group Affiliation</label>
-                      <input
-                        type="text"
-                        value={adminZone}
-                        onChange={(e) => setAdminZone(e.target.value)}
-                        placeholder="Accra Zone 1 • GCYC Group"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-amber-500"
-                      />
-                    </div>
 
                     <div>
                       <label className="block text-slate-700 font-semibold mb-1">Live Database Status</label>

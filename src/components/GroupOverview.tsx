@@ -246,9 +246,6 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                       Head Pastor / Admin
                     </th>
                     <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
-                      Zone
-                    </th>
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
                       Membership
                     </th>
                     <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
@@ -268,9 +265,6 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                         </td>
                         <td className="py-3.5 px-4 text-slate-600 font-medium">
                           {church.pastor}
-                        </td>
-                        <td className="py-3.5 px-4 font-mono text-slate-500">
-                          {church.zone}
                         </td>
                         <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
                           {church.membersCount.toLocaleString()}
@@ -339,9 +333,6 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                       Contact Details
                     </th>
                     <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
-                      Zone
-                    </th>
-                    <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
                       Account Status
                     </th>
                     <th className="py-3 px-4 font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 text-right">
@@ -362,9 +353,6 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                         <td className="py-3.5 px-4">
                           <p className="text-slate-800 font-medium">{adm.adminEmail}</p>
                           <p className="font-mono text-[10px] text-slate-400">{adm.adminPhone}</p>
-                        </td>
-                        <td className="py-3.5 px-4 font-mono text-slate-500">
-                          {adm.zone}
                         </td>
                         <td className="py-3.5 px-4">
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold font-mono border border-emerald-200">
@@ -530,19 +518,6 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
                 />
               </div>
 
-              <div>
-                <label className="block font-mono text-[10px] font-bold uppercase text-slate-500 mb-1">Zone *</label>
-                <select
-                  value={newZone}
-                  onChange={e => setNewZone(e.target.value)}
-                  className="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none focus:bg-white focus:border-blue-600 font-semibold"
-                >
-                  <option value="Zone 1">Zone 1</option>
-                  <option value="Zone 2">Zone 2</option>
-                  <option value="Zone 3">Zone 3</option>
-                  <option value="Zone 4">Zone 4</option>
-                </select>
-              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -662,7 +637,6 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
           fields={[
             { key: 'name', label: 'Branch Name', required: true },
             { key: 'pastor', label: 'Pastor in Charge' },
-            { key: 'zone', label: 'Zone' },
             { key: 'membersCount', label: 'Members Count', type: 'number' },
             { key: 'status', label: 'Status', type: 'select', options: ['Healthy', 'Review', 'Growing'] }
           ]}
@@ -697,7 +671,6 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
             { key: 'adminEmail', label: 'Email', type: 'email' },
             { key: 'adminPhone', label: 'Phone', type: 'tel' },
             { key: 'churchName', label: 'Church Branch' },
-            { key: 'zone', label: 'Zone' },
             { key: 'status', label: 'Status', type: 'select', options: ['Active', 'Pending Verification'] }
           ]}
           onCancel={() => setEditingAdmin(null)}
