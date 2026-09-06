@@ -1479,7 +1479,8 @@ export async function sendPasswordResetEmail(email: string): Promise<{ success: 
  */
 export async function sendAdminVerificationEmail(
   email: string,
-  name?: string
+  name?: string,
+  isSignup = false
 ): Promise<{ success: boolean; message: string; link?: string; alreadyVerified?: boolean }> {
   const client = getSupabase();
   if (!client) {
@@ -1495,6 +1496,7 @@ export async function sendAdminVerificationEmail(
         action: 'send',
         email: trimmedEmail,
         name: name || '',
+        signup: isSignup,
         origin: typeof window !== 'undefined' ? window.location.origin : ''
       }
     });

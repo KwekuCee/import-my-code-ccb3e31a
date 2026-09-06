@@ -631,7 +631,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
     onAddChurchAdmin(newAdmin, newBranch);
     setAdmSuccessMsg(`Church branch "${newBranch.name}" and the admin account for "${newAdmin.adminName}" were created. We are sending a confirmation link to ${newAdmin.adminEmail}…`);
 
-    const res = await sendAdminVerificationEmail(newAdmin.adminEmail, newAdmin.adminName);
+    const res = await sendAdminVerificationEmail(newAdmin.adminEmail, newAdmin.adminName, true);
     setAdmSuccessMsg(
       res.success
         ? `Almost done! We sent a confirmation link to ${newAdmin.adminEmail}. Open it to confirm your email, then sign in. The link lasts 24 hours.`
