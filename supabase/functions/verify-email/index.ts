@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
     if (req.method === 'GET') {
       const token = (url.searchParams.get('token') || '').trim();
       const appUrl = (url.searchParams.get('app') || '').trim() || undefined;
-      if (!token) return page('Link not valid', 'This verification link is incomplete.', appUrl);
+      if (!token) return redirectToApp('invalid', appUrl);
 
       const { data: row } = await admin
         .from('email_verification_tokens')
@@ -62,11 +62,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (!row || row.used_at || new Date(row.expires_at as string).getTime() < Date.now()) {
-        return page(
-          'Link expired',
-          'This verification link has expired or was already used. Please sign in and ask for a new link.',
-          appUrl,
-        );
+        return redirectToApp('expired', appUrl);
       }
 
       const email = row.email as string;
@@ -87,11 +83,7 @@ Deno.serve(async (req) => {
         icon: 'mark_email_read',
       });
 
-      return page(
-        'Email verified',
-        'Thank you. Your email address is confirmed and you can now sign in to your dashboard.',
-        appUrl,
-      );
+      return redirectToApp('verified', appUrl);
     }
 
     // ------------------------------------------------------------ send a link
@@ -122,6 +114,27 @@ Deno.serve(async (req) => {
         name = (acct.admin_name as string) || name;
         verified = acct.admin_verified === true;
       }
+    }
+
+    // A brand-new signup can reach this function before its rows finish saving,
+    // so retry the lookup briefly instead of silently skipping the email.
+    if (!found && body?.signup === true) {
+      for (let attempt = 0; attempt < 5 && !found; attempt++) {
+        await new Promise((r) => setTimeout(r, 600));
+        const { data: retry } = await admin
+          .from('church_admin_accounts')
+          .select('admin_email, admin_name, admin_verified')
+          .ilike('admin_email', email)
+          .maybeSingle();
+        if (retry) {
+          found = true;
+          name = (retry.admin_name as string) || name;
+          verified = retry.admin_verified === true;
+        }
+      }
+      // Send regardless: the person just submitted this address themselves.
+      found = true;
+      verified = false;
     }
 
     if (!found) {
