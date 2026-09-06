@@ -65,6 +65,7 @@ import { AttendanceView } from './components/AttendanceView';
 import { LeaderDirectory } from './components/LeaderDirectory';
 import { LeaderRegistration } from './components/LeaderRegistration';
 import { ResetPasswordScreen } from './components/ResetPasswordScreen';
+import { EmailVerifiedScreen } from './components/EmailVerifiedScreen';
 import { AnalyticsView } from './components/AnalyticsView';
 import { DatabaseSchemaView } from './components/DatabaseSchemaView';
 import { SettingsView } from './components/SettingsView';
@@ -588,6 +589,22 @@ export default function App() {
       <ResetPasswordScreen
         token={resetToken}
         onDone={() => {
+          window.history.replaceState({}, '', window.location.pathname);
+          window.location.reload();
+        }}
+      />
+    );
+  }
+
+  // Email confirmation link landing page
+  const emailVerifiedStatus = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('email_verified')
+    : null;
+  if (emailVerifiedStatus === 'verified' || emailVerifiedStatus === 'expired' || emailVerifiedStatus === 'invalid') {
+    return (
+      <EmailVerifiedScreen
+        status={emailVerifiedStatus}
+        onContinue={() => {
           window.history.replaceState({}, '', window.location.pathname);
           window.location.reload();
         }}
