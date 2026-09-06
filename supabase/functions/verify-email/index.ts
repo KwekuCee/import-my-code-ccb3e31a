@@ -5,7 +5,7 @@
 
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { sendGmail } from '../_shared/gmail.ts';
+import { sendMail } from '../_shared/mailer.ts';
 
 const TOKEN_TTL_HOURS = 24;
 
@@ -23,21 +23,20 @@ function json(body: unknown, status = 200) {
   });
 }
 
-function page(title: string, message: string, appUrl?: string) {
-  return new Response(
-    `<!doctype html><html lang="en"><head><meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>${title}</title></head>
-<body style="margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f8fafc;color:#0f172a;display:flex;min-height:100vh;align-items:center;justify-content:center;">
-  <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:36px;max-width:420px;text-align:center;box-shadow:0 10px 30px rgba(15,23,42,.06)">
-    <h1 style="font-size:20px;margin:0 0 10px">${title}</h1>
-    <p style="font-size:14px;line-height:1.6;color:#475569;margin:0 0 22px">${message}</p>
-    ${appUrl ? `<a href="${appUrl}" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:700;font-size:13px">Go to sign in</a>` : ''}
-  </div>
-</body></html>`,
-    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' } },
-  );
+const DEFAULT_APP_URL = 'https://gcycattendance.online';
+
+/**
+ * The edge gateway serves function HTML as text/plain, so never render a page here.
+ * Redirect the browser to the app's own confirmation screen instead.
+ */
+function redirectToApp(status: 'verified' | 'expired' | 'invalid', appUrl?: string) {
+  const base = (appUrl || DEFAULT_APP_URL).replace(/\/$/, '');
+  return new Response(null, {
+    status: 302,
+    headers: { ...corsHeaders, Location: `${base}/?email_verified=${status}` },
+  });
 }
+
 
 const admin = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -54,7 +53,7 @@ Deno.serve(async (req) => {
     if (req.method === 'GET') {
       const token = (url.searchParams.get('token') || '').trim();
       const appUrl = (url.searchParams.get('app') || '').trim() || undefined;
-      if (!token) return page('Link not valid', 'This verification link is incomplete.', appUrl);
+      if (!token) return redirectToApp('invalid', appUrl);
 
       const { data: row } = await admin
         .from('email_verification_tokens')
@@ -63,11 +62,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (!row || row.used_at || new Date(row.expires_at as string).getTime() < Date.now()) {
-        return page(
-          'Link expired',
-          'This verification link has expired or was already used. Please sign in and ask for a new link.',
-          appUrl,
-        );
+        return redirectToApp('expired', appUrl);
       }
 
       const email = row.email as string;
@@ -88,11 +83,7 @@ Deno.serve(async (req) => {
         icon: 'mark_email_read',
       });
 
-      return page(
-        'Email verified',
-        'Thank you. Your email address is confirmed and you can now sign in to your dashboard.',
-        appUrl,
-      );
+      return redirectToApp('verified', appUrl);
     }
 
     // ------------------------------------------------------------ send a link
@@ -125,6 +116,27 @@ Deno.serve(async (req) => {
       }
     }
 
+    // A brand-new signup can reach this function before its rows finish saving,
+    // so retry the lookup briefly instead of silently skipping the email.
+    if (!found && body?.signup === true) {
+      for (let attempt = 0; attempt < 5 && !found; attempt++) {
+        await new Promise((r) => setTimeout(r, 600));
+        const { data: retry } = await admin
+          .from('church_admin_accounts')
+          .select('admin_email, admin_name, admin_verified')
+          .ilike('admin_email', email)
+          .maybeSingle();
+        if (retry) {
+          found = true;
+          name = (retry.admin_name as string) || name;
+          verified = retry.admin_verified === true;
+        }
+      }
+      // Send regardless: the person just submitted this address themselves.
+      found = true;
+      verified = false;
+    }
+
     if (!found) {
       // Never reveal whether an account exists.
       return json({ success: true, message: 'If that email belongs to an account, a verification link has been sent.' });
@@ -145,7 +157,7 @@ Deno.serve(async (req) => {
       `${url.origin}/functions/v1/verify-email?token=${token}` +
       (appOrigin ? `&app=${encodeURIComponent(appOrigin)}` : '');
 
-    const sendResult = await sendGmail({
+    const sendResult = await sendMail({
       to: email,
       fromName: 'GCYC Group',
       subject: 'Verify your email to activate your GCYC admin account',
