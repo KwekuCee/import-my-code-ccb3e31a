@@ -5,7 +5,7 @@
 
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { sendGmail } from '../_shared/gmail.ts';
+import { sendMail } from '../_shared/mailer.ts';
 
 const TOKEN_TTL_HOURS = 24;
 
@@ -145,7 +145,7 @@ Deno.serve(async (req) => {
       `${url.origin}/functions/v1/verify-email?token=${token}` +
       (appOrigin ? `&app=${encodeURIComponent(appOrigin)}` : '');
 
-    const sendResult = await sendGmail({
+    const sendResult = await sendMail({
       to: email,
       fromName: 'GCYC Group',
       subject: 'Verify your email to activate your GCYC admin account',
