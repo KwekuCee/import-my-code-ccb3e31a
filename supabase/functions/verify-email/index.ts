@@ -23,21 +23,20 @@ function json(body: unknown, status = 200) {
   });
 }
 
-function page(title: string, message: string, appUrl?: string) {
-  return new Response(
-    `<!doctype html><html lang="en"><head><meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>${title}</title></head>
-<body style="margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f8fafc;color:#0f172a;display:flex;min-height:100vh;align-items:center;justify-content:center;">
-  <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:36px;max-width:420px;text-align:center;box-shadow:0 10px 30px rgba(15,23,42,.06)">
-    <h1 style="font-size:20px;margin:0 0 10px">${title}</h1>
-    <p style="font-size:14px;line-height:1.6;color:#475569;margin:0 0 22px">${message}</p>
-    ${appUrl ? `<a href="${appUrl}" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:700;font-size:13px">Go to sign in</a>` : ''}
-  </div>
-</body></html>`,
-    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' } },
-  );
+const DEFAULT_APP_URL = 'https://gcycattendance.online';
+
+/**
+ * The edge gateway serves function HTML as text/plain, so never render a page here.
+ * Redirect the browser to the app's own confirmation screen instead.
+ */
+function redirectToApp(status: 'verified' | 'expired' | 'invalid', appUrl?: string) {
+  const base = (appUrl || DEFAULT_APP_URL).replace(/\/$/, '');
+  return new Response(null, {
+    status: 302,
+    headers: { ...corsHeaders, Location: `${base}/?email_verified=${status}` },
+  });
 }
+
 
 const admin = createClient(
   Deno.env.get('SUPABASE_URL')!,
