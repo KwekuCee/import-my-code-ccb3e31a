@@ -3,7 +3,7 @@
 // and sends from the connected Gmail account. Optionally attaches the QR pass PNG.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-import { sendGmail } from '../_shared/gmail.ts';
+import { sendMail as sendGmail } from '../_shared/mailer.ts';
 
 declare const Deno: { env: { get(key: string): string | undefined } };
 
