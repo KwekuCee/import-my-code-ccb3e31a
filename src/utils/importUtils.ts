@@ -1,0 +1,293 @@
+// Reads members / leaders out of an uploaded .xlsx or .csv file, maps the
+// column headings onto the app's own fields (tolerating common wording
+// variations), and validates each row in plain English before anything is saved.
+
+import * as XLSX from 'xlsx';
+import { LeaderType, Member, Leader } from '../types';
+
+export type ImportKind = 'members' | 'leaders';
+
+export interface RawRow {
+  [key: string]: string;
+}
+
+export interface PreparedRow {
+  index: number; // 1-based row number as it appears in the file
+  raw: RawRow;
+  valid: boolean;
+  problems: string[];
+  duplicate: boolean;
+  member?: Omit<Member, 'id' | 'initials'> & { id?: string };
+  leader?: Omit<Leader, 'id' | 'initials' | 'downstreamCount' | 'isAppointed' | 'promotionStatus' | 'joinedDate'>;
+}
+
+const LEADER_TYPES: LeaderType[] = ['BSCT', 'Cell Leader', 'PCF Leader', 'Church Coordinator'];
+
+/** Column heading variations we accept for each field. */
+const HEADER_ALIASES: Record<string, string[]> = {
+  fullName: ['full name', 'name', 'fullname', 'member name', 'leader name', 'names', 'surname and other names'],
+  email: ['email', 'e-mail', 'email address', 'mail', 'email addr'],
+  phone: ['phone', 'contact', 'phone number', 'contact number', 'mobile', 'mobile number', 'telephone', 'tel', 'whatsapp'],
+  dob: ['dob', 'date of birth', 'birthday', 'birth date', 'birthdate'],
+  gender: ['gender', 'sex'],
+  maritalStatus: ['marital status', 'marital', 'status (marital)'],
+  occupation: ['occupation', 'job', 'work', 'profession'],
+  education: ['education', 'education level', 'educational level', 'school level'],
+  location: ['location', 'address', 'residence', 'area', 'town', 'city'],
+  church: ['church', 'church branch', 'branch', 'church name', 'assembly'],
+  foundationClass: ['foundation class', 'foundation school', 'foundation school class', 'class'],
+  invitedBy: ['invited by', 'who invited you', 'leader', 'inviter', 'referred by'],
+  leaderType: ['leader type', 'role', 'leadership role', 'position', 'leader role'],
+  cellOrPcfName: ['cell', 'pcf', 'cell name', 'pcf name', 'cell or pcf', 'cell/pcf name', 'cell or pcf name', 'group name'],
+};
+
+function normalizeHeader(h: string): string {
+  return (h || '').toString().trim().toLowerCase().replace(/[_.*]+/g, ' ').replace(/\s+/g, ' ');
+}
+
+/** Maps the file's headings to our field names. */
+export function mapHeaders(headers: string[]): Record<number, string> {
+  const out: Record<number, string> = {};
+  headers.forEach((header, i) => {
+    const norm = normalizeHeader(header);
+    if (!norm) return;
+    for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
+      if (aliases.includes(norm) || aliases.some((a) => norm === a || norm.replace(/[^a-z]/g, '') === a.replace(/[^a-z]/g, ''))) {
+        if (!Object.values(out).includes(field)) out[i] = field;
+        return;
+      }
+    }
+  });
+  return out;
+}
+
+/** Very small CSV reader that copes with quoted values and commas inside them. */
+export function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') {
+          cell += '"';
+          i++;
+        } else inQuotes = false;
+      } else cell += ch;
+      continue;
+    }
+    if (ch === '"') {
+      inQuotes = true;
+    } else if (ch === ',') {
+      row.push(cell);
+      cell = '';
+    } else if (ch === '\n') {
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = '';
+    } else if (ch !== '\r') {
+      cell += ch;
+    }
+  }
+  if (cell.length > 0 || row.length > 0) {
+    row.push(cell);
+    rows.push(row);
+  }
+  return rows.filter((r) => r.some((c) => (c || '').trim() !== ''));
+}
+
+/** Reads any supported file into a grid of raw text cells. */
+export async function readSpreadsheet(file: File): Promise<string[][]> {
+  const lower = file.name.toLowerCase();
+  if (lower.endsWith('.csv') || file.type === 'text/csv') {
+    return parseCsv(await file.text());
+  }
+  const buffer = await file.arrayBuffer();
+  const wb = XLSX.read(buffer, { type: 'array', cellDates: true });
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  const grid = XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1, raw: false, defval: '' });
+  return (grid || [])
+    .map((r) => (r || []).map((c) => (c === null || c === undefined ? '' : String(c))))
+    .filter((r) => r.some((c) => (c || '').trim() !== ''));
+}
+
+/** Turns a written date into YYYY-MM-DD, or returns null when unreadable. */
+export function parseDate(value: string): string | null {
+  const v = (value || '').trim();
+  if (!v) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+
+  const slash = v.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2,4})$/);
+  if (slash) {
+    let [, a, b, c] = slash;
+    let day = parseInt(a, 10);
+    let month = parseInt(b, 10);
+    if (day > 12 && month <= 12) {
+      // already day/month
+    } else if (month > 12 && day <= 12) {
+      const t = day;
+      day = month;
+      month = t;
+    }
+    let year = parseInt(c, 10);
+    if (year < 100) year += year > 30 ? 1900 : 2000;
+    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  }
+
+  const parsed = new Date(v);
+  if (!isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
+  return null;
+}
+
+function parseFoundation(value: string): number {
+  const digits = (value || '').match(/\d+/);
+  if (!digits) {
+    if (/complete|done|graduat/i.test(value || '')) return 7;
+    return 0;
+  }
+  const n = parseInt(digits[0], 10);
+  return Math.max(0, Math.min(7, isNaN(n) ? 0 : n));
+}
+
+function initialsOf(name: string): string {
+  return (
+    (name || 'Member')
+      .split(' ')
+      .filter(Boolean)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || 'MB'
+  );
+}
+
+function normalizeLeaderType(value: string): LeaderType {
+  const v = (value || '').trim().toLowerCase();
+  if (v.includes('pcf')) return 'PCF Leader';
+  if (v.includes('coordinat')) return 'Church Coordinator';
+  if (v.includes('cell')) return 'Cell Leader';
+  if (v.includes('bible') || v === 'bsct' || v.includes('teacher') || v.includes('study')) return 'BSCT';
+  const exact = LEADER_TYPES.find((t) => t.toLowerCase() === v);
+  return exact || 'BSCT';
+}
+
+export interface ExistingIndex {
+  emails: Set<string>;
+  phones: Set<string>;
+}
+
+export function buildExistingIndex(members: Member[], leaders: Leader[]): ExistingIndex {
+  const emails = new Set<string>();
+  const phones = new Set<string>();
+  (members || []).forEach((m) => {
+    if (m?.email) emails.add(m.email.trim().toLowerCase());
+    if (m?.phone) phones.add(m.phone.replace(/\D/g, ''));
+  });
+  (leaders || []).forEach((l) => {
+    if (l?.email) emails.add(l.email.trim().toLowerCase());
+    if (l?.contact) phones.add(l.contact.replace(/\D/g, ''));
+  });
+  return { emails, phones };
+}
+
+export interface PrepareOptions {
+  kind: ImportKind;
+  church: string;
+  existing: ExistingIndex;
+}
+
+/** Validates and shapes every row of the file, ready for the preview table. */
+export function prepareRows(grid: string[][], options: PrepareOptions): { headerMap: Record<number, string>; rows: PreparedRow[] } {
+  if (!grid.length) return { headerMap: {}, rows: [] };
+
+  const headers = grid[0].map((h) => String(h || ''));
+  const headerMap = mapHeaders(headers);
+  const seenEmails = new Set<string>();
+  const seenPhones = new Set<string>();
+
+  const rows: PreparedRow[] = grid.slice(1).map((cells, i) => {
+    const raw: RawRow = {};
+    Object.entries(headerMap).forEach(([colIdx, field]) => {
+      raw[field] = String(cells[Number(colIdx)] ?? '').trim();
+    });
+
+    const problems: string[] = [];
+    const fullName = (raw.fullName || '').trim();
+    const email = (raw.email || '').trim();
+    const phone = (raw.phone || '').trim();
+    const dobRaw = (raw.dob || '').trim();
+    const dob = dobRaw ? parseDate(dobRaw) : null;
+
+    if (!fullName) problems.push('Missing name');
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) problems.push('Email address looks wrong');
+    if (dobRaw && !dob) problems.push('Date of birth could not be read');
+    if (options.kind === 'leaders' && !(raw.cellOrPcfName || '').trim()) {
+      problems.push('Missing cell / PCF name');
+    }
+
+    let duplicate = false;
+    const emailKey = email.toLowerCase();
+    const phoneKey = phone.replace(/\D/g, '');
+    if (emailKey && (options.existing.emails.has(emailKey) || seenEmails.has(emailKey))) duplicate = true;
+    if (!duplicate && phoneKey && (options.existing.phones.has(phoneKey) || seenPhones.has(phoneKey))) duplicate = true;
+    if (duplicate) problems.push('Already in the system — will be skipped');
+    if (emailKey) seenEmails.add(emailKey);
+    if (phoneKey) seenPhones.add(phoneKey);
+
+    const hardProblems = problems.filter((p) => !p.startsWith('Already in the system'));
+    const valid = hardProblems.length === 0 && !duplicate;
+
+    const prepared: PreparedRow = {
+      index: i + 2,
+      raw,
+      valid,
+      duplicate,
+      problems,
+    };
+
+    const church = (raw.church || '').trim() || options.church;
+
+    if (options.kind === 'members') {
+      prepared.member = {
+        fullName,
+        phone,
+        email: email || undefined,
+        dob: dob || undefined,
+        role: 'Member',
+        occupation: raw.occupation || 'Not Specified',
+        education: raw.education || 'Not Specified',
+        location: raw.location || 'Not Specified',
+        church,
+        invitedBy: raw.invitedBy || 'Spreadsheet Import',
+        joinDate: new Date().toISOString().slice(0, 10),
+        serviceCount: 1,
+        foundationClass: parseFoundation(raw.foundationClass || ''),
+        status: 'General Member',
+        gender: /^f/i.test(raw.gender || '') ? 'Female' : /^m/i.test(raw.gender || '') ? 'Male' : undefined,
+        maritalStatus: raw.maritalStatus || undefined,
+      } as PreparedRow['member'];
+    } else {
+      prepared.leader = {
+        fullName,
+        email,
+        contact: phone,
+        dob: dob || '',
+        location: raw.location || 'Not Specified',
+        leaderType: normalizeLeaderType(raw.leaderType || ''),
+        cellOrPcfName: (raw.cellOrPcfName || '').trim(),
+        church,
+      } as PreparedRow['leader'];
+    }
+
+    return prepared;
+  });
+
+  return { headerMap, rows };
+}
+
+export { initialsOf };
