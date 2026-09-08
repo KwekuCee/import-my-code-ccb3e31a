@@ -1829,3 +1829,50 @@ export async function saveAbsenceFollowUp(entry: {
     return false;
   }
 }
+
+// ============================================================================
+// BULK QR PASS EMAILS + SPREADSHEET IMPORT
+// ============================================================================
+
+export interface QrPassRecipient {
+  id: string;
+  name: string;
+  email: string;
+  church?: string;
+  role?: string;
+}
+
+export interface QrPassEmailResult {
+  success: boolean;
+  sent: number;
+  skipped: number;
+  failed: number;
+  error?: string;
+}
+
+/** Emails each person their attendance code. Safe to run again. */
+export async function sendQrPassEmails(recipients: QrPassRecipient[]): Promise<QrPassEmailResult> {
+  const client = getSupabase();
+  const valid = (recipients || []).filter((r) => r && r.id && r.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email));
+  const skippedUpfront = (recipients || []).length - valid.length;
+
+  if (!client) return { success: false, sent: 0, skipped: skippedUpfront, failed: valid.length, error: 'Not connected.' };
+  if (!valid.length) return { success: true, sent: 0, skipped: skippedUpfront, failed: 0 };
+
+  try {
+    const { data, error } = await client.functions.invoke('send-qr-passes', {
+      body: { recipients: valid },
+    });
+    if (error) {
+      return { success: false, sent: 0, skipped: skippedUpfront, failed: valid.length, error: error.message };
+    }
+    return {
+      success: true,
+      sent: (data as any)?.sent || 0,
+      skipped: ((data as any)?.skipped || 0) + skippedUpfront,
+      failed: (data as any)?.failed || 0,
+    };
+  } catch (err: any) {
+    return { success: false, sent: 0, skipped: skippedUpfront, failed: valid.length, error: err?.message || 'Failed to send.' };
+  }
+}
