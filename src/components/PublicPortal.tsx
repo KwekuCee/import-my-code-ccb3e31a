@@ -1143,6 +1143,39 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
               </div>
             )}
 
+            {ldrSuccessMsg && attPassImageDataUrl && (
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3 shadow-sm text-center">
+                <p className="text-xs font-bold text-slate-500 uppercase">Your Leader Scan Pass</p>
+                <img
+                  src={attPassImageDataUrl}
+                  alt="Leader QR Pass"
+                  className="max-w-[280px] mx-auto rounded-xl border border-blue-200 shadow-sm"
+                />
+                <p className="text-xs text-blue-800 bg-blue-50 border border-blue-100 rounded-xl p-2.5 font-semibold text-left">
+                  On iPhone: press and hold the pass above and choose <strong>Save to Photos</strong>, or tap Save Pass below.
+                </p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (passFile) {
+                      const outcome = await saveQrPass(passFile, 'GCYC_Leader_Pass.png');
+                      setPassSaveOutcome(outcome);
+                    }
+                  }}
+                  className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[18px]">download</span>
+                  <span>Save Pass to My Phone</span>
+                </button>
+                {passSaveOutcome === 'failed' && (
+                  <p className="text-xs text-rose-600 font-semibold">
+                    Your browser blocked the automatic save — please press and hold the image to save it.
+                  </p>
+                )}
+              </div>
+            )}
+
+
             {ldrError && (
               <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs font-semibold flex items-center gap-2">
                 <span className="material-symbols-outlined text-[20px] text-rose-600">error</span>
