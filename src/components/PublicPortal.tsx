@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import QRCode from 'qrcode';
+import { renderQrPass, saveQrPass, QrPassResult, SaveOutcome } from '../utils/qrPass';
 import { motion } from 'motion/react';
 import { Member, Leader, ChurchBranch, ChurchAdminAccount, AttendanceRecord } from '../types';
 import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClassNumber, getFoundationClassLabel } from '../data/constants';
-import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin, uploadMemberPhoto, uploadProfilePhoto, sendAdminVerificationEmail, syncLeaderAsMember, generateLeaderCode } from '../lib/supabaseService';
+import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin, uploadMemberPhoto, uploadProfilePhoto, sendAdminVerificationEmail, syncLeaderAsMember, generateLeaderCode, sendQrPassEmails } from '../lib/supabaseService';
 import { ChurchLogo } from './ChurchLogo';
 
 interface PublicPortalProps {
@@ -141,7 +141,10 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const [attSearchQuery, setAttSearchQuery] = useState('');
   const [attSuccessPass, setAttSuccessPass] = useState<AttendanceRecord | null>(null);
   const [attPassImageDataUrl, setAttPassImageDataUrl] = useState('');
+  const [passFile, setPassFile] = useState<QrPassResult | null>(null);
+  const [passSaveOutcome, setPassSaveOutcome] = useState<SaveOutcome | null>(null);
   const [isGeneratingQr, setIsGeneratingQr] = useState(false);
+
   const [isSubmittingAttendance, setIsSubmittingAttendance] = useState(false);
 
   // Auto-fill church when leader is chosen
@@ -255,117 +258,20 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   const generateAndDownloadQrPass = async (member: Member, churchName: string, serviceType: string, timestamp: string) => {
     try {
       setIsGeneratingQr(true);
-      // Keep the code content as short as possible so phone cameras read it
-      // easily: the member ID alone is enough to look everything else up.
-      const qrContent = member.id;
-
-      const qrDataUrl = await QRCode.toDataURL(qrContent, {
-        width: 720,
-        margin: 3,
-        errorCorrectionLevel: 'H',
-        color: { dark: '#000000', light: '#ffffff' }
-      });
-
-      // Canvas element for Digital Member Pass Badge
-      const canvas = document.createElement('canvas');
-      canvas.width = 600;
-      canvas.height = 780;
-      const ctx = canvas.getContext('2d');
-
-      if (!ctx) return qrDataUrl;
-
-      // Dark Luxury Gradient Background
-      const grad = ctx.createLinearGradient(0, 0, 0, 780);
-      grad.addColorStop(0, '#090d16');
-      grad.addColorStop(1, '#1e293b');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 600, 780);
-
-      // Gold Outer Frame
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 6;
-      ctx.strokeRect(16, 16, 568, 748);
-
-      // Inner Header
-      ctx.fillStyle = '#f59e0b';
-      ctx.font = 'bold 22px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('CHRIST EMBASSY • GCYC', 300, 60);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 26px sans-serif';
-      ctx.fillText(`${churchName.toUpperCase()}`, 300, 98);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.fillText('OFFICIAL DIGITAL ATTENDANCE QR PASS', 300, 122);
-
-      // White QR Container Box
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.roundRect(140, 130, 320, 320, 20);
-      ctx.fill();
-
-      // Draw QR Code Image
-      const img = new Image();
-      img.src = qrDataUrl;
-      await new Promise((resolve) => { img.onload = resolve; });
-      ctx.drawImage(img, 150, 140, 300, 300);
-
-      // Member Details Frame
-      ctx.fillStyle = '#0f172a';
-      ctx.beginPath();
-      ctx.roundRect(40, 440, 520, 250, 16);
-      ctx.fill();
-      ctx.strokeStyle = '#334155';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(40, 440, 520, 250);
-
-      // Details Text
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#f59e0b';
-      ctx.font = 'bold 20px sans-serif';
-      ctx.fillText(member.fullName, 60, 478);
-
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = 'bold 14px monospace';
-      ctx.fillText(`MEMBER ID: ${member.id}`, 60, 506);
-
-      ctx.fillStyle = '#e2e8f0';
-      ctx.font = '13px sans-serif';
-      ctx.fillText(`Contact: ${member.phone}`, 60, 536);
-      ctx.fillText(`Location: ${member.location || 'N/A'}`, 60, 560);
-      ctx.fillText(`Occupation: ${member.occupation || 'N/A'}`, 60, 584);
-      ctx.fillText(`Education: ${member.education || 'N/A'}`, 60, 608);
-      const foundationDisplay = member.foundationClass > 0 ? getFoundationClassLabel(member.foundationClass) : 'Not Enrolled';
-      ctx.fillText(`Foundation Class: ${foundationDisplay}`, 60, 632);
-      ctx.fillText(`Checked In: ${serviceType} (${timestamp})`, 60, 656);
-
-      // Footer
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#64748b';
-      ctx.font = '12px sans-serif';
-      ctx.fillText('Scan this QR code at usher station every time you attend church', 300, 725);
-
-      const passDataUrl = canvas.toDataURL('image/png');
-
-      // Trigger automatic download
-      const downloadLink = document.createElement('a');
-      downloadLink.href = passDataUrl;
-      downloadLink.download = `CE_Korle_Bu_QR_Pass_${member.id}.png`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      downloadLink.remove();
-
-      setAttPassImageDataUrl(passDataUrl);
+      const pass = await renderQrPass(member, churchName, serviceType, timestamp);
+      setAttPassImageDataUrl(pass.dataUrl);
+      setPassFile(pass);
+      const outcome = await saveQrPass(pass, `GCYC_QR_Pass_${member.id}.png`);
+      setPassSaveOutcome(outcome);
       setIsGeneratingQr(false);
-      return passDataUrl;
+      return pass.dataUrl;
     } catch (err) {
       console.error('Error generating QR pass:', err);
       setIsGeneratingQr(false);
       return '';
     }
   };
+
 
   // Handlers
   const handleSelfAttendanceSubmit = async (e: React.FormEvent) => {
@@ -479,6 +385,18 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       timestamp,
       qrPassBase64: passDataUrl || undefined,
     }).catch(() => {});
+
+    // Always leave a copy in the attendee's own inbox when they gave an email.
+    if (existingMember.email) {
+      sendQrPassEmails([
+        {
+          id: existingMember.id,
+          name: existingMember.fullName,
+          email: existingMember.email,
+          church: attChurch,
+        },
+      ]).catch(() => {});
+    }
     } finally {
       setIsSubmittingAttendance(false);
     }
@@ -558,6 +476,18 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
     };
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     await generateAndDownloadQrPass(leaderAsMember, newLeader.church, `${newLeader.leaderType} Pass`, timestamp);
+
+    if (newLeader.email) {
+      sendQrPassEmails([
+        {
+          id: memberId,
+          name: newLeader.fullName,
+          email: newLeader.email,
+          church: newLeader.church,
+          role: newLeader.leaderType,
+        },
+      ]).catch(() => {});
+    }
 
     setLdrSuccessMsg(`Registration complete for ${newLeader.fullName} (${newLeader.leaderType} - ${newLeader.church}). Leader code: ${leaderCode}. Your scan pass has been downloaded — show it to your branch admin at every service.`);
     setLdrName('');
@@ -838,6 +768,16 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     <p className="text-xs text-slate-500 italic">
                       Show this QR Code to the usher on your phone or print out every time you attend church for fast scan!
                     </p>
+                    <p className="text-xs text-blue-800 bg-blue-50 border border-blue-100 rounded-xl p-2.5 font-semibold">
+                      On iPhone: press and hold the pass above, then choose <strong>Save to Photos</strong>. You can also tap
+                      Save Pass below to use the share sheet.
+                    </p>
+                    {passSaveOutcome === 'failed' && (
+                      <p className="text-xs text-rose-600 font-semibold">
+                        Your browser blocked the automatic save — please press and hold the image to save it.
+                      </p>
+                    )}
+
                   </div>
                 )}
 
@@ -862,21 +802,21 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
-                    onClick={() => {
-                      if (attPassImageDataUrl) {
-                        const downloadLink = document.createElement('a');
-                        downloadLink.href = attPassImageDataUrl;
-                        downloadLink.download = `CE_Korle_Bu_QR_Pass_${attSuccessPass.memberId}.png`;
-                        document.body.appendChild(downloadLink);
-                        downloadLink.click();
-                        downloadLink.remove();
+                    onClick={async () => {
+                      if (passFile) {
+                        const outcome = await saveQrPass(
+                          passFile,
+                          `GCYC_QR_Pass_${attSuccessPass.memberId}.png`
+                        );
+                        setPassSaveOutcome(outcome);
                       }
                     }}
                     className="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-blue-700/20"
                   >
                     <span className="material-symbols-outlined text-[18px]">download</span>
-                    <span>Re-Download QR Pass PNG</span>
+                    <span>Save Pass to My Phone</span>
                   </button>
+
 
                   <button
                     onClick={() => {
@@ -886,6 +826,9 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                       setAttPhone('');
                       setAttDob('');
                       setAttPassImageDataUrl('');
+                      setPassFile(null);
+                      setPassSaveOutcome(null);
+
                       setAttInvitedByLeaderId('self_invite');
                     }}
                     className="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 font-bold text-xs py-3 px-5 rounded-xl cursor-pointer"
@@ -1223,6 +1166,39 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 <span>{ldrSuccessMsg}</span>
               </div>
             )}
+
+            {ldrSuccessMsg && attPassImageDataUrl && (
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3 shadow-sm text-center">
+                <p className="text-xs font-bold text-slate-500 uppercase">Your Leader Scan Pass</p>
+                <img
+                  src={attPassImageDataUrl}
+                  alt="Leader QR Pass"
+                  className="max-w-[280px] mx-auto rounded-xl border border-blue-200 shadow-sm"
+                />
+                <p className="text-xs text-blue-800 bg-blue-50 border border-blue-100 rounded-xl p-2.5 font-semibold text-left">
+                  On iPhone: press and hold the pass above and choose <strong>Save to Photos</strong>, or tap Save Pass below.
+                </p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (passFile) {
+                      const outcome = await saveQrPass(passFile, 'GCYC_Leader_Pass.png');
+                      setPassSaveOutcome(outcome);
+                    }
+                  }}
+                  className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[18px]">download</span>
+                  <span>Save Pass to My Phone</span>
+                </button>
+                {passSaveOutcome === 'failed' && (
+                  <p className="text-xs text-rose-600 font-semibold">
+                    Your browser blocked the automatic save — please press and hold the image to save it.
+                  </p>
+                )}
+              </div>
+            )}
+
 
             {ldrError && (
               <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs font-semibold flex items-center gap-2">
