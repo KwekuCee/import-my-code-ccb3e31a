@@ -3,7 +3,7 @@ import { renderQrPass, saveQrPass, QrPassResult, SaveOutcome } from '../utils/qr
 import { motion } from 'motion/react';
 import { Member, Leader, ChurchBranch, ChurchAdminAccount, AttendanceRecord } from '../types';
 import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClassNumber, getFoundationClassLabel } from '../data/constants';
-import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin, uploadMemberPhoto, uploadProfilePhoto, sendAdminVerificationEmail, syncLeaderAsMember, generateLeaderCode } from '../lib/supabaseService';
+import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin, uploadMemberPhoto, uploadProfilePhoto, sendAdminVerificationEmail, syncLeaderAsMember, generateLeaderCode, sendQrPassEmails } from '../lib/supabaseService';
 import { ChurchLogo } from './ChurchLogo';
 
 interface PublicPortalProps {
@@ -385,6 +385,18 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       timestamp,
       qrPassBase64: passDataUrl || undefined,
     }).catch(() => {});
+
+    // Always leave a copy in the attendee's own inbox when they gave an email.
+    if (existingMember.email) {
+      sendQrPassEmails([
+        {
+          id: existingMember.id,
+          name: existingMember.fullName,
+          email: existingMember.email,
+          church: attChurch,
+        },
+      ]).catch(() => {});
+    }
     } finally {
       setIsSubmittingAttendance(false);
     }
@@ -464,6 +476,18 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
     };
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     await generateAndDownloadQrPass(leaderAsMember, newLeader.church, `${newLeader.leaderType} Pass`, timestamp);
+
+    if (newLeader.email) {
+      sendQrPassEmails([
+        {
+          id: memberId,
+          name: newLeader.fullName,
+          email: newLeader.email,
+          church: newLeader.church,
+          role: newLeader.leaderType,
+        },
+      ]).catch(() => {});
+    }
 
     setLdrSuccessMsg(`Registration complete for ${newLeader.fullName} (${newLeader.leaderType} - ${newLeader.church}). Leader code: ${leaderCode}. Your scan pass has been downloaded — show it to your branch admin at every service.`);
     setLdrName('');
