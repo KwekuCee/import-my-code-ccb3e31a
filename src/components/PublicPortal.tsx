@@ -744,6 +744,16 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     <p className="text-xs text-slate-500 italic">
                       Show this QR Code to the usher on your phone or print out every time you attend church for fast scan!
                     </p>
+                    <p className="text-xs text-blue-800 bg-blue-50 border border-blue-100 rounded-xl p-2.5 font-semibold">
+                      On iPhone: press and hold the pass above, then choose <strong>Save to Photos</strong>. You can also tap
+                      Save Pass below to use the share sheet.
+                    </p>
+                    {passSaveOutcome === 'failed' && (
+                      <p className="text-xs text-rose-600 font-semibold">
+                        Your browser blocked the automatic save — please press and hold the image to save it.
+                      </p>
+                    )}
+
                   </div>
                 )}
 
