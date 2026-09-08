@@ -778,21 +778,21 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
-                    onClick={() => {
-                      if (attPassImageDataUrl) {
-                        const downloadLink = document.createElement('a');
-                        downloadLink.href = attPassImageDataUrl;
-                        downloadLink.download = `CE_Korle_Bu_QR_Pass_${attSuccessPass.memberId}.png`;
-                        document.body.appendChild(downloadLink);
-                        downloadLink.click();
-                        downloadLink.remove();
+                    onClick={async () => {
+                      if (passFile) {
+                        const outcome = await saveQrPass(
+                          passFile,
+                          `GCYC_QR_Pass_${attSuccessPass.memberId}.png`
+                        );
+                        setPassSaveOutcome(outcome);
                       }
                     }}
                     className="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-blue-700/20"
                   >
                     <span className="material-symbols-outlined text-[18px]">download</span>
-                    <span>Re-Download QR Pass PNG</span>
+                    <span>Save Pass to My Phone</span>
                   </button>
+
 
                   <button
                     onClick={() => {
