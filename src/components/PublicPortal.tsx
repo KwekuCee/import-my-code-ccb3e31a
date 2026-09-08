@@ -802,6 +802,9 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                       setAttPhone('');
                       setAttDob('');
                       setAttPassImageDataUrl('');
+                      setPassFile(null);
+                      setPassSaveOutcome(null);
+
                       setAttInvitedByLeaderId('self_invite');
                     }}
                     className="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 font-bold text-xs py-3 px-5 rounded-xl cursor-pointer"
