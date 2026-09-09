@@ -108,7 +108,7 @@ export default function App() {
           id: l.id,
           fullName: l.fullName,
           initials: l.initials,
-          phone: l.phone,
+          phone: (l as any).phone || '',
           email: l.email,
           church: l.church,
           role: 'Leader',
