@@ -291,3 +291,62 @@ export function prepareRows(grid: string[][], options: PrepareOptions): { header
 }
 
 export { initialsOf };
+
+/** The exact column headings the system reads, in order, per import type. */
+export const TEMPLATE_COLUMNS: Record<ImportKind, { header: string; note: string; required?: boolean }[]> = {
+  members: [
+    { header: 'Full Name', note: 'First and last name', required: true },
+    { header: 'Phone', note: 'e.g. 0244000000' },
+    { header: 'Email', note: 'Needed to email their attendance code' },
+    { header: 'Date of Birth', note: 'DD/MM/YYYY' },
+    { header: 'Gender', note: 'Male or Female' },
+    { header: 'Marital Status', note: 'Single, Married…' },
+    { header: 'Occupation', note: 'Student, Trader…' },
+    { header: 'Education', note: 'SHS, Tertiary…' },
+    { header: 'Location', note: 'Where they live' },
+    { header: 'Church', note: 'Leave blank to use the branch chosen above' },
+    { header: 'Foundation Class', note: '0 to 7' },
+    { header: 'Invited By', note: 'Name of the leader who invited them' },
+  ],
+  leaders: [
+    { header: 'Full Name', note: 'First and last name', required: true },
+    { header: 'Phone', note: 'e.g. 0244000000' },
+    { header: 'Email', note: 'Needed to email their attendance code' },
+    { header: 'Date of Birth', note: 'DD/MM/YYYY' },
+    { header: 'Leader Type', note: 'BSCT, Cell Leader, PCF Leader or Church Coordinator', required: true },
+    { header: 'Cell or PCF Name', note: 'The group they lead', required: true },
+    { header: 'Location', note: 'Where they live' },
+    { header: 'Church', note: 'Leave blank to use the branch chosen above' },
+  ],
+};
+
+/** Two example rows so the format is obvious at a glance. */
+const TEMPLATE_EXAMPLES: Record<ImportKind, string[][]> = {
+  members: [
+    ['Ama Mensah', '0244000001', 'ama@example.com', '14/03/1998', 'Female', 'Single', 'Student', 'Tertiary', 'Achimota', '', '3', 'Kofi Boateng'],
+    ['Kwame Owusu', '0244000002', 'kwame@example.com', '02/11/1990', 'Male', 'Married', 'Trader', 'SHS', 'Dansoman', '', '7', 'Self'],
+  ],
+  leaders: [
+    ['Kofi Boateng', '0244000003', 'kofi@example.com', '21/06/1988', 'Cell Leader', 'Grace Cell', 'Achimota', ''],
+    ['Adjoa Sarpong', '0244000004', 'adjoa@example.com', '09/09/1992', 'BSCT', 'Faith Class', 'Dansoman', ''],
+  ],
+};
+
+/** Builds and downloads a ready-to-fill .xlsx template for the chosen import type. */
+export function downloadImportTemplate(kind: ImportKind): void {
+  const cols = TEMPLATE_COLUMNS[kind];
+  const headers = cols.map((c) => c.header);
+  const guide = cols.map((c) => (c.required ? `REQUIRED — ${c.note}` : c.note));
+
+  const wb = XLSX.utils.book_new();
+  // Data sheet: headings + example rows only, so the file can be filled in and sent back as-is.
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...TEMPLATE_EXAMPLES[kind]]);
+  ws['!cols'] = headers.map(() => ({ wch: 22 }));
+  XLSX.utils.book_append_sheet(wb, ws, kind === 'members' ? 'Members' : 'Leaders');
+
+  // Separate guide sheet so notes never get imported as people.
+  const help = XLSX.utils.aoa_to_sheet([['Column', 'What to put'], ...headers.map((h, i) => [h, guide[i]])]);
+  help['!cols'] = [{ wch: 24 }, { wch: 60 }];
+  XLSX.utils.book_append_sheet(wb, help, 'How to fill');
+  XLSX.writeFile(wb, `GCYC_${kind}_import_template.xlsx`);
+}

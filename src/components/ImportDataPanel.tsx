@@ -3,7 +3,9 @@ import { ChurchBranch, Leader, Member } from '../types';
 import {
   ImportKind,
   PreparedRow,
+  TEMPLATE_COLUMNS,
   buildExistingIndex,
+  downloadImportTemplate,
   initialsOf,
   prepareRows,
   readSpreadsheet,
@@ -49,6 +51,7 @@ export const ImportDataPanel: React.FC<ImportDataPanelProps> = ({
   const [isImporting, setIsImporting] = useState(false);
   const [summary, setSummary] = useState<ImportSummary | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [showColumns, setShowColumns] = useState(false);
   const [emailStatus, setEmailStatus] = useState('');
   const [emailProgress, setEmailProgress] = useState(0);
   const [isEmailing, setIsEmailing] = useState(false);
@@ -219,12 +222,67 @@ export const ImportDataPanel: React.FC<ImportDataPanelProps> = ({
             Add many people at once from an Excel (.xlsx) or CSV file, then email everyone their attendance code.
           </p>
         </div>
-        {fileName && (
-          <button onClick={reset} className="text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer">
-            Clear file
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => downloadImportTemplate(kind)}
+            className="bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 font-bold text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[18px]">download</span>
+            <span>Download template</span>
           </button>
-        )}
+          {fileName && (
+            <button onClick={reset} className="text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer">
+              Clear file
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Column guide */}
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <p className="text-xs font-bold text-slate-700">
+            Columns the system reads for {kind === 'members' ? 'members' : 'leaders'}
+          </p>
+          <button
+            onClick={() => setShowColumns((v) => !v)}
+            className="text-xs font-bold text-blue-700 hover:text-blue-900 cursor-pointer"
+          >
+            {showColumns ? 'Hide' : 'Show all'}
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {TEMPLATE_COLUMNS[kind].map((c) => (
+            <span
+              key={c.header}
+              title={c.note}
+              className={`text-xs font-semibold px-2 py-1 rounded-lg border ${
+                c.required
+                  ? 'bg-blue-700 text-white border-blue-700'
+                  : 'bg-white text-slate-700 border-slate-200'
+              }`}
+            >
+              {c.header}
+              {c.required ? ' *' : ''}
+            </span>
+          ))}
+        </div>
+        {showColumns && (
+          <ul className="mt-2 space-y-1">
+            {TEMPLATE_COLUMNS[kind].map((c) => (
+              <li key={c.header} className="text-xs text-slate-600">
+                <span className="font-bold text-slate-800">{c.header}</span>
+                {c.required ? <span className="text-blue-700 font-bold"> (required)</span> : ''} — {c.note}
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="text-xs text-slate-500 mt-2">
+          Download the template, replace the two example rows with your own people, and upload it. Extra columns are
+          ignored, and the order does not matter.
+        </p>
+      </div>
+
 
       {/* Options */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
