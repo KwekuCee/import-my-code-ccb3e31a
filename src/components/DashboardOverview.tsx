@@ -5,6 +5,7 @@ import { BirthdaysPanel } from './BirthdaysPanel';
 import { ClassGroupsPanel } from './ClassGroupsPanel';
 import { AbsenteesPanel } from './AbsenteesPanel';
 import { HierarchyAttendancePanel } from './HierarchyAttendancePanel';
+import { ImportDataPanel } from './ImportDataPanel';
 
 
 interface DashboardOverviewProps {
