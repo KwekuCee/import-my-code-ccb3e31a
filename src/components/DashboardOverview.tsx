@@ -40,7 +40,8 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   attendanceRecords,
   onNavigate,
   onSelectMemberForCard,
-  serviceTypes = []
+  serviceTypes = [],
+  onImported
 }) => {
   const isSuperadmin = user.role === 'Superadmin';
   const currentChurchName = user.church || churches[0]?.name || 'Unassigned';
