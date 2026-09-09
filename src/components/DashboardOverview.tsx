@@ -1290,6 +1290,16 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
         </div>
       )}
 
+      <div className="px-4 md:px-8 pb-8">
+        <ImportDataPanel
+          members={members}
+          leaders={leaders}
+          churches={churches}
+          defaultChurch={currentChurchName}
+          canChooseChurch={isSuperadmin}
+          onImported={(m, l) => onImported?.(m, l)}
+        />
+      </div>
     </div>
   );
 };
