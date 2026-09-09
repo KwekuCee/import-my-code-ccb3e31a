@@ -3,7 +3,9 @@ import { ChurchBranch, Leader, Member } from '../types';
 import {
   ImportKind,
   PreparedRow,
+  TEMPLATE_COLUMNS,
   buildExistingIndex,
+  downloadImportTemplate,
   initialsOf,
   prepareRows,
   readSpreadsheet,
