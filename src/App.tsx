@@ -99,6 +99,24 @@ export default function App() {
 
   const isSuperadmin = user.role === 'Superadmin';
   const [members, setMembers] = useState<Member[]>([]);
+  const handleImported = (newMembers: Member[], newLeaders: Leader[]) => {
+    if (newMembers.length) setMembers(prev => [...newMembers, ...prev]);
+    if (newLeaders.length) {
+      setLeaders(prev => [...newLeaders, ...prev]);
+      setMembers(prev => [
+        ...newLeaders.map(l => ({
+          id: l.id,
+          fullName: l.fullName,
+          initials: l.initials,
+          phone: l.phone,
+          email: l.email,
+          church: l.church,
+          role: 'Leader',
+        } as unknown as Member)),
+        ...prev,
+      ]);
+    }
+  };
   const [churches, setChurches] = useState<ChurchBranch[]>([]);
   const [churchAdmins, setChurchAdmins] = useState<ChurchAdminAccount[]>([]);
   const [leaders, setLeaders] = useState<Leader[]>([]);
@@ -697,6 +715,7 @@ export default function App() {
                   onNavigate={setCurrentView}
                   onSelectMemberForCard={setSelectedMemberForCard}
                   onUpdateServiceTypes={setServiceTypes}
+                  onImported={handleImported}
                 />
               )}
 
@@ -715,6 +734,7 @@ export default function App() {
                   onDeleteChurch={handleDeleteChurch}
                   onUpdateChurchAdmin={handleUpdateChurchAdmin}
                   onDeleteChurchAdmin={handleDeleteChurchAdmin}
+                  onImported={handleImported}
                 />
               )}
 
