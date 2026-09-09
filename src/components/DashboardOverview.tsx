@@ -5,6 +5,7 @@ import { BirthdaysPanel } from './BirthdaysPanel';
 import { ClassGroupsPanel } from './ClassGroupsPanel';
 import { AbsenteesPanel } from './AbsenteesPanel';
 import { HierarchyAttendancePanel } from './HierarchyAttendancePanel';
+import { ImportDataPanel } from './ImportDataPanel';
 
 
 interface DashboardOverviewProps {
@@ -26,6 +27,7 @@ interface DashboardOverviewProps {
   onNavigate: (view: ViewType) => void;
   onSelectMemberForCard: (member: Member) => void;
   onUpdateServiceTypes?: (serviceTypes: Array<{ id: string; name: string; active: boolean }>) => void;
+  onImported?: (newMembers: Member[], newLeaders: Leader[]) => void;
 }
 
 export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
@@ -38,7 +40,8 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   attendanceRecords,
   onNavigate,
   onSelectMemberForCard,
-  serviceTypes = []
+  serviceTypes = [],
+  onImported
 }) => {
   const isSuperadmin = user.role === 'Superadmin';
   const currentChurchName = user.church || churches[0]?.name || 'Unassigned';
@@ -1290,6 +1293,16 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
         </div>
       )}
 
+      <div className="px-4 md:px-8 pb-8">
+        <ImportDataPanel
+          members={members}
+          leaders={leaders}
+          churches={churches}
+          defaultChurch={currentChurchName}
+          canChooseChurch={isSuperadmin}
+          onImported={(m, l) => onImported?.(m, l)}
+        />
+      </div>
     </div>
   );
 };
