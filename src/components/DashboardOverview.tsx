@@ -27,6 +27,7 @@ interface DashboardOverviewProps {
   onNavigate: (view: ViewType) => void;
   onSelectMemberForCard: (member: Member) => void;
   onUpdateServiceTypes?: (serviceTypes: Array<{ id: string; name: string; active: boolean }>) => void;
+  onImported?: (newMembers: Member[], newLeaders: Leader[]) => void;
 }
 
 export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
