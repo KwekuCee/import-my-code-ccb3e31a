@@ -339,8 +339,14 @@ export function downloadImportTemplate(kind: ImportKind): void {
   const guide = cols.map((c) => (c.required ? `REQUIRED — ${c.note}` : c.note));
 
   const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet([headers, guide, ...TEMPLATE_EXAMPLES[kind]]);
+  // Data sheet: headings + example rows only, so the file can be filled in and sent back as-is.
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...TEMPLATE_EXAMPLES[kind]]);
   ws['!cols'] = headers.map(() => ({ wch: 22 }));
   XLSX.utils.book_append_sheet(wb, ws, kind === 'members' ? 'Members' : 'Leaders');
+
+  // Separate guide sheet so notes never get imported as people.
+  const help = XLSX.utils.aoa_to_sheet([['Column', 'What to put'], ...headers.map((h, i) => [h, guide[i]])]);
+  help['!cols'] = [{ wch: 24 }, { wch: 60 }];
+  XLSX.utils.book_append_sheet(wb, help, 'How to fill');
   XLSX.writeFile(wb, `GCYC_${kind}_import_template.xlsx`);
 }
