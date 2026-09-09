@@ -51,6 +51,7 @@ export const ImportDataPanel: React.FC<ImportDataPanelProps> = ({
   const [isImporting, setIsImporting] = useState(false);
   const [summary, setSummary] = useState<ImportSummary | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [showColumns, setShowColumns] = useState(false);
   const [emailStatus, setEmailStatus] = useState('');
   const [emailProgress, setEmailProgress] = useState(0);
   const [isEmailing, setIsEmailing] = useState(false);
