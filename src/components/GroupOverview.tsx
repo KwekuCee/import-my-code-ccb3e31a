@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChurchBranch, AuditLogItem, ViewType, ChurchAdminAccount, Member, Leader, AttendanceRecord } from '../types';
 import { HierarchyAttendancePanel } from './HierarchyAttendancePanel';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
+import { ImportDataPanel } from './ImportDataPanel';
 
 interface GroupOverviewProps {
   churches: ChurchBranch[];
@@ -17,6 +18,7 @@ interface GroupOverviewProps {
   onDeleteChurch?: (churchId: string) => void;
   onUpdateChurchAdmin?: (admin: ChurchAdminAccount) => void;
   onDeleteChurchAdmin?: (adminId: string) => void;
+  onImported?: (newMembers: Member[], newLeaders: Leader[]) => void;
 }
 
 export const GroupOverview: React.FC<GroupOverviewProps> = ({
@@ -32,7 +34,8 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
   onUpdateChurch,
   onDeleteChurch,
   onUpdateChurchAdmin,
-  onDeleteChurchAdmin
+  onDeleteChurchAdmin,
+  onImported
 }) => {
   const [activeTab, setActiveTab] = useState<'branches' | 'admins'>('branches');
   const [editingChurch, setEditingChurch] = useState<ChurchBranch | null>(null);
@@ -707,6 +710,17 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
           }}
         />
       )}
+      <div className="pb-8">
+        <ImportDataPanel
+          members={members}
+          leaders={leaders}
+          churches={churches}
+          defaultChurch={churches[0]?.name || ''}
+          canChooseChurch
+          onImported={(m, l) => onImported?.(m, l)}
+        />
+      </div>
+
     </div>
   );
 };
