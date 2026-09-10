@@ -302,8 +302,9 @@ export function prepareRows(grid: string[][], options: PrepareOptions): PrepareR
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) problems.push('Email address looks wrong');
     if (dobRaw && !dob) problems.push('Date of birth could not be read');
     if (options.kind === 'leaders' && !(raw.cellOrPcfName || '').trim()) {
-      problems.push('Missing cell / PCF name');
+      problems.push('Note: no cell / PCF name — you can add it after importing');
     }
+
 
     let duplicate = false;
     const emailKey = email.toLowerCase();
