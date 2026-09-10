@@ -363,10 +363,117 @@ export function prepareRows(grid: string[][], options: PrepareOptions): PrepareR
     return prepared;
   });
 
-  return { headerMap, rows };
+  return { headerMap, matchedHeaders, unmatchedHeaders, rows };
 }
 
 export { initialsOf };
+
+// ---------------------------------------------------------------------------
+// Leaders picked out of a members file
+// ---------------------------------------------------------------------------
+
+/** A leader name found in the Leader / Invited By column of a members file. */
+export interface DerivedLeader {
+  name: string;
+  key: string;
+  memberCount: number;
+  existingLeaderId?: string;
+  phone: string;
+  email: string;
+  dob: string;
+  location: string;
+  church: string;
+}
+
+/** Values people type when nobody invited them — never treated as a leader. */
+const NON_LEADER_VALUES = new Set([
+  'self',
+  'selfwalkin',
+  'selfwalkin',
+  'walkin',
+  'none',
+  'na',
+  'nil',
+  'nobody',
+  'myself',
+  'noone',
+  'notapplicable',
+  'spreadsheetimport',
+  'direct',
+  'directself',
+  'firsttimer',
+  'unknown',
+]);
+
+export function nameKey(name: string): string {
+  return (name || '')
+    .toLowerCase()
+    .replace(/\b(pastor|pst|bro|bro\.|sis|sis\.|dcn|deacon|mr|mrs|ms|dr)\b/g, ' ')
+    .replace(/[^a-z]/g, '');
+}
+
+/** A leader is incomplete while we only know their name. */
+export function isIncompleteLeader(leader: { contact?: string; email?: string; cellOrPcfName?: string }): boolean {
+  const noContact = !(leader.contact || '').trim() && !(leader.email || '').trim();
+  const noGroup = !(leader.cellOrPcfName || '').trim();
+  return noContact || noGroup;
+}
+
+/**
+ * Collects every name in the Leader / Invited By column, counts how many members
+ * named them, reuses an existing leader in the branch when the name matches, and
+ * fills in details from that person's own member row when the file has one.
+ */
+export function collectLeadersFromRows(
+  rows: PreparedRow[],
+  options: { church: string; existingLeaders: Leader[] }
+): DerivedLeader[] {
+  const existingByName = new Map<string, Leader>();
+  (options.existingLeaders || []).forEach((l) => {
+    const key = nameKey(l.fullName);
+    if (key) existingByName.set(key, l);
+  });
+
+  // Every person in the file, so a leader who also appears as a member row
+  // inherits their own contact details.
+  const rowByName = new Map<string, PreparedRow>();
+  rows.forEach((r) => {
+    const key = nameKey(r.raw.fullName || '');
+    if (key && !rowByName.has(key)) rowByName.set(key, r);
+  });
+
+  const found = new Map<string, DerivedLeader>();
+
+  rows.forEach((r) => {
+    const rawName = (r.raw.invitedBy || '').trim();
+    if (!rawName) return;
+    const key = nameKey(rawName);
+    if (!key || key.length < 3 || NON_LEADER_VALUES.has(key)) return;
+
+    const current = found.get(key);
+    if (current) {
+      current.memberCount += 1;
+      return;
+    }
+
+    const ownRow = rowByName.get(key);
+    const existing = existingByName.get(key);
+    found.set(key, {
+      name: rawName.replace(/\s+/g, ' '),
+      key,
+      memberCount: 1,
+      existingLeaderId: existing?.id,
+      phone: (ownRow?.raw.phone || '').trim(),
+      email: (ownRow?.raw.email || '').trim(),
+      dob: ownRow?.raw.dob ? parseDate(ownRow.raw.dob) || '' : '',
+      location: (ownRow?.raw.location || '').trim(),
+      church: (ownRow?.raw.church || '').trim() || options.church,
+    });
+  });
+
+  return Array.from(found.values()).sort((a, b) => b.memberCount - a.memberCount);
+}
+
 
 /** The exact column headings the system reads, in order, per import type. */
 export const TEMPLATE_COLUMNS: Record<ImportKind, { header: string; note: string; required?: boolean }[]> = {
