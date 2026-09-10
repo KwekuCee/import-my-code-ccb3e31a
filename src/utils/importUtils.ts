@@ -25,41 +25,108 @@ const LEADER_TYPES: LeaderType[] = ['BSCT', 'Cell Leader', 'PCF Leader', 'Church
 
 /** Column heading variations we accept for each field. */
 const HEADER_ALIASES: Record<string, string[]> = {
-  fullName: ['full name', 'name', 'fullname', 'member name', 'leader name', 'names', 'surname and other names'],
-  email: ['email', 'e-mail', 'email address', 'mail', 'email addr'],
-  phone: ['phone', 'contact', 'phone number', 'contact number', 'mobile', 'mobile number', 'telephone', 'tel', 'whatsapp'],
-  dob: ['dob', 'date of birth', 'birthday', 'birth date', 'birthdate'],
+  fullName: ['full name', 'name', 'fullname', 'member name', 'leader name', 'names', 'surname and other names', 'member', 'first name and surname'],
+  email: ['email', 'e-mail', 'email address', 'mail', 'email addr', 'e mail'],
+  phone: ['phone', 'contact', 'phone number', 'contact number', 'contact no', 'mobile', 'mobile number', 'telephone', 'tel', 'whatsapp', 'whatsapp number', 'number'],
+  dob: ['dob', 'date of birth', 'birthday', 'birth date', 'birthdate', 'd o b'],
   gender: ['gender', 'sex'],
   maritalStatus: ['marital status', 'marital', 'status (marital)'],
-  occupation: ['occupation', 'job', 'work', 'profession'],
-  education: ['education', 'education level', 'educational level', 'school level'],
-  location: ['location', 'address', 'residence', 'area', 'town', 'city'],
+  occupation: ['occupation', 'job', 'work', 'profession', 'career', 'occupation category'],
+  education: ['education', 'education level', 'educational level', 'school level', 'qualification'],
+  location: ['location', 'address', 'residence', 'area', 'town', 'city', 'residential address', 'where do you stay'],
   church: ['church', 'church branch', 'branch', 'church name', 'assembly'],
   foundationClass: ['foundation class', 'foundation school', 'foundation school class', 'class'],
-  invitedBy: ['invited by', 'who invited you', 'leader', 'inviter', 'referred by'],
-  leaderType: ['leader type', 'role', 'leadership role', 'position', 'leader role'],
-  cellOrPcfName: ['cell', 'pcf', 'cell name', 'pcf name', 'cell or pcf', 'cell/pcf name', 'cell or pcf name', 'group name'],
+  invitedBy: [
+    'invited by',
+    'who invited you',
+    'leader',
+    'inviter',
+    'referred by',
+    'cell leader',
+    'pcf leader',
+    'bible study class teacher',
+    'bsct',
+    'leaders name',
+    'name of leader',
+    'invited by leader',
+  ],
+  leaderType: ['leader type', 'role', 'leadership role', 'position', 'leader role', 'type of leader'],
+  cellOrPcfName: ['cell', 'pcf', 'cell name', 'pcf name', 'cell or pcf', 'cell/pcf name', 'cell or pcf name', 'group name', 'pcf/cell'],
 };
 
 function normalizeHeader(h: string): string {
   return (h || '').toString().trim().toLowerCase().replace(/[_.*]+/g, ' ').replace(/\s+/g, ' ');
 }
 
-/** Maps the file's headings to our field names. */
-export function mapHeaders(headers: string[]): Record<number, string> {
-  const out: Record<number, string> = {};
+/** Field-to-heading matching, plus any heading we could not place. */
+export interface HeaderMapResult {
+  map: Record<number, string>;
+  matched: { header: string; field: string }[];
+  unmatched: string[];
+}
+
+const FIELD_LABELS: Record<string, string> = {
+  fullName: 'Full name',
+  email: 'Email',
+  phone: 'Phone',
+  dob: 'Date of birth',
+  gender: 'Gender',
+  maritalStatus: 'Marital status',
+  occupation: 'Occupation',
+  education: 'Education',
+  location: 'Location',
+  church: 'Church',
+  foundationClass: 'Foundation class',
+  invitedBy: 'Leader / invited by',
+  leaderType: 'Leader type',
+  cellOrPcfName: 'Cell or PCF name',
+};
+
+export function fieldLabel(field: string): string {
+  return FIELD_LABELS[field] || field;
+}
+
+/** Maps the file's headings to our field names, whatever wording was used. */
+export function mapHeadersDetailed(headers: string[]): HeaderMapResult {
+  const map: Record<number, string> = {};
+  const matched: { header: string; field: string }[] = [];
+  const unmatched: string[] = [];
+
   headers.forEach((header, i) => {
     const norm = normalizeHeader(header);
     if (!norm) return;
+    const squashed = norm.replace(/[^a-z]/g, '');
+    let hit: string | null = null;
     for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
-      if (aliases.includes(norm) || aliases.some((a) => norm === a || norm.replace(/[^a-z]/g, '') === a.replace(/[^a-z]/g, ''))) {
-        if (!Object.values(out).includes(field)) out[i] = field;
-        return;
+      if (aliases.some((a) => norm === a || squashed === a.replace(/[^a-z]/g, ''))) {
+        hit = field;
+        break;
       }
     }
+    // Second pass: allow "member's full name", "phone (mobile)" style wording.
+    if (!hit) {
+      for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
+        if (aliases.some((a) => a.length > 3 && norm.includes(a))) {
+          hit = field;
+          break;
+        }
+      }
+    }
+    if (hit && !Object.values(map).includes(hit)) {
+      map[i] = hit;
+      matched.push({ header: String(header), field: hit });
+    } else {
+      unmatched.push(String(header));
+    }
   });
-  return out;
+
+  return { map, matched, unmatched };
 }
+
+export function mapHeaders(headers: string[]): Record<number, string> {
+  return mapHeadersDetailed(headers).map;
+}
+
 
 /** Very small CSV reader that copes with quoted values and commas inside them. */
 export function parseCsv(text: string): string[][] {
@@ -201,12 +268,20 @@ export interface PrepareOptions {
   existing: ExistingIndex;
 }
 
+export interface PrepareResult {
+  headerMap: Record<number, string>;
+  matchedHeaders: { header: string; field: string }[];
+  unmatchedHeaders: string[];
+  rows: PreparedRow[];
+}
+
 /** Validates and shapes every row of the file, ready for the preview table. */
-export function prepareRows(grid: string[][], options: PrepareOptions): { headerMap: Record<number, string>; rows: PreparedRow[] } {
-  if (!grid.length) return { headerMap: {}, rows: [] };
+export function prepareRows(grid: string[][], options: PrepareOptions): PrepareResult {
+  if (!grid.length) return { headerMap: {}, matchedHeaders: [], unmatchedHeaders: [], rows: [] };
 
   const headers = grid[0].map((h) => String(h || ''));
-  const headerMap = mapHeaders(headers);
+  const { map: headerMap, matched: matchedHeaders, unmatched: unmatchedHeaders } = mapHeadersDetailed(headers);
+
   const seenEmails = new Set<string>();
   const seenPhones = new Set<string>();
 
@@ -227,8 +302,9 @@ export function prepareRows(grid: string[][], options: PrepareOptions): { header
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) problems.push('Email address looks wrong');
     if (dobRaw && !dob) problems.push('Date of birth could not be read');
     if (options.kind === 'leaders' && !(raw.cellOrPcfName || '').trim()) {
-      problems.push('Missing cell / PCF name');
+      problems.push('Note: no cell / PCF name — you can add it after importing');
     }
+
 
     let duplicate = false;
     const emailKey = email.toLowerCase();
@@ -239,7 +315,7 @@ export function prepareRows(grid: string[][], options: PrepareOptions): { header
     if (emailKey) seenEmails.add(emailKey);
     if (phoneKey) seenPhones.add(phoneKey);
 
-    const hardProblems = problems.filter((p) => !p.startsWith('Already in the system'));
+    const hardProblems = problems.filter((p) => !p.startsWith('Already in the system') && !p.startsWith('Note:'));
     const valid = hardProblems.length === 0 && !duplicate;
 
     const prepared: PreparedRow = {
@@ -287,10 +363,117 @@ export function prepareRows(grid: string[][], options: PrepareOptions): { header
     return prepared;
   });
 
-  return { headerMap, rows };
+  return { headerMap, matchedHeaders, unmatchedHeaders, rows };
 }
 
 export { initialsOf };
+
+// ---------------------------------------------------------------------------
+// Leaders picked out of a members file
+// ---------------------------------------------------------------------------
+
+/** A leader name found in the Leader / Invited By column of a members file. */
+export interface DerivedLeader {
+  name: string;
+  key: string;
+  memberCount: number;
+  existingLeaderId?: string;
+  phone: string;
+  email: string;
+  dob: string;
+  location: string;
+  church: string;
+}
+
+/** Values people type when nobody invited them — never treated as a leader. */
+const NON_LEADER_VALUES = new Set([
+  'self',
+  'selfwalkin',
+  'selfwalkin',
+  'walkin',
+  'none',
+  'na',
+  'nil',
+  'nobody',
+  'myself',
+  'noone',
+  'notapplicable',
+  'spreadsheetimport',
+  'direct',
+  'directself',
+  'firsttimer',
+  'unknown',
+]);
+
+export function nameKey(name: string): string {
+  return (name || '')
+    .toLowerCase()
+    .replace(/\b(pastor|pst|bro|bro\.|sis|sis\.|dcn|deacon|mr|mrs|ms|dr)\b/g, ' ')
+    .replace(/[^a-z]/g, '');
+}
+
+/** A leader is incomplete while we only know their name. */
+export function isIncompleteLeader(leader: { contact?: string; email?: string; cellOrPcfName?: string }): boolean {
+  const noContact = !(leader.contact || '').trim() && !(leader.email || '').trim();
+  const noGroup = !(leader.cellOrPcfName || '').trim();
+  return noContact || noGroup;
+}
+
+/**
+ * Collects every name in the Leader / Invited By column, counts how many members
+ * named them, reuses an existing leader in the branch when the name matches, and
+ * fills in details from that person's own member row when the file has one.
+ */
+export function collectLeadersFromRows(
+  rows: PreparedRow[],
+  options: { church: string; existingLeaders: Leader[] }
+): DerivedLeader[] {
+  const existingByName = new Map<string, Leader>();
+  (options.existingLeaders || []).forEach((l) => {
+    const key = nameKey(l.fullName);
+    if (key) existingByName.set(key, l);
+  });
+
+  // Every person in the file, so a leader who also appears as a member row
+  // inherits their own contact details.
+  const rowByName = new Map<string, PreparedRow>();
+  rows.forEach((r) => {
+    const key = nameKey(r.raw.fullName || '');
+    if (key && !rowByName.has(key)) rowByName.set(key, r);
+  });
+
+  const found = new Map<string, DerivedLeader>();
+
+  rows.forEach((r) => {
+    const rawName = (r.raw.invitedBy || '').trim();
+    if (!rawName) return;
+    const key = nameKey(rawName);
+    if (!key || key.length < 3 || NON_LEADER_VALUES.has(key)) return;
+
+    const current = found.get(key);
+    if (current) {
+      current.memberCount += 1;
+      return;
+    }
+
+    const ownRow = rowByName.get(key);
+    const existing = existingByName.get(key);
+    found.set(key, {
+      name: rawName.replace(/\s+/g, ' '),
+      key,
+      memberCount: 1,
+      existingLeaderId: existing?.id,
+      phone: (ownRow?.raw.phone || '').trim(),
+      email: (ownRow?.raw.email || '').trim(),
+      dob: ownRow?.raw.dob ? parseDate(ownRow.raw.dob) || '' : '',
+      location: (ownRow?.raw.location || '').trim(),
+      church: (ownRow?.raw.church || '').trim() || options.church,
+    });
+  });
+
+  return Array.from(found.values()).sort((a, b) => b.memberCount - a.memberCount);
+}
+
 
 /** The exact column headings the system reads, in order, per import type. */
 export const TEMPLATE_COLUMNS: Record<ImportKind, { header: string; note: string; required?: boolean }[]> = {
