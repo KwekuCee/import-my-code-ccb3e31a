@@ -315,7 +315,7 @@ export function prepareRows(grid: string[][], options: PrepareOptions): PrepareR
     if (emailKey) seenEmails.add(emailKey);
     if (phoneKey) seenPhones.add(phoneKey);
 
-    const hardProblems = problems.filter((p) => !p.startsWith('Already in the system'));
+    const hardProblems = problems.filter((p) => !p.startsWith('Already in the system') && !p.startsWith('Note:'));
     const valid = hardProblems.length === 0 && !duplicate;
 
     const prepared: PreparedRow = {
