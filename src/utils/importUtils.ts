@@ -25,41 +25,108 @@ const LEADER_TYPES: LeaderType[] = ['BSCT', 'Cell Leader', 'PCF Leader', 'Church
 
 /** Column heading variations we accept for each field. */
 const HEADER_ALIASES: Record<string, string[]> = {
-  fullName: ['full name', 'name', 'fullname', 'member name', 'leader name', 'names', 'surname and other names'],
-  email: ['email', 'e-mail', 'email address', 'mail', 'email addr'],
-  phone: ['phone', 'contact', 'phone number', 'contact number', 'mobile', 'mobile number', 'telephone', 'tel', 'whatsapp'],
-  dob: ['dob', 'date of birth', 'birthday', 'birth date', 'birthdate'],
+  fullName: ['full name', 'name', 'fullname', 'member name', 'leader name', 'names', 'surname and other names', 'member', 'first name and surname'],
+  email: ['email', 'e-mail', 'email address', 'mail', 'email addr', 'e mail'],
+  phone: ['phone', 'contact', 'phone number', 'contact number', 'contact no', 'mobile', 'mobile number', 'telephone', 'tel', 'whatsapp', 'whatsapp number', 'number'],
+  dob: ['dob', 'date of birth', 'birthday', 'birth date', 'birthdate', 'd o b'],
   gender: ['gender', 'sex'],
   maritalStatus: ['marital status', 'marital', 'status (marital)'],
-  occupation: ['occupation', 'job', 'work', 'profession'],
-  education: ['education', 'education level', 'educational level', 'school level'],
-  location: ['location', 'address', 'residence', 'area', 'town', 'city'],
+  occupation: ['occupation', 'job', 'work', 'profession', 'career', 'occupation category'],
+  education: ['education', 'education level', 'educational level', 'school level', 'qualification'],
+  location: ['location', 'address', 'residence', 'area', 'town', 'city', 'residential address', 'where do you stay'],
   church: ['church', 'church branch', 'branch', 'church name', 'assembly'],
   foundationClass: ['foundation class', 'foundation school', 'foundation school class', 'class'],
-  invitedBy: ['invited by', 'who invited you', 'leader', 'inviter', 'referred by'],
-  leaderType: ['leader type', 'role', 'leadership role', 'position', 'leader role'],
-  cellOrPcfName: ['cell', 'pcf', 'cell name', 'pcf name', 'cell or pcf', 'cell/pcf name', 'cell or pcf name', 'group name'],
+  invitedBy: [
+    'invited by',
+    'who invited you',
+    'leader',
+    'inviter',
+    'referred by',
+    'cell leader',
+    'pcf leader',
+    'bible study class teacher',
+    'bsct',
+    'leaders name',
+    'name of leader',
+    'invited by leader',
+  ],
+  leaderType: ['leader type', 'role', 'leadership role', 'position', 'leader role', 'type of leader'],
+  cellOrPcfName: ['cell', 'pcf', 'cell name', 'pcf name', 'cell or pcf', 'cell/pcf name', 'cell or pcf name', 'group name', 'pcf/cell'],
 };
 
 function normalizeHeader(h: string): string {
   return (h || '').toString().trim().toLowerCase().replace(/[_.*]+/g, ' ').replace(/\s+/g, ' ');
 }
 
-/** Maps the file's headings to our field names. */
-export function mapHeaders(headers: string[]): Record<number, string> {
-  const out: Record<number, string> = {};
+/** Field-to-heading matching, plus any heading we could not place. */
+export interface HeaderMapResult {
+  map: Record<number, string>;
+  matched: { header: string; field: string }[];
+  unmatched: string[];
+}
+
+const FIELD_LABELS: Record<string, string> = {
+  fullName: 'Full name',
+  email: 'Email',
+  phone: 'Phone',
+  dob: 'Date of birth',
+  gender: 'Gender',
+  maritalStatus: 'Marital status',
+  occupation: 'Occupation',
+  education: 'Education',
+  location: 'Location',
+  church: 'Church',
+  foundationClass: 'Foundation class',
+  invitedBy: 'Leader / invited by',
+  leaderType: 'Leader type',
+  cellOrPcfName: 'Cell or PCF name',
+};
+
+export function fieldLabel(field: string): string {
+  return FIELD_LABELS[field] || field;
+}
+
+/** Maps the file's headings to our field names, whatever wording was used. */
+export function mapHeadersDetailed(headers: string[]): HeaderMapResult {
+  const map: Record<number, string> = {};
+  const matched: { header: string; field: string }[] = [];
+  const unmatched: string[] = [];
+
   headers.forEach((header, i) => {
     const norm = normalizeHeader(header);
     if (!norm) return;
+    const squashed = norm.replace(/[^a-z]/g, '');
+    let hit: string | null = null;
     for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
-      if (aliases.includes(norm) || aliases.some((a) => norm === a || norm.replace(/[^a-z]/g, '') === a.replace(/[^a-z]/g, ''))) {
-        if (!Object.values(out).includes(field)) out[i] = field;
-        return;
+      if (aliases.some((a) => norm === a || squashed === a.replace(/[^a-z]/g, ''))) {
+        hit = field;
+        break;
       }
     }
+    // Second pass: allow "member's full name", "phone (mobile)" style wording.
+    if (!hit) {
+      for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
+        if (aliases.some((a) => a.length > 3 && norm.includes(a))) {
+          hit = field;
+          break;
+        }
+      }
+    }
+    if (hit && !Object.values(map).includes(hit)) {
+      map[i] = hit;
+      matched.push({ header: String(header), field: hit });
+    } else {
+      unmatched.push(String(header));
+    }
   });
-  return out;
+
+  return { map, matched, unmatched };
 }
+
+export function mapHeaders(headers: string[]): Record<number, string> {
+  return mapHeadersDetailed(headers).map;
+}
+
 
 /** Very small CSV reader that copes with quoted values and commas inside them. */
 export function parseCsv(text: string): string[][] {
