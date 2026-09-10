@@ -268,12 +268,20 @@ export interface PrepareOptions {
   existing: ExistingIndex;
 }
 
+export interface PrepareResult {
+  headerMap: Record<number, string>;
+  matchedHeaders: { header: string; field: string }[];
+  unmatchedHeaders: string[];
+  rows: PreparedRow[];
+}
+
 /** Validates and shapes every row of the file, ready for the preview table. */
-export function prepareRows(grid: string[][], options: PrepareOptions): { headerMap: Record<number, string>; rows: PreparedRow[] } {
-  if (!grid.length) return { headerMap: {}, rows: [] };
+export function prepareRows(grid: string[][], options: PrepareOptions): PrepareResult {
+  if (!grid.length) return { headerMap: {}, matchedHeaders: [], unmatchedHeaders: [], rows: [] };
 
   const headers = grid[0].map((h) => String(h || ''));
-  const headerMap = mapHeaders(headers);
+  const { map: headerMap, matched: matchedHeaders, unmatched: unmatchedHeaders } = mapHeadersDetailed(headers);
+
   const seenEmails = new Set<string>();
   const seenPhones = new Set<string>();
 
