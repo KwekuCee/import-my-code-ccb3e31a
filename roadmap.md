@@ -17,6 +17,7 @@
 - [x] QR scanner really reads the passes the app creates (camera decoding, records instantly, blocks repeats)
 - [x] Member roles narrowed to Leader, Member, First Timer (legacy roles read as Member)
 - [x] Leader self-registration lists every registered church branch
+- [ ] Finish flexible spreadsheet imports: derive leaders, link members, show matched headings, and complete missing leader details
 
 ## Branch privacy, group names, automatic growth (done)
 - Branch admins limited to their own branch (members, leaders, attendance) — no cross-branch filters or church editing.
