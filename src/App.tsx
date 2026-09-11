@@ -100,20 +100,14 @@ export default function App() {
   const isSuperadmin = user.role === 'Superadmin';
   const [members, setMembers] = useState<Member[]>([]);
   const handleImported = (newMembers: Member[], newLeaders: Leader[]) => {
-    if (newMembers.length) setMembers(prev => [...newMembers, ...prev]);
+    if (newMembers.length) setMembers(prev => [
+      ...newMembers,
+      ...prev.filter(existing => !newMembers.some(incoming => incoming.id === existing.id)),
+    ]);
     if (newLeaders.length) {
-      setLeaders(prev => [...newLeaders, ...prev]);
-      setMembers(prev => [
-        ...newLeaders.map(l => ({
-          id: l.id,
-          fullName: l.fullName,
-          initials: l.initials,
-          phone: (l as any).phone || '',
-          email: l.email,
-          church: l.church,
-          role: 'Leader',
-        } as unknown as Member)),
-        ...prev,
+      setLeaders(prev => [
+        ...newLeaders,
+        ...prev.filter(existing => !newLeaders.some(incoming => incoming.id === existing.id)),
       ]);
     }
   };

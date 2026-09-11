@@ -5,7 +5,7 @@ import { isIncompleteLeader, nameKey } from '../utils/importUtils';
 interface IncompleteLeadersPanelProps {
   leaders: Leader[];
   members?: Member[];
-  onSave: (leader: Leader) => void;
+  onSave: (leader: Leader) => void | boolean | Promise<void | boolean>;
   /** Only show these leader ids (e.g. the ones just created by an import). */
   onlyIds?: string[];
   title?: string;
@@ -40,6 +40,8 @@ export const IncompleteLeadersPanel: React.FC<IncompleteLeadersPanelProps> = ({
 }) => {
   const [drafts, setDrafts] = useState<Record<string, DraftFields>>({});
   const [saved, setSaved] = useState<Record<string, boolean>>({});
+  const [saving, setSaving] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const pending = useMemo(
     () =>
@@ -71,9 +73,11 @@ export const IncompleteLeadersPanel: React.FC<IncompleteLeadersPanelProps> = ({
     setDrafts((prev) => ({ ...prev, [leader.id]: { ...base, [field]: value } as DraftFields }));
   };
 
-  const save = (leader: Leader) => {
+  const save = async (leader: Leader) => {
     const d = draftFor(leader);
-    onSave({
+    setSaving((prev) => ({ ...prev, [leader.id]: true }));
+    setErrors((prev) => ({ ...prev, [leader.id]: '' }));
+    const result = await onSave({
       ...leader,
       contact: d.contact.trim(),
       email: d.email.trim(),
@@ -82,7 +86,12 @@ export const IncompleteLeadersPanel: React.FC<IncompleteLeadersPanelProps> = ({
       leaderType: (d.leaderType || leader.leaderType || 'BSCT') as LeaderType,
       cellOrPcfName: d.cellOrPcfName.trim(),
     });
-    setSaved((prev) => ({ ...prev, [leader.id]: true }));
+    if (result === false) {
+      setErrors((prev) => ({ ...prev, [leader.id]: 'The details could not be saved. Please try again.' }));
+    } else {
+      setSaved((prev) => ({ ...prev, [leader.id]: true }));
+    }
+    setSaving((prev) => ({ ...prev, [leader.id]: false }));
   };
 
   if (!pending.length) return null;
@@ -169,12 +178,13 @@ export const IncompleteLeadersPanel: React.FC<IncompleteLeadersPanelProps> = ({
 
               <button
                 onClick={() => save(leader)}
-                disabled={!d.cellOrPcfName.trim() || !d.leaderType}
+                disabled={!d.cellOrPcfName.trim() || !d.leaderType || saving[leader.id]}
                 className="bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px]">save</span>
-                <span>Save details</span>
+                <span>{saving[leader.id] ? 'Saving…' : 'Save details'}</span>
               </button>
+              {errors[leader.id] && <p className="text-xs font-semibold text-rose-700">{errors[leader.id]}</p>}
             </div>
           );
         })}

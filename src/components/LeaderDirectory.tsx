@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Leader, LeaderType, PromotionQueueItem, ViewType, ChurchBranch, Member } from '../types';
 import { EditRecordModal, ConfirmDeleteDialog } from './EditRecordModal';
 import { getGroupNamesForLeader } from '../utils/analyticsUtils';
+import { IncompleteLeadersPanel } from './IncompleteLeadersPanel';
+import { isIncompleteLeader } from '../utils/importUtils';
 
 interface LeaderDirectoryProps {
   leaders: Leader[];
@@ -166,6 +168,14 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
         </div>
       )}
 
+      {onUpdateLeader && (
+        <IncompleteLeadersPanel
+          leaders={scopedLeaders}
+          members={members}
+          onSave={(updated) => onUpdateLeader(updated)}
+        />
+      )}
+
       {/* Filter Controls */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-3">
         <div className="relative flex-1 w-full">
@@ -260,7 +270,7 @@ export const LeaderDirectory: React.FC<LeaderDirectoryProps> = ({
                         ${ldr.leaderType === 'Cell Leader' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : ''}
                         ${ldr.leaderType === 'BSCT' ? 'bg-blue-50 text-blue-800 border-blue-100' : ''}
                       `}>
-                        {ldr.leaderType}
+                        {!ldr.isAppointed && isIncompleteLeader(ldr) ? 'Not set' : ldr.leaderType}
                       </span>
                     </td>
 

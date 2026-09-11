@@ -1,15 +1,20 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { ChurchBranch, Leader, Member } from '../types';
 import {
+  HeaderMapResult,
   ImportKind,
   PreparedRow,
   TEMPLATE_COLUMNS,
   buildExistingIndex,
+  collectLeadersFromRows,
   downloadImportTemplate,
+  fieldLabel,
   initialsOf,
+  nameKey,
   prepareRows,
   readSpreadsheet,
 } from '../utils/importUtils';
+import { IncompleteLeadersPanel } from './IncompleteLeadersPanel';
 import {
   generateLeaderCode,
   saveLeaderToSupabase,
@@ -29,7 +34,9 @@ interface ImportDataPanelProps {
 }
 
 interface ImportSummary {
-  added: number;
+  membersAdded: number;
+  leadersAdded: number;
+  leadersNeedingDetails: number;
   skipped: number;
   rejected: number;
 }
@@ -46,6 +53,8 @@ export const ImportDataPanel: React.FC<ImportDataPanelProps> = ({
   const [church, setChurch] = useState(defaultChurch || churches[0]?.name || '');
   const [fileName, setFileName] = useState('');
   const [rows, setRows] = useState<PreparedRow[]>([]);
+  const [headerResult, setHeaderResult] = useState<HeaderMapResult | null>(null);
+  const [newIncompleteLeaders, setNewIncompleteLeaders] = useState<Leader[]>([]);
   const [readError, setReadError] = useState('');
   const [isReading, setIsReading] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -85,11 +94,17 @@ export const ImportDataPanel: React.FC<ImportDataPanelProps> = ({
       } else {
         const prepared = prepareRows(grid, { kind, church, existing });
         setRows(prepared.rows);
+        setHeaderResult({
+          map: prepared.headerMap,
+          matched: prepared.matchedHeaders,
+          unmatched: prepared.unmatchedHeaders,
+        });
         if (!prepared.rows.length) setReadError('No usable rows were found in that file.');
       }
       setFileName(file.name);
     } catch (err: any) {
       setRows([]);
+      setHeaderResult(null);
       setReadError(err?.message || 'That file could not be read. Please use .xlsx or .csv.');
     } finally {
       setIsReading(false);
@@ -98,6 +113,8 @@ export const ImportDataPanel: React.FC<ImportDataPanelProps> = ({
 
   const reset = () => {
     setRows([]);
+    setHeaderResult(null);
+    setNewIncompleteLeaders([]);
     setFileName('');
     setReadError('');
     setSummary(null);
@@ -111,13 +128,52 @@ export const ImportDataPanel: React.FC<ImportDataPanelProps> = ({
     const addedLeaders: Leader[] = [];
 
     try {
+      const leaderIdsByName = new Map<string, string>();
+
+      if (kind === 'members') {
+        const derived = collectLeadersFromRows(goodRows, { church, existingLeaders: leaders });
+        for (const item of derived) {
+          if (item.existingLeaderId) {
+            leaderIdsByName.set(item.key, item.existingLeaderId);
+            continue;
+          }
+
+          const code = generateLeaderCode();
+          const leader: Leader = {
+            id: code,
+            leaderCode: code,
+            fullName: item.name,
+            contact: item.phone,
+            email: item.email,
+            dob: item.dob,
+            location: item.location || 'Not Specified',
+            leaderType: 'BSCT',
+            cellOrPcfName: '',
+            church: item.church || church,
+            isAppointed: false,
+            downstreamCount: item.memberCount,
+            promotionStatus: 'Confirmed',
+            joinedDate: new Date().toISOString().slice(0, 10),
+            initials: initialsOf(item.name),
+          };
+          const ok = await saveLeaderToSupabase(leader);
+          if (ok) {
+            leaderIdsByName.set(item.key, leader.id);
+            await syncLeaderAsMember(leader).catch(() => null);
+            addedLeaders.push(leader);
+          }
+        }
+      }
+
       for (const row of goodRows) {
         if (kind === 'members' && row.member) {
+          const leaderId = leaderIdsByName.get(nameKey(row.raw.invitedBy || ''));
           const member: Member = {
             ...(row.member as Member),
             id: `CE-${Math.floor(1000 + Math.random() * 9000)}`,
             initials: initialsOf(row.member.fullName || ''),
             church: row.member.church || church,
+            invitedByLeaderId: leaderId,
           };
           const ok = await saveMemberToSupabase(member);
           if (ok) addedMembers.push(member);
@@ -143,8 +199,11 @@ export const ImportDataPanel: React.FC<ImportDataPanelProps> = ({
       }
 
       onImported(addedMembers, addedLeaders);
+      setNewIncompleteLeaders(addedLeaders);
       setSummary({
-        added: addedMembers.length + addedLeaders.length,
+        membersAdded: addedMembers.length,
+        leadersAdded: addedLeaders.length,
+        leadersNeedingDetails: addedLeaders.length,
         skipped: dupRows.length,
         rejected: badRows.length,
       });
@@ -359,6 +418,24 @@ export const ImportDataPanel: React.FC<ImportDataPanelProps> = ({
         <p className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">{readError}</p>
       )}
 
+      {headerResult && (
+        <div className="border border-slate-200 rounded-xl p-3 space-y-2">
+          <p className="text-xs font-bold text-slate-800">Columns found in your file</p>
+          <div className="flex flex-wrap gap-1.5">
+            {headerResult.matched.map((item) => (
+              <span key={`${item.header}-${item.field}`} className="text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-1 rounded-lg">
+                {item.header} → {fieldLabel(item.field)}
+              </span>
+            ))}
+          </div>
+          {headerResult.unmatched.length > 0 && (
+            <p className="text-xs text-amber-800">
+              Not imported: <span className="font-semibold">{headerResult.unmatched.join(', ')}</span>
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Preview */}
       {rows.length > 0 && (
         <div className="space-y-3">
@@ -394,8 +471,11 @@ export const ImportDataPanel: React.FC<ImportDataPanelProps> = ({
                     <td className="p-2 text-slate-600">{r.raw.email || '—'}</td>
                     <td className="p-2">
                       {r.valid ? (
-                        <span className="text-emerald-700 font-bold flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[16px]">check_circle</span> Ready
+                        <span className="text-emerald-700 font-bold">
+                          <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">check_circle</span> Ready</span>
+                          {r.problems.filter((p) => p.startsWith('Note:')).map((p) => (
+                            <span key={p} className="block text-amber-700 font-semibold mt-0.5">{p}</span>
+                          ))}
                         </span>
                       ) : (
                         <span className={`font-bold ${r.duplicate ? 'text-amber-700' : 'text-rose-700'}`}>
@@ -422,9 +502,38 @@ export const ImportDataPanel: React.FC<ImportDataPanelProps> = ({
 
       {summary && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs font-semibold text-emerald-800">
-          {summary.added} added · {summary.skipped} skipped (already in the system) · {summary.rejected} rejected
+          {summary.membersAdded} members added · {summary.skipped} skipped as already in the system · {summary.rejected} rejected
+          {summary.leadersAdded > 0 && ` · ${summary.leadersAdded} leaders created from the Leader column — ${summary.leadersNeedingDetails} still need details`}
         </div>
       )}
+
+      <IncompleteLeadersPanel
+        leaders={newIncompleteLeaders}
+        members={[...members, ...newIncompleteLeaders.map((leader) => ({
+          id: leader.id,
+          fullName: leader.fullName,
+          phone: leader.contact,
+          email: leader.email,
+          role: 'Leader' as const,
+          occupation: 'General',
+          education: 'Not Specified',
+          location: leader.location,
+          church: leader.church,
+          joinDate: leader.joinedDate,
+          initials: leader.initials,
+          serviceCount: 1,
+          foundationClass: 7,
+          status: 'General Member' as const,
+        }))]}
+        onSave={async (updated) => {
+          const ok = await saveLeaderToSupabase(updated);
+          if (!ok) return false;
+          await syncLeaderAsMember(updated).catch(() => null);
+          setNewIncompleteLeaders((current) => current.map((leader) => leader.id === updated.id ? updated : leader));
+          onImported([], [updated]);
+          return true;
+        }}
+      />
 
       {/* Email codes */}
       <div className="pt-4 border-t border-slate-100 space-y-2">
