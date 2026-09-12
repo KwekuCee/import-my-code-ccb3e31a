@@ -5,6 +5,7 @@ import { Member, Leader, ChurchBranch, ChurchAdminAccount, AttendanceRecord } fr
 import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClassNumber, getFoundationClassLabel } from '../data/constants';
 import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin, uploadMemberPhoto, uploadProfilePhoto, sendAdminVerificationEmail, syncLeaderAsMember, generateLeaderCode, sendQrPassEmails } from '../lib/supabaseService';
 import { ChurchLogo } from './ChurchLogo';
+import { HeroSection } from './HeroSection';
 
 interface PublicPortalProps {
   members: Member[];
@@ -31,7 +32,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   onLoginSuccess,
   onAddMember,
 }) => {
-  const [activeTab, setActiveTab] = useState<'attendance' | 'leader_reg' | 'admin_signup' | 'login'>('attendance');
+  const [activeTab, setActiveTab] = useState<'home' | 'attendance' | 'leader_reg' | 'admin_signup' | 'login'>('home');
 
   // Dynamically derive effective list of churches from DB and registered admins
   const effectiveChurches = useMemo(() => {
