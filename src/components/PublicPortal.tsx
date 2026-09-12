@@ -659,66 +659,73 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 md:py-10 space-y-8">
-        {/* Hero Welcome Header */}
-        <div className="text-center space-y-3 max-w-2xl mx-auto">
+        {/* HOMEPAGE HERO — shown only on the landing tab */}
+        {activeTab === 'home' && (
+          <HeroSection onNavigate={(tab) => { setActiveTab(tab); if (tab === 'attendance') setAttSuccessPass(null); }} />
+        )}
 
-          <h2 className="font-display text-2xl md:text-4xl font-black text-slate-900 tracking-tight">
-            Welcome to GCYC Group Portal
-          </h2>
-          <p className="text-xs md:text-sm text-slate-600">
-            Platform for member attendance, leader onboarding, and church admin portal registration across all group branches.
-          </p>
-        </div>
+        {/* Action Tabs Switcher — hidden on the hero landing page */}
+        {activeTab !== 'home' && (
+          <div className="flex flex-wrap justify-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 max-w-3xl mx-auto shadow-xs">
+            <button
+              onClick={() => {
+                setActiveTab('home');
+                setAttSuccessPass(null);
+              }}
+              className="flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer text-slate-600 hover:text-blue-800 hover:bg-white/80"
+            >
+              <span className="material-symbols-outlined text-[18px]">home</span>
+              <span>Home</span>
+            </button>
 
-        {/* Action Tabs Switcher */}
-        <div className="flex flex-wrap justify-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 max-w-3xl mx-auto shadow-xs">
-          <button
-            onClick={() => {
-              setActiveTab('attendance');
-              setAttSuccessPass(null);
-            }}
-            className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'attendance'
-              ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
-              : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
-              }`}
-          >
-            <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
-            <span>Self Attendance</span>
-          </button>
+            <button
+              onClick={() => {
+                setActiveTab('attendance');
+                setAttSuccessPass(null);
+              }}
+              className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'attendance'
+                ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
+                : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
+                }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
+              <span>Self Attendance</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('leader_reg')}
-            className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'leader_reg'
-              ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
-              : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
-              }`}
-          >
-            <span className="material-symbols-outlined text-[18px]">person_add</span>
-            <span>Self Leader Reg</span>
-          </button>
+            <button
+              onClick={() => setActiveTab('leader_reg')}
+              className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'leader_reg'
+                ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
+                : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
+                }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">person_add</span>
+              <span>Self Leader Reg</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('admin_signup')}
-            className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'admin_signup'
-              ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
-              : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
-              }`}
-          >
-            <span className="material-symbols-outlined text-[18px]">church</span>
-            <span>Admin Sign Up</span>
-          </button>
+            <button
+              onClick={() => setActiveTab('admin_signup')}
+              className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'admin_signup'
+                ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
+                : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
+                }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">church</span>
+              <span>Admin Sign Up</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('login')}
-            className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'login'
-              ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
-              : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
-              }`}
-          >
-            <span className="material-symbols-outlined text-[18px]">lock</span>
-            <span>Admin Login</span>
-          </button>
-        </div>
+            <button
+              onClick={() => setActiveTab('login')}
+              className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'login'
+                ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
+                : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
+                }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">lock</span>
+              <span>Admin Login</span>
+            </button>
+          </div>
+        )}
 
         {/* TAB 1: SELF ATTENDANCE RECORDING */}
         {activeTab === 'attendance' && (
