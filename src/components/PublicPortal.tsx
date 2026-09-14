@@ -753,15 +753,25 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                 </div>
                 <div>
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-900 text-xs font-bold rounded-full border border-blue-300 mb-2">
-                    <span className="material-symbols-outlined text-[14px]">download_done</span>
-                    <span>QR CODE AUTOMATICALLY DOWNLOADED</span>
+                    <span className="material-symbols-outlined text-[14px]">
+                      {passSaveOutcome === 'shared' || passSaveOutcome === 'downloaded' ? 'download_done' : 'qr_code_2'}
+                    </span>
+                    <span>
+                      {passSaveOutcome === 'shared' || passSaveOutcome === 'downloaded'
+                        ? 'QR CODE SAVED TO YOUR DEVICE'
+                        : 'QR CODE READY — SAVE IT BELOW'}
+                    </span>
                   </div>
                   <h4 className="font-display font-extrabold text-2xl text-slate-900">
                     Attendance Confirmed!
                   </h4>
                   <p className="text-xs text-slate-600 mt-1">
-                    God bless you for coming to church, <span className="font-bold text-slate-900">{attSuccessPass.memberName}</span>! Your personal Digital Attendance Pass QR Code has been saved to your device.
+                    God bless you for coming to church, <span className="font-bold text-slate-900">{attSuccessPass.memberName}</span>!{' '}
+                    {passSaveOutcome === 'shared' || passSaveOutcome === 'downloaded'
+                      ? 'Your personal Digital Attendance Pass QR Code has been saved to your device.'
+                      : 'Save your personal Digital Attendance Pass below — press and hold the image, or tap Save Pass.'}
                   </p>
+
                 </div>
 
                 {/* QR Pass Preview Card */}

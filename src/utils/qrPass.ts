@@ -142,8 +142,11 @@ export async function saveQrPass(
       }
     } catch (err: any) {
       // User cancelled the sheet — treat as handled, nothing else to do.
-      if (err && (err.name === 'AbortError' || err.name === 'NotAllowedError')) return 'shared';
+      if (err && err.name === 'AbortError') return 'shared';
+      // NotAllowedError means Safari refused because we're outside a tap:
+      // fall through to the download / new-tab fallbacks below.
     }
+
 
     // 2. Blob download.
     try {
