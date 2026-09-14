@@ -295,7 +295,7 @@ export function prepareRows(grid: string[][], options: PrepareOptions): PrepareR
   if (!grid.length) return { headerMap: {}, matchedHeaders: [], unmatchedHeaders: [], rows: [] };
 
   const headers = grid[0].map((h) => String(h || ''));
-  const { map: headerMap, matched: matchedHeaders, unmatched: unmatchedHeaders } = mapHeadersDetailed(headers);
+  const { map: headerMap, matched: matchedHeaders, unmatched: unmatchedHeaders } = mapHeadersDetailed(headers, options.kind);
 
   const seenEmails = new Set<string>();
   const seenPhones = new Set<string>();
