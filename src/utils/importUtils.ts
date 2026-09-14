@@ -86,33 +86,47 @@ export function fieldLabel(field: string): string {
   return FIELD_LABELS[field] || field;
 }
 
+/** Headings that mean "the leader who invited this person", never the member's own name. */
+const LEADER_NAME_ALIASES = ['leader name', 'leaders name', 'name of leader', 'leader s name'];
+
 /** Maps the file's headings to our field names, whatever wording was used. */
-export function mapHeadersDetailed(headers: string[]): HeaderMapResult {
+export function mapHeadersDetailed(headers: string[], kind: ImportKind = 'members'): HeaderMapResult {
   const map: Record<number, string> = {};
   const matched: { header: string; field: string }[] = [];
   const unmatched: string[] = [];
+
+  const aliasesFor = (field: string): string[] => {
+    const list = HEADER_ALIASES[field] || [];
+    // In a members file "Leader Name" means who invited them, not their own name.
+    if (field === 'fullName' && kind === 'members') {
+      return list.filter((a) => !LEADER_NAME_ALIASES.includes(a));
+    }
+    return list;
+  };
 
   headers.forEach((header, i) => {
     const norm = normalizeHeader(header);
     if (!norm) return;
     const squashed = norm.replace(/[^a-z]/g, '');
-    let hit: string | null = null;
-    for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
-      if (aliases.some((a) => norm === a || squashed === a.replace(/[^a-z]/g, ''))) {
-        hit = field;
-        break;
+
+    // Collect every field this heading could mean, exact matches first.
+    const candidates: string[] = [];
+    for (const field of Object.keys(HEADER_ALIASES)) {
+      if (aliasesFor(field).some((a) => norm === a || squashed === a.replace(/[^a-z]/g, ''))) {
+        candidates.push(field);
       }
     }
-    // Second pass: allow "member's full name", "phone (mobile)" style wording.
-    if (!hit) {
-      for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
-        if (aliases.some((a) => a.length > 3 && norm.includes(a))) {
-          hit = field;
-          break;
-        }
+    for (const field of Object.keys(HEADER_ALIASES)) {
+      if (candidates.includes(field)) continue;
+      if (aliasesFor(field).some((a) => a.length > 3 && norm.includes(a))) {
+        candidates.push(field);
       }
     }
-    if (hit && !Object.values(map).includes(hit)) {
+
+    // Use the first candidate that isn't already taken by an earlier column.
+    const used = Object.values(map);
+    const hit = candidates.find((f) => !used.includes(f));
+    if (hit) {
       map[i] = hit;
       matched.push({ header: String(header), field: hit });
     } else {
@@ -123,9 +137,10 @@ export function mapHeadersDetailed(headers: string[]): HeaderMapResult {
   return { map, matched, unmatched };
 }
 
-export function mapHeaders(headers: string[]): Record<number, string> {
-  return mapHeadersDetailed(headers).map;
+export function mapHeaders(headers: string[], kind: ImportKind = 'members'): Record<number, string> {
+  return mapHeadersDetailed(headers, kind).map;
 }
+
 
 
 /** Very small CSV reader that copes with quoted values and commas inside them. */
