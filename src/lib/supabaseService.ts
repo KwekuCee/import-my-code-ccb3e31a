@@ -1,4 +1,5 @@
 import { getSupabase } from './supabase';
+import { getPortalToken } from './portalDb';
 import {
   Member,
   Leader,
@@ -384,6 +385,8 @@ export async function deleteLeaderFromSupabase(leaderId: string): Promise<boolea
 export async function fetchAttendanceFromSupabase(): Promise<AttendanceRecord[] | null> {
   const client = getSupabase();
   if (!client) return null;
+  if (!getPortalToken()) return []; // history is only for signed-in accounts
+
 
   try {
     const { data, error } = await client.from('attendance_records').select('*').order('checked_in_at', { ascending: false });
@@ -1038,6 +1041,8 @@ export async function declinePromotionInSupabase(promotionId: string): Promise<b
 export async function fetchAuditLogsFromSupabase(limit = 10): Promise<AuditLogItem[] | null> {
   const client = getSupabase();
   if (!client) return null;
+  if (!getPortalToken()) return []; // activity history is only for signed-in accounts
+
 
   try {
     const { data, error } = await client

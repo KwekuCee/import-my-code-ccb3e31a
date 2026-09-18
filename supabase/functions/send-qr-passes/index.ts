@@ -2,8 +2,15 @@
 // Used both for the automatic copy sent after check-in / leader registration and
 // for the bulk "Email codes to all members / all leaders" buttons.
 
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { corsHeaders as baseCorsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { sendMail } from '../_shared/mailer.ts';
+import { getPortalSession } from '../_shared/portal-session.ts';
+
+const corsHeaders = {
+  ...baseCorsHeaders,
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type, x-portal-session',
+};
 
 interface Recipient {
   id: string;
@@ -58,6 +65,18 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => null);
     const recipients: Recipient[] = Array.isArray(body?.recipients) ? body.recipients : [];
+
+    // One pass at a time is allowed for self check-in / self registration.
+    // Anything larger is an admin action and needs a signed-in session.
+    if (recipients.length > 1) {
+      const session = await getPortalSession(req);
+      if (!session) {
+        return new Response(JSON.stringify({ error: 'Please sign in to email codes in bulk.' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
 
     if (!recipients.length) {
       return new Response(JSON.stringify({ error: 'No recipients supplied.' }), {

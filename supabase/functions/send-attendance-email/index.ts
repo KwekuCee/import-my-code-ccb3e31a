@@ -9,7 +9,8 @@ declare const Deno: { env: { get(key: string): string | undefined } };
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type, x-portal-session',
 };
 
 interface RequestBody {
@@ -47,6 +48,21 @@ Deno.serve(async (req: Request) => {
       );
     }
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // The person must really be on this branch's roll, so the notification can
+    // never be used to push made-up names or text at a branch admin.
+    const { data: memberRow } = await supabase
+      .from('members')
+      .select('id, church_name')
+      .eq('id', memberId)
+      .maybeSingle();
+
+    if (!memberRow || (memberRow.church_name || '').toLowerCase() !== churchName.trim().toLowerCase()) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'This person is not on that branch’s records.' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Look up the admin email for this church (case-insensitive match on name).
     const { data: adminRow, error: adminErr } = await supabase

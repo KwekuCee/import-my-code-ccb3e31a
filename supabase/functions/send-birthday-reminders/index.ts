@@ -1,7 +1,14 @@
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { corsHeaders as baseCorsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { sendMail as sendGmail } from '../_shared/mailer.ts';
+import { getPortalSession } from '../_shared/portal-session.ts';
+import { authenticateCronRequest } from '../_shared/cron-auth.ts';
 
+const corsHeaders = {
+  ...baseCorsHeaders,
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type, x-portal-session',
+};
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -13,7 +20,13 @@ function json(body: unknown, status = 200) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
-  
+  // Runs on a schedule, or by hand from a signed-in admin account. Nobody else.
+  const cronCheck = authenticateCronRequest(req);
+  if (cronCheck) {
+    const session = await getPortalSession(req);
+    if (!session) return json({ success: false, message: 'Please sign in to send reminders.' }, 401);
+  }
+
   const admin = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,

@@ -58,6 +58,21 @@ const ALLOWED_TABLES = new Set([
 
 const FILTER_OPS = new Set(['eq', 'neq', 'ilike', 'like', 'gte', 'lte', 'gt', 'lt', 'in', 'is', 'not']);
 
+/**
+ * Tables that belong to a single branch. Anyone who is not the group account
+ * only ever receives their own branch's rows, enforced here on the server so
+ * the browser never holds another branch's records.
+ */
+const BRANCH_SCOPED = new Set([
+  'members',
+  'leaders',
+  'attendance_records',
+  'absence_records',
+  'church_admin_accounts',
+  'promotion_queue',
+  'audit_logs',
+]);
+
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -182,6 +197,24 @@ async function handleQuery(body: QueryRequest, session: Session | null) {
     }
   }
 
+  // A branch account always writes into its own branch, whatever the browser sent.
+  if (
+    session &&
+    session.role !== 'Superadmin' &&
+    session.church_name &&
+    BRANCH_SCOPED.has(table) &&
+    (op === 'insert' || op === 'upsert')
+  ) {
+    const rows = (Array.isArray(body.values) ? body.values : [body.values]) as Array<
+      Record<string, unknown>
+    >;
+    for (const row of rows) {
+      if (row && typeof row === 'object' && 'church_name' in row) {
+        row.church_name = session.church_name;
+      }
+    }
+  }
+
   let query: any = admin.from(table);
 
   if (op === 'select') {
@@ -209,6 +242,14 @@ async function handleQuery(body: QueryRequest, session: Session | null) {
     } else {
       query = (query as any)[filter.op](filter.column, filter.value as any);
     }
+  }
+
+  // Branch scoping: a branch account never sees or changes another branch's rows.
+  if (session && session.role !== 'Superadmin' && BRANCH_SCOPED.has(table) && op !== 'insert' && op !== 'upsert') {
+    if (!session.church_name) {
+      return json({ error: { message: 'Your account is not linked to a branch yet.' } }, 403);
+    }
+    query = query.ilike('church_name', session.church_name);
   }
 
   if (body.or) {

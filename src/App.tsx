@@ -247,15 +247,46 @@ export default function App() {
   const handleConfirmPromotion = (promotionId: string) => {
     const item = promotionQueue.find(p => p.id === promotionId);
     if (item) {
-      // Update leader's role
-      setLeaders(prev => prev.map(ldr => {
-        if (ldr.id === item.leaderId) {
-          const updated = { ...ldr, leaderType: item.targetRole, promotionStatus: 'Confirmed' as const };
-          saveLeaderToSupabase(updated);
-          return updated;
-        }
-        return ldr;
-      }));
+      const existingLeader = leaders.find(l => l.id === item.leaderId);
+
+      if (existingLeader) {
+        // Update leader's role
+        setLeaders(prev => prev.map(ldr => {
+          if (ldr.id === item.leaderId) {
+            const updated = { ...ldr, leaderType: item.targetRole, promotionStatus: 'Confirmed' as const };
+            saveLeaderToSupabase(updated);
+            return updated;
+          }
+          return ldr;
+        }));
+      } else {
+        // The person was never a leader before — create their leader record now,
+        // using whatever we already know from their member record.
+        const source = members.find(
+          m => m && (m.id === item.memberId || (m.fullName || '').toLowerCase() === (item.leaderName || '').toLowerCase())
+        );
+        const fullName = source?.fullName || item.leaderName || 'New Leader';
+        const initials = fullName.split(' ').filter(Boolean).map(p => p[0]).join('').slice(0, 2).toUpperCase();
+        const newLeader: Leader = {
+          id: item.leaderId || `leader-${Date.now()}`,
+          fullName,
+          email: source?.email || '',
+          contact: source?.phone || '',
+          dob: source?.dob || '',
+          location: source?.location || '',
+          leaderType: item.targetRole,
+          cellOrPcfName: `${fullName}'s Group`,
+          church: item.church || source?.church || '',
+          parentLeaderId: source?.invitedByLeaderId,
+          isAppointed: true,
+          downstreamCount: 0,
+          promotionStatus: 'Confirmed',
+          joinedDate: new Date().toISOString().slice(0, 10),
+          initials,
+        };
+        setLeaders(prev => [newLeader, ...prev]);
+        saveLeaderToSupabase(newLeader).then(() => syncLeaderAsMember(newLeader)).catch(() => {});
+      }
       // Tag the person as a leader in the member records too
       setMembers(prev => prev.map(m =>
         m && (m.id === item.memberId || (m.fullName || '').toLowerCase() === (item.leaderName || '').toLowerCase())
