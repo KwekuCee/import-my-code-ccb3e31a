@@ -1040,6 +1040,8 @@ export async function declinePromotionInSupabase(promotionId: string): Promise<b
 export async function fetchAuditLogsFromSupabase(limit = 10): Promise<AuditLogItem[] | null> {
   const client = getSupabase();
   if (!client) return null;
+  if (!getPortalToken()) return []; // activity history is only for signed-in accounts
+
 
   try {
     const { data, error } = await client
