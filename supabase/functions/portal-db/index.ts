@@ -58,6 +58,22 @@ const ALLOWED_TABLES = new Set([
 
 const FILTER_OPS = new Set(['eq', 'neq', 'ilike', 'like', 'gte', 'lte', 'gt', 'lt', 'in', 'is', 'not']);
 
+/**
+ * Tables that belong to a single branch. Anyone who is not the group account
+ * only ever receives their own branch's rows, enforced here on the server so
+ * the browser never holds another branch's records.
+ */
+const BRANCH_SCOPED = new Set([
+  'members',
+  'leaders',
+  'attendance_records',
+  'absence_records',
+  'church_admin_accounts',
+  'promotion_queue',
+  'audit_logs',
+  'announcements',
+]);
+
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
