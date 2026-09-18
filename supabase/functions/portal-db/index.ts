@@ -71,7 +71,6 @@ const BRANCH_SCOPED = new Set([
   'church_admin_accounts',
   'promotion_queue',
   'audit_logs',
-  'announcements',
 ]);
 
 function json(body: unknown, status = 200) {
