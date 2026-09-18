@@ -227,6 +227,14 @@ async function handleQuery(body: QueryRequest, session: Session | null) {
     }
   }
 
+  // Branch scoping: a branch account never sees or changes another branch's rows.
+  if (session && session.role !== 'Superadmin' && BRANCH_SCOPED.has(table) && op !== 'insert' && op !== 'upsert') {
+    if (!session.church_name) {
+      return json({ error: { message: 'Your account is not linked to a branch yet.' } }, 403);
+    }
+    query = query.ilike('church_name', session.church_name);
+  }
+
   if (body.or) {
     if (!session) return json({ error: { message: 'Please sign in to run this search.' } }, 401);
     query = query.or(body.or);
