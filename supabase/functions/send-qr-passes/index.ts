@@ -66,6 +66,18 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => null);
     const recipients: Recipient[] = Array.isArray(body?.recipients) ? body.recipients : [];
 
+    // One pass at a time is allowed for self check-in / self registration.
+    // Anything larger is an admin action and needs a signed-in session.
+    if (recipients.length > 1) {
+      const session = await getPortalSession(req);
+      if (!session) {
+        return new Response(JSON.stringify({ error: 'Please sign in to email codes in bulk.' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     if (!recipients.length) {
       return new Response(JSON.stringify({ error: 'No recipients supplied.' }), {
         status: 400,
