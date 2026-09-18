@@ -1,4 +1,5 @@
 import { getSupabase } from './supabase';
+import { getPortalToken } from './portalDb';
 import {
   Member,
   Leader,
