@@ -201,8 +201,15 @@ export const portalDb = {
 
 
   functions: {
-    invoke(name: string, options?: { body?: unknown }) {
-      return (cloudClient as any).functions.invoke(name, options);
+    invoke(name: string, options?: { body?: unknown; headers?: Record<string, string> }) {
+      const token = getPortalToken();
+      return (cloudClient as any).functions.invoke(name, {
+        ...options,
+        headers: {
+          ...(options?.headers || {}),
+          ...(token ? { 'x-portal-session': token } : {}),
+        },
+      });
     },
   },
 
