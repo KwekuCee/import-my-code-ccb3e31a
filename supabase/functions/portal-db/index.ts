@@ -197,6 +197,24 @@ async function handleQuery(body: QueryRequest, session: Session | null) {
     }
   }
 
+  // A branch account always writes into its own branch, whatever the browser sent.
+  if (
+    session &&
+    session.role !== 'Superadmin' &&
+    session.church_name &&
+    BRANCH_SCOPED.has(table) &&
+    (op === 'insert' || op === 'upsert')
+  ) {
+    const rows = (Array.isArray(body.values) ? body.values : [body.values]) as Array<
+      Record<string, unknown>
+    >;
+    for (const row of rows) {
+      if (row && typeof row === 'object' && 'church_name' in row) {
+        row.church_name = session.church_name;
+      }
+    }
+  }
+
   let query: any = admin.from(table);
 
   if (op === 'select') {
