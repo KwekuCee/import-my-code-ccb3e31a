@@ -146,7 +146,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [newServiceName, setNewServiceName] = useState('');
 
   // Church Admin profile states (initialized with details entered at signup)
-  const [branchName, setBranchName] = useState(matchingChurch?.name || user.church || 'GCYC 1');
+  const [branchName, setBranchName] = useState(matchingChurch?.name || user.church || '');
   const [pastorInCharge, setPastorInCharge] = useState(matchingChurch?.pastor || 'Pastor Emmanuel');
   const [adminFullName, setAdminFullName] = useState(matchingAdmin?.adminName || user.name || 'Branch Admin');
   const [adminEmail, setAdminEmail] = useState(matchingAdmin?.adminEmail || user.email || 'admin@cekorlebu.org');

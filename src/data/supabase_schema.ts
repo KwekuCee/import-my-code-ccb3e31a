@@ -1,10 +1,8 @@
 export const SUPABASE_SQL_SCHEMA = `-- ============================================================================
 -- GCYC GROUP CHURCH MANAGEMENT SYSTEM - COMPREHENSIVE SUPABASE POSTGRESQL DDL
 -- Multi-Tenancy, Foundation School (7 Classes), Hierarchy Tree, RLS Policies & Triggers
--- Superadmin Initial Credentials:
---   Username: group.pastor
---   Email:    group.pastor@cekorlebu.org
---   Password: CEKBU@2026
+-- No default accounts or passwords: every account is created through sign-up
+-- and each person sets their own password (stored as a bcrypt hash).
 -- ============================================================================
 
 -- 0. Enable Required PostgreSQL Extensions
@@ -46,7 +44,7 @@ CREATE TABLE IF NOT EXISTS public.user_profiles (
   auth_user_id UUID UNIQUE, -- Foreign key referencing auth.users(id) in Supabase Auth
   username VARCHAR(100) UNIQUE NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL, -- Hashed with pgcrypto: crypt('CEKBU@2026', gen_salt('bf'))
+  password_hash TEXT NOT NULL, -- Hashed with pgcrypto: crypt(<chosen password>, gen_salt('bf'))
   full_name VARCHAR(255) NOT NULL,
   role user_role_enum NOT NULL DEFAULT 'Church Admin',
   church_id UUID REFERENCES public.churches(id) ON DELETE SET NULL,
@@ -115,7 +113,7 @@ CREATE TABLE IF NOT EXISTS public.church_admin_accounts (
   admin_name VARCHAR(255) NOT NULL,
   admin_email VARCHAR(255) NOT NULL,
   admin_phone VARCHAR(50) NOT NULL,
-  password VARCHAR(255) DEFAULT 'CEKBU@2026',
+  password VARCHAR(255), -- bcrypt hash, set when the admin account is created
   zone VARCHAR(100) DEFAULT 'Zone 1 (Korle Bu)',
   role VARCHAR(50) DEFAULT 'Church Admin',
   status VARCHAR(50) DEFAULT 'Active',
@@ -364,76 +362,10 @@ CREATE POLICY "Church Admin Isolation Attendance" ON public.attendance_records
     OR (auth.jwt() ->> 'is_superadmin')::BOOLEAN = TRUE
   );
 
--- 17. Initial Seed Data: Church Branches & Superadmin
-INSERT INTO public.churches (id, name, pastor_name, members_count, status, zone)
-VALUES 
-  ('a1b2c3d4-0000-0000-0000-000000000001', 'GCYC 1', 'Pastor Emmanuel', 280, 'Healthy', 'Zone 1 (Korle Bu)'),
-  ('a1b2c3d4-0000-0000-0000-000000000002', 'GCYC 2', 'Pastor Michael', 195, 'Healthy', 'Zone 1 (Korle Bu)'),
-  ('a1b2c3d4-0000-0000-0000-000000000003', 'GCYC 3', 'Pastor Sarah', 220, 'Healthy', 'Zone 1 (Korle Bu)'),
-  ('a1b2c3d4-0000-0000-0000-000000000004', 'GCYC 4', 'Pastor David', 160, 'Attention Needed', 'Zone 1 (Korle Bu)'),
-  ('a1b2c3d4-0000-0000-0000-000000000005', 'GCYC 5', 'Pastor Grace', 140, 'Healthy', 'Zone 1 (Korle Bu)')
-ON CONFLICT (name) DO NOTHING;
-
--- Seed Default Superadmin Credentials
--- Username: group.pastor
--- Password: CEKBU@2026
-INSERT INTO public.user_profiles (
-  username,
-  email,
-  password_hash,
-  full_name,
-  role,
-  church_id,
-  church_name,
-  zone,
-  avatar_url
-)
-VALUES 
-  (
-    'group.pastor',
-    'group.pastor@cekorlebu.org',
-    crypt('CEKBU@2026', gen_salt('bf')),
-    'Pastor Joseph (Group Pastor)',
-    'Superadmin',
-    'a1b2c3d4-0000-0000-0000-000000000001',
-    'GCYC Group HQ',
-    'Zone 1 (Korle Bu)',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200'
-  ),
-  (
-    'admin.korlebu1',
-    'admin.korlebu1@cekorlebu.org',
-    crypt('CEKBU@2026', gen_salt('bf')),
-    'Brother Michael (Admin)',
-    'Church Admin',
-    'a1b2c3d4-0000-0000-0000-000000000001',
-    'GCYC 1',
-    'Zone 1 (Korle Bu)',
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200'
-  ),
-  (
-    'admin.korlebu2',
-    'admin.korlebu2@cekorlebu.org',
-    crypt('CEKBU@2026', gen_salt('bf')),
-    'Sister Debra (Admin)',
-    'Church Admin',
-    'a1b2c3d4-0000-0000-0000-000000000002',
-    'GCYC 2',
-    'Zone 1 (Korle Bu)',
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200'
-  )
-ON CONFLICT (email) DO UPDATE 
-SET password_hash = EXCLUDED.password_hash,
-    full_name = EXCLUDED.full_name,
-    church_name = EXCLUDED.church_name;
-
--- Seed church_admin_accounts directory
-INSERT INTO public.church_admin_accounts (id, church_name, admin_name, admin_email, admin_phone, zone, role)
-VALUES
-  ('ADM-101', 'GCYC 1', 'Brother Michael', 'admin.korlebu1@cekorlebu.org', '+233 24 111 2222', 'Zone 1 (Korle Bu)', 'Church Admin'),
-  ('ADM-102', 'GCYC 2', 'Sister Debra', 'admin.korlebu2@cekorlebu.org', '+233 24 333 4444', 'Zone 1 (Korle Bu)', 'Church Admin'),
-  ('ADM-103', 'GCYC 3', 'Brother Daniel', 'admin.korlebu3@cekorlebu.org', '+233 24 555 6666', 'Zone 1 (Korle Bu)', 'Church Admin')
-ON CONFLICT (id) DO NOTHING;
+-- 17. Initial Seed Data
+-- No branches, admins or sample accounts are seeded. Branches and their admin
+-- accounts are created through the sign-up screen, and each admin chooses their
+-- own password, so no shared or default password exists anywhere.
 
 -- Seed Standard Service Types
 INSERT INTO public.service_types (name, description, is_active)
@@ -633,7 +565,7 @@ BEGIN
       gen_random_uuid() as id,
       admin_email as username,
       admin_email as email,
-      COALESCE(password, 'CEKBU@2026') as password_hash,
+      password as password_hash,
       admin_name as full_name,
       'Church Admin'::user_role_enum as role,
       church_name,
@@ -659,9 +591,9 @@ BEGIN
   END IF;
 
   -- 4. Password Crypt / Hash / Plain Comparison
-  IF v_user.password_hash != p_password 
-     AND v_user.password_hash != crypt(p_password, v_user.password_hash)
-     AND p_password != 'CEKBU@2026' THEN
+  IF v_user.password_hash IS NULL
+     OR v_user.password_hash NOT LIKE '$2%'
+     OR v_user.password_hash != crypt(p_password, v_user.password_hash) THEN
     RETURN jsonb_build_object(
       'success', false,
       'error', 'Incorrect password entered. Please check your credentials.'
@@ -676,7 +608,7 @@ BEGIN
       'name', v_user.full_name,
       'email', v_user.email,
       'role', v_user.role,
-      'church', COALESCE(v_user.church_name, CASE WHEN v_user.role = 'Superadmin' THEN '' ELSE 'GCYC 1' END),
+      'church', COALESCE(v_user.church_name, ''),
       'zone', COALESCE(v_user.zone, 'Zone 1 (Korle Bu)')
     )
   );
