@@ -695,7 +695,7 @@ export async function fetchChurchAdminsFromSupabase(): Promise<ChurchAdminAccoun
 
 export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Promise<boolean> {
   const email = (admin.adminEmail || '').trim().toLowerCase();
-  const passwordToStore = admin.password?.trim() || 'CEKBU@2026';
+  const passwordToStore = admin.password?.trim() || '';
   // Passwords are never cached on the device; the server scrambles them on save.
 
   // 1. Immediately cache in localStorage for instant persistence

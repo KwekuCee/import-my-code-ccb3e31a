@@ -527,6 +527,11 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       return;
     }
 
+    if (admPassword.trim().length < 8) {
+      setAdmError('Please choose a password with at least 8 characters.');
+      return;
+    }
+
     setIsSubmittingAdmin(true);
     try {
     const newBranch: ChurchBranch = {
@@ -556,7 +561,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       zone: 'Zone 1 (Korle Bu)',
       joinedDate: new Date().toISOString().slice(0, 10),
       status: 'Active',
-      password: admPassword.trim() || 'CEKBU@2026'
+      password: admPassword.trim()
     };
 
     onAddChurchAdmin(newAdmin, newBranch);

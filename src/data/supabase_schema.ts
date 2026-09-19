@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS public.church_admin_accounts (
   admin_name VARCHAR(255) NOT NULL,
   admin_email VARCHAR(255) NOT NULL,
   admin_phone VARCHAR(50) NOT NULL,
-  password VARCHAR(255) DEFAULT 'CEKBU@2026',
+  password VARCHAR(255), -- bcrypt hash, set when the admin account is created
   zone VARCHAR(100) DEFAULT 'Zone 1 (Korle Bu)',
   role VARCHAR(50) DEFAULT 'Church Admin',
   status VARCHAR(50) DEFAULT 'Active',
@@ -633,7 +633,7 @@ BEGIN
       gen_random_uuid() as id,
       admin_email as username,
       admin_email as email,
-      COALESCE(password, 'CEKBU@2026') as password_hash,
+      password as password_hash,
       admin_name as full_name,
       'Church Admin'::user_role_enum as role,
       church_name,
@@ -659,9 +659,9 @@ BEGIN
   END IF;
 
   -- 4. Password Crypt / Hash / Plain Comparison
-  IF v_user.password_hash != p_password 
-     AND v_user.password_hash != crypt(p_password, v_user.password_hash)
-     AND p_password != 'CEKBU@2026' THEN
+  IF v_user.password_hash IS NULL
+     OR v_user.password_hash NOT LIKE '$2%'
+     OR v_user.password_hash != crypt(p_password, v_user.password_hash) THEN
     RETURN jsonb_build_object(
       'success', false,
       'error', 'Incorrect password entered. Please check your credentials.'
@@ -676,7 +676,7 @@ BEGIN
       'name', v_user.full_name,
       'email', v_user.email,
       'role', v_user.role,
-      'church', COALESCE(v_user.church_name, CASE WHEN v_user.role = 'Superadmin' THEN '' ELSE 'GCYC 1' END),
+      'church', COALESCE(v_user.church_name, ''),
       'zone', COALESCE(v_user.zone, 'Zone 1 (Korle Bu)')
     )
   );

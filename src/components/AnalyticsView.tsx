@@ -22,7 +22,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   onAddAuditLog
 }) => {
   const isSuperadmin = user?.role === 'Superadmin';
-  const churchName = user?.church || 'GCYC 1';
+  const churchName = user?.church || '';
   const [selectedBranch, setSelectedBranch] = useState<string>('All');
   const [sentBirthdayFor, setSentBirthdayFor] = useState<string[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -340,7 +340,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
               <span>First Timers Follow-up Engine</span>
             </div>
             <p className="text-xs text-slate-300 font-body leading-relaxed">
-              Every first timer remains in active follow-up for their first 3 services. Upon their 3rd attendance, the system converts them to a General Member and assigns them to Foundation School class 1.
+              Every first timer stays in active follow-up until their second service. On that second attendance, the system converts them to a General Member and assigns them to Foundation School class 1.
             </p>
             <button
               onClick={() => onNavigate('members')}
