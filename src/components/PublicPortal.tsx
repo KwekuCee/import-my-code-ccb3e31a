@@ -1109,29 +1109,57 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                     </select>
                   </div>
 
-                  {/* Leader / Inviter Selection — only leaders from the selected church */}
+                  {/* Leader / Inviter Selection — selected church first, then every other branch */}
                   <div>
                     <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
                       Who Invited You / Name of Leader? *
                     </label>
-                    <select
-                      value={attInvitedByLeaderId}
-                      onChange={(e) => handleInvitedByChange(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
-                    >
-                      <option value="self_invite">Self Invited / Walk-In</option>
-                      {leaders
-                        .filter((ldr) => !attChurch || (ldr.church || '').toLowerCase() === attChurch.toLowerCase())
-                        .map((ldr) => (
-                          <option key={ldr.id} value={ldr.id}>
-                            {ldr.fullName} ({ldr.leaderType})
-                          </option>
-                        ))}
-                    </select>
-                    <p className="text-xs text-slate-500 mt-1">
-                      Choose your church first — only leaders from that church are shown.
-                    </p>
+                    {(() => {
+                      const sameChurch = leaders.filter(
+                        (ldr) => attChurch && (ldr.church || '').toLowerCase() === attChurch.toLowerCase()
+                      );
+                      const otherChurch = leaders.filter(
+                        (ldr) => !attChurch || (ldr.church || '').toLowerCase() !== attChurch.toLowerCase()
+                      );
+                      return (
+                        <>
+                          <select
+                            value={attInvitedByLeaderId}
+                            onChange={(e) => handleInvitedByChange(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
+                          >
+                            <option value="self_invite">Self Invited / Walk-In</option>
+                            {sameChurch.length > 0 && (
+                              <optgroup label={attChurch}>
+                                {sameChurch.map((ldr) => (
+                                  <option key={ldr.id} value={ldr.id}>
+                                    {ldr.fullName} ({ldr.leaderType})
+                                  </option>
+                                ))}
+                              </optgroup>
+                            )}
+                            {otherChurch.length > 0 && (
+                              <optgroup label="Other church branches">
+                                {otherChurch.map((ldr) => (
+                                  <option key={ldr.id} value={ldr.id}>
+                                    {ldr.fullName} ({ldr.leaderType}) — {ldr.church}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            )}
+                          </select>
+                          <p className="text-xs text-slate-500 mt-1">
+                            {leaders.length === 0
+                              ? 'No leaders registered yet — choose Self Invited / Walk-In.'
+                              : sameChurch.length === 0
+                                ? `No leaders registered for ${attChurch || 'this church'} yet — leaders from other branches are listed below.`
+                                : 'Leaders of your selected church are listed first.'}
+                          </p>
+                        </>
+                      );
+                    })()}
                   </div>
+
                 </div>
 
                 {/* Service Type Selection */}
