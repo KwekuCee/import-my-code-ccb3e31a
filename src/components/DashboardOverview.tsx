@@ -142,14 +142,15 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
   // --- Derive branches from registered church admins ---
   const branchesFromAdmins = churchAdmins
-    .filter((admin, index, self) => admin && admin.churchName && self.findIndex(a => a && a.churchName === admin.churchName) === index) // Deduplicate by church name
+    .filter((admin, index, self) => admin && admin.churchName && self.findIndex(a => a && a.churchName && a.churchName.trim().toLowerCase() === admin.churchName!.trim().toLowerCase()) === index) // Deduplicate by church name (case-insensitive)
     .map(admin => {
       const cName = admin.churchName || 'Branch';
+      const cKey = cName.trim().toLowerCase();
       return {
         id: `branch-${cName.replace(/\s+/g, '-').toLowerCase()}`,
         name: cName,
         pastor: admin.adminName || 'Branch Pastor',
-        membersCount: members.filter(m => m && m.church === cName).length,
+        membersCount: members.filter(m => m && m.church && m.church.trim().toLowerCase() === cKey).length,
         status: admin.status === 'Active' ? 'Healthy' as const : 'Review' as const,
         zone: admin.zone || 'Zone 1 (Korle Bu)',
         pcfCount: 0,
@@ -360,8 +361,9 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {branchesFromAdmins.map((ch) => {
-                const chMembers = members.filter(m => m.church === ch.name || m.location === ch.name);
-                const chLeaders = leaders.filter(l => l.church === ch.name);
+                const chKey = ch.name.trim().toLowerCase();
+                const chMembers = members.filter(m => (m.church && m.church.trim().toLowerCase() === chKey) || (m.location && m.location.trim().toLowerCase() === chKey));
+                const chLeaders = leaders.filter(l => l.church && l.church.trim().toLowerCase() === chKey);
                 return (
                   <div key={ch.id} className="border border-slate-200 rounded-2xl p-4 space-y-3 hover:border-blue-500/60 transition-all bg-slate-50/50">
                     <div className="flex justify-between items-start">
