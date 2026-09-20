@@ -1115,11 +1115,9 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                       Who Invited You / Name of Leader? *
                     </label>
                     {(() => {
-                      const sameChurch = leaders.filter(
+                      // Only leaders registered in the selected church are shown.
+                      const churchLeaders = leaders.filter(
                         (ldr) => attChurch && (ldr.church || '').toLowerCase() === attChurch.toLowerCase()
-                      );
-                      const otherChurch = leaders.filter(
-                        (ldr) => !attChurch || (ldr.church || '').toLowerCase() !== attChurch.toLowerCase()
                       );
                       return (
                         <>
@@ -1129,31 +1127,16 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-semibold transition-all"
                           >
                             <option value="self_invite">Self Invited / Walk-In</option>
-                            {sameChurch.length > 0 && (
-                              <optgroup label={attChurch}>
-                                {sameChurch.map((ldr) => (
-                                  <option key={ldr.id} value={ldr.id}>
-                                    {ldr.fullName} ({ldr.leaderType})
-                                  </option>
-                                ))}
-                              </optgroup>
-                            )}
-                            {otherChurch.length > 0 && (
-                              <optgroup label="Other church branches">
-                                {otherChurch.map((ldr) => (
-                                  <option key={ldr.id} value={ldr.id}>
-                                    {ldr.fullName} ({ldr.leaderType}) — {ldr.church}
-                                  </option>
-                                ))}
-                              </optgroup>
-                            )}
+                            {churchLeaders.map((ldr) => (
+                              <option key={ldr.id} value={ldr.id}>
+                                {ldr.fullName} ({ldr.leaderType})
+                              </option>
+                            ))}
                           </select>
                           <p className="text-xs text-slate-500 mt-1">
-                            {leaders.length === 0
-                              ? 'No leaders registered yet — choose Self Invited / Walk-In.'
-                              : sameChurch.length === 0
-                                ? `No leaders registered for ${attChurch || 'this church'} yet — leaders from other branches are listed below.`
-                                : 'Leaders of your selected church are listed first.'}
+                            {churchLeaders.length === 0
+                              ? `No leaders registered for ${attChurch || 'this church'} yet — choose Self Invited / Walk-In.`
+                              : `Only leaders registered at ${attChurch} are listed.`}
                           </p>
                         </>
                       );
