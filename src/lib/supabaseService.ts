@@ -745,6 +745,11 @@ export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Prom
     if (churchId) {
       userPayload.church_id = churchId;
     }
+    // Only set the password when one was actually provided — otherwise an
+    // existing account's password would be wiped out by the upsert.
+    if (passwordToStore) {
+      userPayload.password_hash = passwordToStore;
+    }
 
     const { error: userErr } = await client.from('user_profiles').upsert(userPayload, { onConflict: 'email' });
     if (userErr) {
@@ -777,9 +782,11 @@ export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Prom
       admin_phone: admin.adminPhone || '+233 24 000 0000',
       zone: admin.zone || 'Zone 1 (Korle Bu)',
       role: 'Church Admin',
-      password: passwordToStore,
       photo_url: admin.photoUrl || null
     };
+    if (passwordToStore) {
+      adminPayload.password = passwordToStore;
+    }
 
     const { error: adminErr } = await client.from('church_admin_accounts').upsert(adminPayload, { onConflict: 'id' });
     if (adminErr) {
