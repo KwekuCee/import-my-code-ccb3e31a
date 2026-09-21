@@ -54,6 +54,7 @@ const ALLOWED_TABLES = new Set([
   'promotion_queue',
   'service_types',
   'admin_settings',
+  'cell_reports',
 ]);
 
 const FILTER_OPS = new Set(['eq', 'neq', 'ilike', 'like', 'gte', 'lte', 'gt', 'lt', 'in', 'is', 'not']);
@@ -71,6 +72,7 @@ const BRANCH_SCOPED = new Set([
   'church_admin_accounts',
   'promotion_queue',
   'audit_logs',
+  'cell_reports',
 ]);
 
 function json(body: unknown, status = 200) {
