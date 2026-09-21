@@ -268,6 +268,90 @@ export type Database = {
           },
         ]
       }
+      cell_reports: {
+        Row: {
+          cell_attendance: Json
+          cell_name: string | null
+          church_id: string | null
+          church_name: string
+          created_at: string
+          evangelism: Json
+          id: string
+          leader_id: string | null
+          leader_name: string
+          outreach_centre: string | null
+          report_date: string
+          report_grid: Json
+          souls_won_list: Json
+          submitted_by: string | null
+          sunday_register: Json
+          total_attendance: number
+          total_first_timers: number
+          total_offering: number
+          total_souls_won: number
+          updated_at: string
+        }
+        Insert: {
+          cell_attendance?: Json
+          cell_name?: string | null
+          church_id?: string | null
+          church_name: string
+          created_at?: string
+          evangelism?: Json
+          id?: string
+          leader_id?: string | null
+          leader_name: string
+          outreach_centre?: string | null
+          report_date?: string
+          report_grid?: Json
+          souls_won_list?: Json
+          submitted_by?: string | null
+          sunday_register?: Json
+          total_attendance?: number
+          total_first_timers?: number
+          total_offering?: number
+          total_souls_won?: number
+          updated_at?: string
+        }
+        Update: {
+          cell_attendance?: Json
+          cell_name?: string | null
+          church_id?: string | null
+          church_name?: string
+          created_at?: string
+          evangelism?: Json
+          id?: string
+          leader_id?: string | null
+          leader_name?: string
+          outreach_centre?: string | null
+          report_date?: string
+          report_grid?: Json
+          souls_won_list?: Json
+          submitted_by?: string | null
+          sunday_register?: Json
+          total_attendance?: number
+          total_first_timers?: number
+          total_offering?: number
+          total_souls_won?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cell_reports_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cell_reports_leader_id_fkey"
+            columns: ["leader_id"]
+            isOneToOne: false
+            referencedRelation: "leaders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       church_admin_accounts: {
         Row: {
           admin_email: string
@@ -320,6 +404,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "church_admin_accounts_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      church_report_codes: {
+        Row: {
+          church_id: string | null
+          church_name: string
+          code_hash: string
+          code_hint: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          church_id?: string | null
+          church_name: string
+          code_hash: string
+          code_hint?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          church_id?: string | null
+          church_name?: string
+          code_hash?: string
+          code_hint?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_report_codes_church_id_fkey"
             columns: ["church_id"]
             isOneToOne: false
             referencedRelation: "churches"
