@@ -736,7 +736,6 @@ export async function saveChurchAdminToSupabase(admin: ChurchAdminAccount): Prom
     const userPayload: any = {
       username: rawUsername,
       email: email,
-      password_hash: passwordToStore,
       full_name: admin.adminName,
       role: 'Church Admin',
       church_name: admin.churchName,
