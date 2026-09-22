@@ -16,7 +16,33 @@ export type ViewType =
   | 'register'
   | 'database_schema'
   | 'settings'
+  | 'cell_reports'
   | 'church_admins_directory';
+
+export interface CellReportGridCell {
+  cell: string;
+  outreach: string;
+}
+
+export interface CellReport {
+  id: string;
+  church: string;
+  leaderName: string;
+  cellName: string;
+  outreachCentre: string;
+  reportDate: string;
+  reportGrid: Record<string, CellReportGridCell>;
+  evangelism: Record<string, string>;
+  soulsWonList: Array<Record<string, any>>;
+  cellAttendance: Array<Record<string, any>>;
+  sundayRegister: Array<Record<string, any>>;
+  totalAttendance: number;
+  totalFirstTimers: number;
+  totalSoulsWon: number;
+  totalOffering: number;
+  submittedBy: string;
+  createdAt: string;
+}
 
 export interface ChurchAdminAccount {
   id: string;

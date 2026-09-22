@@ -1,0 +1,158 @@
+// Weekly cell report submissions and the per-branch access codes that gate them.
+//
+// Everything here goes through the `cell-report` server function, which holds the
+// only copy of the code check and writes reports with elevated rights. Reading
+// saved reports for the dashboards goes through the usual portal gateway, so
+// branch admins automatically see only their own branch.
+
+import { portalDb, getPortalToken } from './portalDb';
+import type { CellReport } from '../types';
+
+const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL || ''}/functions/v1/cell-report`;
+const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
+
+/** Rows of the printed report sheet — each row has a Cell and an Outreach column. */
+export const GRID_ROWS: Array<{ key: string; label: string; type?: 'text' | 'number' | 'datetime' }> = [
+  { key: 'venue', label: 'Venue', type: 'text' },
+  { key: 'meetingDateTime', label: 'Date & time of meeting', type: 'text' },
+  { key: 'totalAttendance', label: 'Total attendance', type: 'number' },
+  { key: 'totalFirstTimers', label: 'Total first timers', type: 'number' },
+  { key: 'totalLeaders', label: 'Total leaders', type: 'number' },
+  { key: 'gotSaved', label: 'Number got saved', type: 'number' },
+  { key: 'filledWithSpirit', label: 'Number filled with the Spirit', type: 'number' },
+  { key: 'membersPresent', label: 'Members present', type: 'number' },
+  { key: 'midweek', label: 'Midweek service', type: 'number' },
+  { key: 'prayerService', label: 'Prayer service', type: 'number' },
+  { key: 'sundayService', label: 'Sunday service', type: 'number' },
+  { key: 'totalOffering', label: 'Total offering received', type: 'number' },
+];
+
+export const EVANGELISM_FIELDS: Array<{ key: string; label: string; type?: 'text' | 'number' }> = [
+  { key: 'outreachesOrganized', label: 'Outreaches organized this week', type: 'number' },
+  { key: 'location', label: 'Location', type: 'text' },
+  { key: 'type', label: 'Type of outreach', type: 'text' },
+  { key: 'peopleReached', label: 'Total people reached', type: 'number' },
+  { key: 'ledToChrist', label: 'Number led to Christ', type: 'number' },
+  { key: 'filledWithSpirit', label: 'Number filled with the Spirit', type: 'number' },
+];
+
+export interface CellReportSubmission {
+  leaderName: string;
+  cellName: string;
+  outreachCentre: string;
+  reportDate: string;
+  reportGrid: Record<string, { cell: string; outreach: string }>;
+  evangelism: Record<string, string>;
+  soulsWonList: Array<Record<string, any>>;
+  cellAttendance: Array<Record<string, any>>;
+  sundayRegister: Array<Record<string, any>>;
+}
+
+async function callFunction<T = any>(payload: Record<string, unknown>): Promise<{ data: T | null; error: string | null }> {
+  try {
+    const token = getPortalToken();
+    const res = await fetch(FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: ANON_KEY,
+        Authorization: `Bearer ${ANON_KEY}`,
+        ...(token ? { 'x-portal-session': token } : {}),
+      },
+      body: JSON.stringify(payload),
+    });
+    const body = await res.json().catch(() => null);
+    if (!body) return { data: null, error: 'No response from the server. Please try again.' };
+    if (body.error) {
+      const message = typeof body.error === 'string' ? body.error : 'Request failed.';
+      return { data: null, error: message };
+    }
+    return { data: body as T, error: null };
+  } catch (err: any) {
+    return { data: null, error: err?.message || 'Network error. Check your connection and try again.' };
+  }
+}
+
+/** Public: check a branch access code before revealing the report form. */
+export async function verifyReportCode(churchName: string, code: string) {
+  return callFunction<{ ok: boolean; churchName: string }>({
+    action: 'verify_code',
+    churchName,
+    code,
+  });
+}
+
+/** Public: send in a completed weekly report (the code is re-checked server side). */
+export async function submitCellReport(churchName: string, code: string, report: CellReportSubmission) {
+  return callFunction<{ ok: boolean; id: string }>({
+    action: 'submit',
+    churchName,
+    code,
+    report,
+  });
+}
+
+export interface ReportCodeRow {
+  churchName: string;
+  code: string;
+  updatedAt: string;
+}
+
+/** Admin: read the access code(s) this account is allowed to see. */
+export async function listReportCodes(): Promise<{ codes: ReportCodeRow[]; error: string | null }> {
+  const { data, error } = await callFunction<{ codes: any[] }>({ action: 'list_codes' });
+  if (error) return { codes: [], error };
+  const codes = (data?.codes || []).map((row) => ({
+    churchName: row.church_name || '',
+    code: row.code_hint || '',
+    updatedAt: row.updated_at || '',
+  }));
+  return { codes, error: null };
+}
+
+/** Admin: create a fresh access code for a branch (the previous one stops working). */
+export async function rotateReportCode(churchName?: string) {
+  return callFunction<{ code: string; churchName: string }>({
+    action: 'rotate_code',
+    churchName: churchName || '',
+  });
+}
+
+function toNumber(value: unknown): number {
+  const n = Number(value ?? 0);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function mapReport(row: any): CellReport {
+  return {
+    id: row.id,
+    church: row.church_name || '',
+    leaderName: row.leader_name || '',
+    cellName: row.cell_name || '',
+    outreachCentre: row.outreach_centre || '',
+    reportDate: row.report_date || '',
+    reportGrid: (row.report_grid || {}) as Record<string, { cell: string; outreach: string }>,
+    evangelism: (row.evangelism || {}) as Record<string, string>,
+    soulsWonList: Array.isArray(row.souls_won_list) ? row.souls_won_list : [],
+    cellAttendance: Array.isArray(row.cell_attendance) ? row.cell_attendance : [],
+    sundayRegister: Array.isArray(row.sunday_register) ? row.sunday_register : [],
+    totalAttendance: toNumber(row.total_attendance),
+    totalFirstTimers: toNumber(row.total_first_timers),
+    totalSoulsWon: toNumber(row.total_souls_won),
+    totalOffering: toNumber(row.total_offering),
+    submittedBy: row.submitted_by || '',
+    createdAt: row.created_at || '',
+  };
+}
+
+/** Dashboard: load saved reports. Branch admins are scoped server side. */
+export async function fetchCellReports(): Promise<CellReport[]> {
+  if (!getPortalToken()) return [];
+  const { data, error } = await portalDb
+    .from('cell_reports')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(500);
+  if (error || !Array.isArray(data)) return [];
+  return data.map(mapReport);
+}
