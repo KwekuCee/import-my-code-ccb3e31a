@@ -1,4 +1,4 @@
-// Server-side data gateway for the GCYC portal.
+// Server-side data gateway for the CEKB portal.
 //
 // The database tables are locked to the service role, so the browser can never
 // read or write them directly. Every read/write goes through this function,

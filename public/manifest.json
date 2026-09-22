@@ -1,7 +1,7 @@
 {
-  "name": "GCYC Church App",
-  "short_name": "GCYC",
-  "description": "GCYC Group Church Management, Attendance & Discipleship App",
+  "name": "CEKB Church App",
+  "short_name": "CEKB",
+  "description": "CEKB Group Church Management, Attendance & Discipleship App",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#020617",

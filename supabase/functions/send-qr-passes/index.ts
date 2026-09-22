@@ -29,12 +29,12 @@ function qrImageUrl(code: string): string {
 }
 
 function passHtml(r: Recipient): string {
-  const church = r.church || 'GCYC';
+  const church = r.church || 'CEKB';
   return `
   <div style="font-family:Arial,Helvetica,sans-serif;background:#f1f5f9;padding:24px">
     <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0">
       <div style="background:#1d4ed8;color:#ffffff;padding:20px 24px">
-        <div style="font-size:12px;letter-spacing:1px;opacity:.85">CHRIST EMBASSY &bull; GCYC</div>
+        <div style="font-size:12px;letter-spacing:1px;opacity:.85">CHRIST EMBASSY &bull; KORLE BU</div>
         <div style="font-size:20px;font-weight:bold;margin-top:4px">${church}</div>
         <div style="font-size:12px;opacity:.85;margin-top:2px">Digital Attendance Pass</div>
       </div>
@@ -104,9 +104,9 @@ Deno.serve(async (req) => {
 
       const result = await sendMail({
         to: r.email.trim(),
-        subject: `Your GCYC attendance code (${r.id})`,
+        subject: `Your CEKB attendance code (${r.id})`,
         html: passHtml(r),
-        fromName: 'GCYC Attendance',
+        fromName: 'CEKB Attendance',
       });
 
       if (result.ok) sent++;

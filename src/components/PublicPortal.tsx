@@ -262,7 +262,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       const pass = await renderQrPass(member, churchName, serviceType, timestamp);
       setAttPassImageDataUrl(pass.dataUrl);
       setPassFile(pass);
-      const outcome = await saveQrPass(pass, `GCYC_QR_Pass_${member.id}.png`);
+      const outcome = await saveQrPass(pass, `CEKB_QR_Pass_${member.id}.png`);
       setPassSaveOutcome(outcome);
       setIsGeneratingQr(false);
       return pass.dataUrl;
@@ -636,14 +636,14 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
       {/* Top Portal Banner Bar */}
       <header className="border-b border-slate-200/90 bg-white/95 backdrop-blur-md sticky top-0 z-40 px-4 md:px-8 py-3.5 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
-          <ChurchLogo className="w-10 h-10 rounded-2xl overflow-hidden shadow-sm shadow-blue-700/20 shrink-0" alt="GCYC Logo" />
+          <ChurchLogo className="w-10 h-10 rounded-2xl overflow-hidden shadow-sm shadow-blue-700/20 shrink-0" alt="CEKB Logo" />
           <div>
             <h1 className="font-display font-extrabold text-base md:text-lg text-slate-900 tracking-tight flex items-center gap-2">
-              GCYC Group
+              CEKB Group
 
             </h1>
             <p className="text-xs text-slate-500 font-medium hidden sm:block">
-              Grace City Youth Church Attendance System
+              Christ Embassy Korle Bu Attendance System
             </p>
           </div>
         </div>
@@ -829,7 +829,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                       if (passFile) {
                         const outcome = await saveQrPass(
                           passFile,
-                          `GCYC_QR_Pass_${attSuccessPass.memberId}.png`
+                          `CEKB_QR_Pass_${attSuccessPass.memberId}.png`
                         );
                         setPassSaveOutcome(outcome);
                       }
@@ -1216,7 +1216,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
                   type="button"
                   onClick={async () => {
                     if (passFile) {
-                      const outcome = await saveQrPass(passFile, 'GCYC_Leader_Pass.png');
+                      const outcome = await saveQrPass(passFile, 'CEKB_Leader_Pass.png');
                       setPassSaveOutcome(outcome);
                     }
                   }}
@@ -1771,7 +1771,7 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
 
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3">
-        <span>Grace City Youth Church • All Rights Reserved © 2026</span>
+        <span>Christ Embassy Korle Bu • All Rights Reserved © 2026</span>
         <span className="hidden sm:inline text-slate-300">•</span>
         <span>
           Developed by{' '}

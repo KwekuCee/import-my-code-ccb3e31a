@@ -767,7 +767,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <div className="flex items-center justify-between text-white border-b border-slate-800 pb-3">
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-blue-500 text-[20px]">database</span>
-                    <h4 className="text-xs font-bold text-blue-500">GCYC live database Schema (DDL)</h4>
+                    <h4 className="text-xs font-bold text-blue-500">CEKB live database Schema (DDL)</h4>
                   </div>
                   <button
                     onClick={() => {
@@ -795,7 +795,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         {activeTab === 'profile' && (
           <div className="space-y-6">
             {isSuperadmin ? (
-              /* SUPERADMIN: Unified Group Pastor & HQ Account Profile (GCYC Group Networks Form removed, Church Name field added) */
+              /* SUPERADMIN: Unified Group Pastor & HQ Account Profile (CEKB Group Networks Form removed, Church Name field added) */
               <form onSubmit={handleSaveSuperadminProfile} className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm max-w-3xl">
                 <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
                   <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold border border-blue-100">
@@ -977,7 +977,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                         type="text"
                         value={branchName}
                         onChange={(e) => setBranchName(e.target.value)}
-                        placeholder="e.g. GCYC 1"
+                        placeholder="e.g. CEKB 1"
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-slate-900 outline-none focus:border-blue-600"
                       />
                     </div>
@@ -1279,7 +1279,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement('a');
             link.setAttribute('href', encodedUri);
-            link.setAttribute('download', `GCYC_Admin_Accountability_Logs_${new Date().toISOString().slice(0, 10)}.csv`);
+            link.setAttribute('download', `CEKB_Admin_Accountability_Logs_${new Date().toISOString().slice(0, 10)}.csv`);
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -1543,7 +1543,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ churches, churchAdmins, members, leaders, attendanceRecords, timestamp: new Date().toISOString() }, null, 2));
                     const downloadAnchor = document.createElement('a');
                     downloadAnchor.setAttribute("href", dataStr);
-                    downloadAnchor.setAttribute("download", `GCYC_System_Backup_${Date.now()}.json`);
+                    downloadAnchor.setAttribute("download", `CEKB_System_Backup_${Date.now()}.json`);
                     document.body.appendChild(downloadAnchor);
                     downloadAnchor.click();
                     downloadAnchor.remove();

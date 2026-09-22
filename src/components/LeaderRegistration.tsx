@@ -127,7 +127,7 @@ export const LeaderRegistration: React.FC<LeaderRegistrationProps> = ({
       <div>
         <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full mb-1 border border-blue-100">
           <span className="material-symbols-outlined text-[14px]">military_tech</span>
-          GCYC Hierarchy Entry
+          CEKB Hierarchy Entry
         </div>
         <h1 className="font-display text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
           Leader Official Registration

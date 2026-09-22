@@ -12,7 +12,7 @@ export const MemberCardModal: React.FC<MemberCardModalProps> = ({ member, onClos
   if (!member) return null;
 
   const memberInitials = member.initials || (member.fullName ? member.fullName.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'MB');
-  const qrPlaceholderUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(member.id || 'GCYC')}&color=0f172a`;
+  const qrPlaceholderUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(member.id || 'CEKB')}&color=0f172a`;
 
   const handlePrint = () => {
     window.print();
@@ -38,7 +38,7 @@ export const MemberCardModal: React.FC<MemberCardModalProps> = ({ member, onClos
         <div className="bg-blue-700 text-white p-4 px-5 flex justify-between items-center border-b border-slate-800">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-blue-500 text-[20px]">badge</span>
-            <span className="font-headline font-bold text-xs tracking-wider uppercase text-slate-100">GCYC Member ID</span>
+            <span className="font-headline font-bold text-xs tracking-wider uppercase text-slate-100">CEKB Member ID</span>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer">
             <span className="material-symbols-outlined text-[18px]">close</span>

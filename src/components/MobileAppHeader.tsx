@@ -37,7 +37,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
 
     const success = await installPWA();
     if (success) {
-      toast.showSuccess('App Installed!', 'GCYC App added to your device home screen.');
+      toast.showSuccess('App Installed!', 'CEKB App added to your device home screen.');
     } else {
       setShowIOSInstructions(true);
     }
@@ -66,7 +66,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
       case 'settings':
         return 'Settings & Sync';
       default:
-        return 'GCYC';
+        return 'CEKB';
     }
   };
 
@@ -84,7 +84,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
             >
               <img
                 src={logoUrl}
-                alt="GCYC Logo"
+                alt="CEKB Logo"
                 className="w-full h-full object-cover rounded-[10px]"
               />
             </button>
@@ -106,7 +106,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
               </div>
               <p className="text-xs text-slate-500 font-body font-medium truncate flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>GCYC Network</span>
+                <span>CEKB Network</span>
               </p>
             </div>
           </div>

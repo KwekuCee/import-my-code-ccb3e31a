@@ -39,7 +39,7 @@ export const EmailVerifiedScreen: React.FC<EmailVerifiedScreenProps> = ({ status
   return (
     <div className="min-h-screen w-full bg-slate-50 flex items-center justify-center p-4 font-body">
       <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
-        <ChurchLogo className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm mx-auto mb-4" alt="GCYC Logo" />
+        <ChurchLogo className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm mx-auto mb-4" alt="CEKB Logo" />
         <div className={`w-12 h-12 rounded-2xl mx-auto mb-4 flex items-center justify-center ${copy.tone}`}>
           <span className="material-symbols-outlined text-[24px]">{copy.icon}</span>
         </div>

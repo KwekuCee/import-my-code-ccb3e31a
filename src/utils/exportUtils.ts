@@ -21,7 +21,7 @@ function normalizeExportPayload(
     const attendanceRecords = (Array.isArray(arg2) ? arg2 : []) as AttendanceRecord[];
     const churches = (arg3 || []) as ChurchBranch[];
     const churchAdmins = (arg4 || []) as ChurchAdminAccount[];
-    const filenamePrefix = typeof arg2 === 'string' ? arg2 : (arg5 || 'GCYC_Church_Network_Report');
+    const filenamePrefix = typeof arg2 === 'string' ? arg2 : (arg5 || 'CEKB_Church_Network_Report');
     return {
       data: {
         members,
@@ -54,7 +54,7 @@ function normalizeExportPayload(
         leaders: payload.leaders || [],
         attendanceRecords: payload.attendanceRecords || []
       },
-      filenamePrefix: typeof arg2 === 'string' ? arg2 : 'GCYC_Church_Network_Report'
+      filenamePrefix: typeof arg2 === 'string' ? arg2 : 'CEKB_Church_Network_Report'
     };
   }
 }

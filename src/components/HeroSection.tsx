@@ -102,7 +102,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
               className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 backdrop-blur-md px-3.5 py-1.5 text-white text-xs font-semibold"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
-              <span>GCYC Attendance is live</span>
+              <span>CEKB Attendance is live</span>
               <span className="material-symbols-outlined text-[15px] leading-none">arrow_forward</span>
             </motion.div>
 
@@ -190,7 +190,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                   </motion.span>
                 ))}
               </div>
-              <span className="text-xs font-semibold text-blue-50/90">Trusted by GCYC branches</span>
+              <span className="text-xs font-semibold text-blue-50/90">Trusted by CEKB branches</span>
             </motion.div>
           </motion.div>
 
@@ -218,7 +218,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                   </div>
                   <div className="min-w-0">
                     <p className="font-headline font-bold text-sm text-slate-900 truncate">Vanessa Adjei</p>
-                    <p className="text-xs text-slate-500 truncate">GCYC Achimota • Member</p>
+                    <p className="text-xs text-slate-500 truncate">CEKB Achimota • Member</p>
                   </div>
                   <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Checked in
@@ -247,7 +247,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                     ))}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-mono text-xs font-bold text-slate-900">GCYC-MEM-0421</p>
+                    <p className="font-mono text-xs font-bold text-slate-900">CEKB-MEM-0421</p>
                     <p className="text-[11px] text-slate-500 mt-0.5">Scan to record attendance</p>
                   </div>
                   <motion.span

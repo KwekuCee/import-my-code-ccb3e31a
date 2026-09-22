@@ -32,7 +32,7 @@ export const DatabaseSchemaView: React.FC<DatabaseSchemaViewProps> = () => {
             Database & Security Schema
           </h1>
           <p className="font-body text-xs md:text-sm text-slate-500 mt-1">
-            Production PostgreSQL migration DDL with multi-tenancy Row Level Security policies for GCYC Group.
+            Production PostgreSQL migration DDL with multi-tenancy Row Level Security policies for CEKB Group.
           </p>
         </div>
 

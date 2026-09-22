@@ -10,8 +10,8 @@ interface ChurchLogoProps {
 export const ChurchLogo: React.FC<ChurchLogoProps> = ({
     className = 'w-10 h-10 rounded-xl overflow-hidden shadow-sm',
     imgClassName = 'w-full h-full object-cover',
-    alt = 'GCYC Church Logo',
-    fallbackText = 'GCYC',
+    alt = 'CEKB Church Logo',
+    fallbackText = 'CEKB',
 }) => {
     const [hasError, setHasError] = useState(false);
 

@@ -546,5 +546,5 @@ export function downloadImportTemplate(kind: ImportKind): void {
   const help = XLSX.utils.aoa_to_sheet([['Column', 'What to put'], ...headers.map((h, i) => [h, guide[i]])]);
   help['!cols'] = [{ wch: 24 }, { wch: 60 }];
   XLSX.utils.book_append_sheet(wb, help, 'How to fill');
-  XLSX.writeFile(wb, `GCYC_${kind}_import_template.xlsx`);
+  XLSX.writeFile(wb, `CEKB_${kind}_import_template.xlsx`);
 }

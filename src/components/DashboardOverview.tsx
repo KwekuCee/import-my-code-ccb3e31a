@@ -269,7 +269,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 bg-white/20 text-white text-xs font-extrabold px-3.5 py-1 rounded-full border border-white/30 backdrop-blur-xs">
                   <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
-                  SUPERADMIN COMMAND HQ • GCYC GROUP PASTOR
+                  SUPERADMIN COMMAND HQ • CEKB GROUP PASTOR
                 </div>
                 <h1 className="font-display text-2xl md:text-3xl font-extrabold tracking-tight text-white">
                   Welcome, {user.name.startsWith('Pastor') ? user.name : `Pastor ${user.name}`}
