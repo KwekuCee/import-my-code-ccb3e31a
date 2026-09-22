@@ -54,9 +54,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <ChurchLogo className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm mx-auto mb-3" alt="GCYC Logo" />
+          <ChurchLogo className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm mx-auto mb-3" alt="CEKB Logo" />
           <h1 className="font-display text-2xl md:text-3xl text-slate-900 font-extrabold tracking-tight mb-1">
-            GCYC Group
+            CEKB Group
           </h1>
           <p className="font-body text-xs text-slate-500 font-medium">
             Administrative Access Portal
@@ -136,7 +136,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           <p className="text-xs text-slate-500">
             Need system credentials?{' '}
             <button
-              onClick={() => alert('Please contact the GCYC Central IT Administrator at admin@cekorlebu.org or +233 24 123 4567.')}
+              onClick={() => alert('Please contact the CEKB Central IT Administrator at admin@cekorlebu.org or +233 24 123 4567.')}
               className="text-blue-600 font-bold hover:underline cursor-pointer"
             >
               Contact Administrator

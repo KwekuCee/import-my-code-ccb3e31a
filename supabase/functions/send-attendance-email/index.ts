@@ -98,7 +98,7 @@ Deno.serve(async (req: Request) => {
 
     const sendResult = await sendGmail({
       to: adminRow.admin_email,
-      fromName: 'GCYC Attendance',
+      fromName: 'CEKB Attendance',
       subject: `Self Check-In: ${memberName} — ${churchName}`,
       html: `
         <div style="font-family: sans-serif; color: #0f172a;">

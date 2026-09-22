@@ -114,7 +114,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
   const handleExportBackup = () => {
     const backupData = {
       timestamp: new Date().toISOString(),
-      group: 'GCYC Group',
+      group: 'CEKB Group',
       churchesCount: churches.length,
       churches,
       auditLogs
@@ -137,7 +137,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
         <div>
           <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full mb-1">
             <span className="material-symbols-outlined text-[14px]">account_tree</span>
-            GCYC Network Structure
+            CEKB Network Structure
           </div>
           <h1 className="font-display text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
             Group Network Overview
@@ -239,7 +239,7 @@ export const GroupOverview: React.FC<GroupOverviewProps> = ({
               </div>
               <p className="text-xs text-slate-500">
                 {activeTab === 'branches'
-                  ? 'Active church branches under GCYC Group'
+                  ? 'Active church branches under CEKB Group'
                   : 'Details of registered church admins across the platform'}
               </p>
             </div>

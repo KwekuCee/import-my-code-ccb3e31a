@@ -37,7 +37,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   }));
 
   const viewTitles: Record<ViewType, string> = {
-    home: 'GCYC Attendance Portal',
+    home: 'CEKB Attendance Portal',
     login: 'Admin Sign In',
     admin_signup: 'Church Branch Admin Registration',
     self_attendance: 'Self Service Attendance Check-In',
@@ -82,7 +82,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
 
         <div className="flex items-center gap-2.5">
           <h1 className="font-headline text-lg md:text-xl text-slate-900 font-bold tracking-tight">
-            {viewTitles[currentView] || 'GCYC Admin'}
+            {viewTitles[currentView] || 'CEKB Admin'}
           </h1>
           <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold rounded-md">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>

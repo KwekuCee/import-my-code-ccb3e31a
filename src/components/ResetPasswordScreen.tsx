@@ -38,7 +38,7 @@ export const ResetPasswordScreen: React.FC<ResetPasswordScreenProps> = ({ token,
     <div className="min-h-screen w-full bg-slate-50 flex items-center justify-center p-4 font-body">
       <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
         <div className="text-center mb-6">
-          <ChurchLogo className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm mx-auto mb-3" alt="GCYC Logo" />
+          <ChurchLogo className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm mx-auto mb-3" alt="CEKB Logo" />
           <h1 className="font-display text-2xl text-slate-900 font-extrabold tracking-tight mb-1">
             Create a new password
           </h1>

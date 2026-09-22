@@ -536,7 +536,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                   Unrecognized QR Code
                 </h2>
                 <p className="font-body text-xs text-slate-600">
-                  The scanned code is not present in the GCYC active directory. Register as a new member or use manual lookup.
+                  The scanned code is not present in the CEKB active directory. Register as a new member or use manual lookup.
                 </p>
               </div>
 

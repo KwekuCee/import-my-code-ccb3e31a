@@ -22,7 +22,7 @@ export const SupportChat: React.FC<SupportChatProps> = ({ onClose }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: "Hello! I'm the GCYC support assistant. Ask me anything about how to use this system — check-ins, leaders, classes, birthdays, absentees or reports."
+      content: "Hello! I'm the CEKB support assistant. Ask me anything about how to use this system — check-ins, leaders, classes, birthdays, absentees or reports."
     }
   ]);
   const [input, setInput] = useState('');

@@ -119,7 +119,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
         <div>
           <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full mb-1 border border-blue-200">
             <span className="material-symbols-outlined text-[14px]">analytics</span>
-            {isSuperadmin ? 'GCYC Group Analytics Engine' : `${churchName} Branch Analytics Engine`}
+            {isSuperadmin ? 'CEKB Group Analytics Engine' : `${churchName} Branch Analytics Engine`}
           </div>
           <h1 className="font-display text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
             {isSuperadmin ? 'Demographics & Growth Analytics' : `${churchName} Analytics`}

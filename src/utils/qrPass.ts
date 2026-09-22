@@ -48,7 +48,7 @@ export async function renderQrPass(
   ctx.fillStyle = '#f59e0b';
   ctx.font = 'bold 22px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('CHRIST EMBASSY • GCYC', 300, 60);
+  ctx.fillText('CHRIST EMBASSY • KORLE BU', 300, 60);
 
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 26px sans-serif';

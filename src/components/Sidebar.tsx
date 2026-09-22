@@ -86,13 +86,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="w-10 h-10 rounded-xl bg-blue-700 p-0.5 shadow-sm shadow-blue-700/20 shrink-0 flex items-center justify-center overflow-hidden">
               <img
                 src={logoUrl}
-                alt="GCYC Logo"
+                alt="CEKB Logo"
                 className="w-full h-full object-cover rounded-[10px]"
               />
             </div>
             <div>
               <h1 className="font-headline text-base font-bold text-slate-900 tracking-tight leading-tight">
-                GCYC
+                CEKB
               </h1>
               {isSuperadmin ? (
                 <span className="font-label-mono text-[9px] text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">

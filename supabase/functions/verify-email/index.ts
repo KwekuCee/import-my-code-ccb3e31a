@@ -159,10 +159,10 @@ Deno.serve(async (req) => {
 
     const sendResult = await sendMail({
       to: email,
-      fromName: 'GCYC Group',
-      subject: 'Verify your email to activate your GCYC admin account',
+      fromName: 'CEKB Group',
+      subject: 'Verify your email to activate your CEKB admin account',
       html: `<p>Hello ${name || 'there'},</p>
-<p>Please confirm this email address to activate your GCYC Group branch admin account. You will be able to sign in to your dashboard right after.</p>
+<p>Please confirm this email address to activate your CEKB Group branch admin account. You will be able to sign in to your dashboard right after.</p>
 <p><a href="${link}" style="background:#1d4ed8;color:#ffffff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:bold;">Verify my email</a></p>
 <p>This link works once and expires in ${TOKEN_TTL_HOURS} hours. If you did not create this account, you can ignore this email.</p>`,
     });

@@ -78,10 +78,10 @@ Deno.serve(async (req) => {
 
       const sendResult = await sendGmail({
         to: email,
-        fromName: 'GCYC Group',
-        subject: 'Set a new password for your GCYC account',
+        fromName: 'CEKB Group',
+        subject: 'Set a new password for your CEKB account',
         html: `<p>Hello,</p>
-<p>You asked to set a new password for your GCYC Group account.</p>
+<p>You asked to set a new password for your CEKB Group account.</p>
 <p><a href="${link}" style="background:#1d4ed8;color:#ffffff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:bold;">Create a new password</a></p>
 <p>This link works once and expires in ${TOKEN_TTL_MINUTES} minutes. If you did not ask for this, you can ignore this email.</p>`,
       });

@@ -26,7 +26,7 @@ async function sendResend(opts: SendMailOptions): Promise<SendMailResult> {
   if (!key) return { ok: false, error: 'RESEND_API_KEY not configured' };
 
   const body: Record<string, unknown> = {
-    from: `${opts.fromName || 'GCYC Group'} <${RESEND_FROM}>`,
+    from: `${opts.fromName || 'CEKB Group'} <${RESEND_FROM}>`,
     to: Array.isArray(opts.to) ? opts.to : [opts.to],
     subject: opts.subject,
     html: opts.html,

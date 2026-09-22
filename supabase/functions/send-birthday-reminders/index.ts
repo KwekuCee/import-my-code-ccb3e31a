@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
 
       const res = await sendGmail({
         to: email,
-        fromName: 'GCYC Group',
+        fromName: 'CEKB Group',
         subject: `Birthday tomorrow: ${bucket.people.length} to celebrate`,
         html: `<p>Hello ${bucket.name},</p>
 <p>The following ${bucket.people.length === 1 ? 'person is' : 'people are'} celebrating a birthday tomorrow:</p>
