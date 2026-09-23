@@ -734,7 +734,26 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
               <span className="material-symbols-outlined text-[18px]">lock</span>
               <span>Admin Login</span>
             </button>
+
+            <button
+              onClick={() => setActiveTab('cell_report')}
+              className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'cell_report'
+                ? 'bg-blue-700 text-white shadow-sm shadow-blue-700/20'
+                : 'text-slate-600 hover:text-blue-800 hover:bg-white/80'
+                }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">assignment</span>
+              <span>Submit Cell Report</span>
+            </button>
           </div>
+        )}
+
+        {/* WEEKLY CELL REPORT SHEET (access code protected) */}
+        {activeTab === 'cell_report' && (
+          <CellReportForm
+            churchOptions={adminRegisteredChurches.map(c => c.name).filter(Boolean)}
+            leaders={leaders}
+          />
         )}
 
         {/* TAB 1: SELF ATTENDANCE RECORDING */}
