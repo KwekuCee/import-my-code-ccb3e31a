@@ -53,6 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'leader_registration', label: 'Leader Self-Reg Portal', icon: 'military_tech' },
     { id: 'members', label: 'All Church Members', icon: 'group' },
     { id: 'attendance', label: 'Group Attendance Log', icon: 'fact_check' },
+    { id: 'cell_reports', label: 'Weekly Cell Reports', icon: 'assignment' },
     { id: 'analytics', label: 'Network Analytics', icon: 'analytics' },
     { id: 'settings', label: 'Superadmin Settings', icon: 'settings' },
   ] : [
@@ -60,6 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'leaders', label: 'PCF & Cell Leaders', icon: 'military_tech' },
     { id: 'members', label: 'Members', icon: 'group' },
     { id: 'attendance', label: 'Service Attendance Log', icon: 'fact_check' },
+    { id: 'cell_reports', label: 'Weekly Cell Reports', icon: 'assignment' },
     { id: 'analytics', label: 'Branch Analytics', icon: 'analytics' },
     { id: 'leader_registration', label: 'Register New Leader', icon: 'person_add' },
     { id: 'settings', label: 'Branch Settings', icon: 'settings' },

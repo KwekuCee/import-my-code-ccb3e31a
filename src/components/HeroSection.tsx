@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, type Variants } from 'motion/react';
 import { ChurchLogo } from './ChurchLogo';
 
-type Tab = 'home' | 'attendance' | 'leader_reg' | 'admin_signup' | 'login';
+type Tab = 'home' | 'attendance' | 'leader_reg' | 'admin_signup' | 'login' | 'cell_report';
 
 interface HeroSectionProps {
   onNavigate: (tab: Tab) => void;
@@ -49,6 +49,7 @@ const quickActions: Array<{ tab: Tab; icon: string; label: string }> = [
   { tab: 'leader_reg', icon: 'person_add', label: 'Leader Sign-up' },
   { tab: 'admin_signup', icon: 'church', label: 'Register a Branch' },
   { tab: 'login', icon: 'lock', label: 'Admin Login' },
+  { tab: 'cell_report', icon: 'assignment', label: 'Submit Cell Report' },
 ];
 
 /**
