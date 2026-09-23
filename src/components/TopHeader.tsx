@@ -54,6 +54,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
     qr_scanner: 'QR Check-In Station',
     register: 'Member Check-In',
     church_admins_directory: 'Church Branch Administrators',
+    cell_reports: 'Weekly Cell Reports',
     settings: 'System Settings'
   };
 
