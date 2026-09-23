@@ -6,6 +6,7 @@ import { FOUNDATION_SCHOOL_CLASSES, STANDARD_SERVICE_TYPES, parseFoundationClass
 import { authenticateUserWithDatabase, sendPasswordResetEmail, fetchServiceTypesFromSupabase, sendAttendanceEmailToChurchAdmin, uploadMemberPhoto, uploadProfilePhoto, sendAdminVerificationEmail, syncLeaderAsMember, generateLeaderCode, sendQrPassEmails } from '../lib/supabaseService';
 import { ChurchLogo } from './ChurchLogo';
 import { HeroSection } from './HeroSection';
+import { CellReportForm } from './CellReportForm';
 
 interface PublicPortalProps {
   members: Member[];
@@ -32,7 +33,11 @@ export const PublicPortal: React.FC<PublicPortalProps> = ({
   onLoginSuccess,
   onAddMember,
 }) => {
-  const [activeTab, setActiveTab] = useState<'home' | 'attendance' | 'leader_reg' | 'admin_signup' | 'login'>('home');
+  // A dedicated /cell-report address opens the weekly report sheet straight away,
+  // so a subdomain can be pointed at it for leaders.
+  const [activeTab, setActiveTab] = useState<'home' | 'attendance' | 'leader_reg' | 'admin_signup' | 'login' | 'cell_report'>(
+    () => (typeof window !== 'undefined' && window.location.pathname.replace(/\/+$/, '') === '/cell-report' ? 'cell_report' : 'home')
+  );
 
   // Dynamically derive effective list of churches from DB and registered admins
   const effectiveChurches = useMemo(() => {
