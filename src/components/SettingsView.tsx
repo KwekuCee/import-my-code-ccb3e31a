@@ -24,6 +24,7 @@ import {
 } from '../lib/supabaseService';
 import { exportMultiSheetExcel, exportMultiSectionCSV } from '../utils/exportUtils';
 import { SUPABASE_SQL_SCHEMA } from '../data/supabase_schema';
+import { ReportCodesPanel } from './ReportCodesPanel';
 
 interface SettingsViewProps {
   user: UserProfile | AuthSessionUser;
@@ -607,6 +608,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
       {/* Tab Content Cards */}
       <div className="space-y-6">
+        {activeTab === 'profile' && (
+          <ReportCodesPanel
+            isSuperadmin={isSuperadmin}
+            churchNames={churches.map(c => c.name).filter(Boolean)}
+            ownChurch={user.church}
+          />
+        )}
 
         {/* TAB 0: Live Database Configuration */}
         {activeTab === 'supabase' && (

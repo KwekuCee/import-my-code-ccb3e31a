@@ -69,6 +69,7 @@ import { EmailVerifiedScreen } from './components/EmailVerifiedScreen';
 import { AnalyticsView } from './components/AnalyticsView';
 import { DatabaseSchemaView } from './components/DatabaseSchemaView';
 import { SettingsView } from './components/SettingsView';
+import { CellReportsView } from './components/CellReportsView';
 import { useToast } from './context/ToastContext';
 import { getGroupNamesForLeader, findLeaderByName } from './utils/analyticsUtils';
 
@@ -852,6 +853,10 @@ export default function App() {
                   onNavigate={setCurrentView}
                 />
 
+              )}
+
+              {currentView === 'cell_reports' && (
+                <CellReportsView user={user} onNavigate={setCurrentView} />
               )}
 
               {currentView === 'analytics' && (
