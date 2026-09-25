@@ -18,15 +18,14 @@ export interface SendMailResult {
   status?: number;
 }
 
-const RESEND_FROM =
-  Deno.env.get('RESEND_FROM') || 'noreply@gcycattendance.online';
+const MAIL_FROM = 'CE Korle Bu <support@gcycattendance.online>';
 
 async function sendResend(opts: SendMailOptions): Promise<SendMailResult> {
   const key = Deno.env.get('RESEND_API_KEY');
   if (!key) return { ok: false, error: 'RESEND_API_KEY not configured' };
 
   const body: Record<string, unknown> = {
-    from: `${opts.fromName || 'CEKB Group'} <${RESEND_FROM}>`,
+    from: MAIL_FROM,
     to: Array.isArray(opts.to) ? opts.to : [opts.to],
     subject: opts.subject,
     html: opts.html,
