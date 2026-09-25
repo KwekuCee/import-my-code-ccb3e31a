@@ -36,10 +36,10 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "Import My Code"
+const SITE_NAME = "CE Korle Bu"
 const SENDER_DOMAIN = "notify.gcycattendance.online"
 const ROOT_DOMAIN = "gcycattendance.online"
-const FROM_DOMAIN = "gcycattendance.online" // Domain shown in From address (may be root or sender subdomain)
+const MAIL_FROM = "CE Korle Bu <support@gcycattendance.online>"
 
 function redactEmail(email: string | null | undefined): string {
   if (!email) return '***'
@@ -265,7 +265,7 @@ async function handleWebhook(req: Request): Promise<Response> {
       run_id,
       message_id: messageId,
       to: payload.data.email,
-      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+      from: MAIL_FROM,
       sender_domain: SENDER_DOMAIN,
       subject: EMAIL_SUBJECTS[emailType] || 'Notification',
       html,

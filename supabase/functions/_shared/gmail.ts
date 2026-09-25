@@ -1,6 +1,7 @@
 // Sends email through the connected Gmail account via the Lovable connector gateway.
 
 const GATEWAY_URL = 'https://connector-gateway.lovable.dev/google_mail/gmail/v1';
+const MAIL_FROM = 'CE Korle Bu <support@gcycattendance.online>';
 
 const b64 = (s: string) =>
   btoa(Array.from(new TextEncoder().encode(s), (b) => String.fromCharCode(b)).join(''));
@@ -26,12 +27,11 @@ function buildRaw(opts: SendGmailOptions): string {
   const to = Array.isArray(opts.to) ? opts.to.join(', ') : opts.to;
   const boundary = `bnd_${crypto.randomUUID().replace(/-/g, '')}`;
   const lines: string[] = [
+    `From: ${MAIL_FROM}`,
     `To: ${to}`,
     `Subject: ${header(opts.subject)}`,
     'MIME-Version: 1.0',
   ];
-
-  if (opts.fromName) lines.unshift(`From: ${header(opts.fromName)}`);
 
   if (opts.attachments?.length) {
     lines.push(`Content-Type: multipart/mixed; boundary="${boundary}"`, '');
