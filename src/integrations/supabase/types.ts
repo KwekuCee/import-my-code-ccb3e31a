@@ -925,6 +925,27 @@ export type Database = {
           },
         ]
       }
+      request_rate_limits: {
+        Row: {
+          bucket_key: string
+          request_count: number
+          updated_at: string
+          window_started_at: string
+        }
+        Insert: {
+          bucket_key: string
+          request_count?: number
+          updated_at?: string
+          window_started_at?: string
+        }
+        Update: {
+          bucket_key?: string
+          request_count?: number
+          updated_at?: string
+          window_started_at?: string
+        }
+        Relationships: []
+      }
       service_types: {
         Row: {
           church_id: string | null
@@ -1064,6 +1085,17 @@ export type Database = {
       confirm_leader_promotion: {
         Args: { p_promotion_id: string }
         Returns: boolean
+      }
+      consume_rate_limit: {
+        Args: {
+          p_bucket_key: string
+          p_max_requests: number
+          p_window_seconds: number
+        }
+        Returns: {
+          allowed: boolean
+          retry_after_seconds: number
+        }[]
       }
       delete_church_cascade: { Args: { p_church_id: string }; Returns: boolean }
       delete_email: {
