@@ -6,6 +6,8 @@ import {
   EVANGELISM_FIELDS,
   verifyReportCode,
   submitCellReport,
+  normalizeGhanaPhone,
+  sanitizeAmount,
   type CellReportSubmission,
 } from '../lib/cellReports';
 
@@ -41,6 +43,63 @@ const makeRegister = (n: number): RegisterRow[] =>
 
 const inputClass =
   'w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition';
+
+type PickedContact = { name: string; phone: string };
+const contactPickerSupported = () =>
+  typeof navigator !== 'undefined' && 'contacts' in navigator && 'ContactsManager' in window;
+
+async function pickContacts(): Promise<PickedContact[] | null> {
+  if (!contactPickerSupported()) return null;
+  try {
+    const list: any[] = await (navigator as any).contacts.select(['name', 'tel'], { multiple: true });
+    return list
+      .map((c) => ({
+        name: String(c?.name?.[0] || '').trim(),
+        phone: normalizeGhanaPhone(String(c?.tel?.[0] || '')) || String(c?.tel?.[0] || '').trim(),
+      }))
+      .filter((c) => c.name || c.phone);
+  } catch {
+    return [];
+  }
+}
+
+const PhonebookButton: React.FC<{ onPick: (c: PickedContact[]) => void }> = ({ onPick }) => {
+  const [note, setNote] = useState('');
+  return (
+    <span className="inline-flex items-center gap-2 flex-wrap">
+      <button
+        type="button"
+        onClick={async () => {
+          const res = await pickContacts();
+          if (res === null) {
+            setNote('Your browser cannot open the phonebook. Please type the names and numbers instead.');
+            return;
+          }
+          setNote(res.length ? `Added ${res.length} contact${res.length > 1 ? 's' : ''}.` : '');
+          if (res.length) onPick(res);
+        }}
+        className="text-xs font-bold text-blue-700 hover:text-blue-900 inline-flex items-center gap-1 cursor-pointer border border-blue-200 rounded-lg px-2.5 py-1.5 bg-blue-50"
+      >
+        <span className="material-symbols-outlined text-[16px]">contacts</span> Import from phonebook
+      </button>
+      {note && <span className="text-xs text-slate-500">{note}</span>}
+    </span>
+  );
+};
+
+/** Fills empty rows first, then appends new rows. */
+function mergeContacts<T>(rows: T[], picked: PickedContact[], isEmpty: (r: T) => boolean, make: (c: PickedContact, base?: T) => T): T[] {
+  const out = [...rows];
+  for (const c of picked) {
+    const idx = out.findIndex(isEmpty);
+    if (idx >= 0) out[idx] = make(c, out[idx]);
+    else out.push(make(c));
+  }
+  return out;
+}
+
+const phoneError = (v: string) => !!v.trim() && !normalizeGhanaPhone(v);
+const phoneClass = (v: string) => (phoneError(v) ? ' border-rose-400 ring-1 ring-rose-300' : '');
 
 const labelClass = 'block text-xs font-bold text-slate-600 mb-1.5';
 
@@ -119,6 +178,16 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
       return;
     }
 
+    const phones = [
+      ...soulsWon.map((r) => r.contact),
+      ...cellAttendance.map((r) => r.contact),
+      ...sundayRegister.flatMap((r) => [r.contact, r.absenteeContact]),
+    ];
+    if (phones.some(phoneError)) {
+      setSubmitError('Some phone numbers are not valid Ghana numbers (use 0XXXXXXXXX or +233XXXXXXXXX). They are outlined in red.');
+      return;
+    }
+    const np = (v: string) => (v.trim() ? normalizeGhanaPhone(v) || '' : '');
     const payload: CellReportSubmission = {
       leaderName: leaderName.trim(),
       cellName: cellName.trim(),
@@ -126,11 +195,11 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
       reportDate,
       reportGrid: grid,
       evangelism,
-      soulsWonList: soulsWon.filter((r) => r.name.trim() || r.contact.trim()),
-      cellAttendance: cellAttendance.filter((r) => r.name.trim() || r.contact.trim()),
+      soulsWonList: soulsWon.filter((r) => r.name.trim() || r.contact.trim()).map((r) => ({ ...r, contact: np(r.contact) })),
+      cellAttendance: cellAttendance.filter((r) => r.name.trim() || r.contact.trim()).map((r) => ({ ...r, contact: np(r.contact) })),
       sundayRegister: sundayRegister.filter(
         (r) => r.present.trim() || r.contact.trim() || r.absentee.trim() || r.absenteeContact.trim(),
-      ),
+      ).map((r) => ({ ...r, contact: np(r.contact), absenteeContact: np(r.absenteeContact) })),
     };
 
     setIsSubmitting(true);
@@ -258,11 +327,22 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={labelClass}>Church</label>
-            <input value={church} readOnly className={`${inputClass} bg-slate-50 text-slate-500`} />
+            <div className="relative">
+              <input value={church} readOnly disabled aria-readonly className={`${inputClass} bg-slate-100 text-slate-600 cursor-not-allowed pr-8`} />
+              <span className="material-symbols-outlined text-[16px] text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2">lock</span>
+            </div>
           </div>
           <div>
             <label className={labelClass}>Name of Leader</label>
-            <select value={leaderName} onChange={(e) => setLeaderName(e.target.value)} className={inputClass}>
+            <select
+              value={leaderName}
+              onChange={(e) => {
+                setLeaderName(e.target.value);
+                const l = churchLeaders.find((x) => x.fullName === e.target.value);
+                if (l?.cellOrPcfName) setCellName(l.cellOrPcfName);
+              }}
+              className={inputClass}
+            >
               <option value="">Select your name…</option>
               {churchLeaders.map((l) => (
                 <option key={l.id} value={l.fullName}>
@@ -277,11 +357,11 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
             )}
           </div>
           <div>
-            <label className={labelClass}>Cell Name</label>
+            <label className={labelClass}>Cell / PCF Name</label>
             <input
               value={cellName}
               onChange={(e) => setCellName(e.target.value)}
-              placeholder="Name of your cell"
+              placeholder="Filled in when you pick your name"
               className={inputClass}
             />
           </div>
@@ -322,27 +402,46 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
               </tr>
             </thead>
             <tbody>
-              {GRID_ROWS.map((row) => (
-                <tr key={row.key} className="border-b border-slate-50 last:border-0">
-                  <td className="px-4 py-2 font-semibold text-slate-700">{row.label}</td>
-                  <td className="px-2 py-1.5">
-                    <input
-                      type={row.type === 'number' ? 'number' : 'text'}
-                      value={grid[row.key]?.cell ?? ''}
-                      onChange={(e) => setGridValue(row.key, 'cell', e.target.value)}
-                      className={inputClass}
-                    />
-                  </td>
-                  <td className="px-2 py-1.5">
-                    <input
-                      type={row.type === 'number' ? 'number' : 'text'}
-                      value={grid[row.key]?.outreach ?? ''}
-                      onChange={(e) => setGridValue(row.key, 'outreach', e.target.value)}
-                      className={inputClass}
-                    />
-                  </td>
-                </tr>
-              ))}
+              {GRID_ROWS.map((row) =>
+                row.type === 'heading' ? (
+                  <tr key={row.key} className="bg-blue-50/60 border-b border-blue-100">
+                    <td colSpan={3} className="px-4 py-2 font-display font-bold text-blue-800 text-xs uppercase tracking-wide">
+                      {row.label}
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={row.key} className="border-b border-slate-50 last:border-0">
+                    <td className="px-4 py-2 font-semibold text-slate-700">{row.label}</td>
+                    {(['cell', 'outreach'] as const).map((col) => (
+                      <td key={col} className="px-2 py-1.5">
+                        {row.type === 'money' ? (
+                          <div className="relative">
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">GH₵</span>
+                            <input
+                              inputMode="decimal"
+                              value={grid[row.key]?.[col] ?? ''}
+                              onChange={(e) => setGridValue(row.key, col, sanitizeAmount(e.target.value, true))}
+                              placeholder="0.00"
+                              className={`${inputClass} pl-11`}
+                            />
+                          </div>
+                        ) : (
+                          <input
+                            type={row.type === 'datetime' ? 'datetime-local' : 'text'}
+                            inputMode={row.type === 'number' ? 'numeric' : undefined}
+                            value={grid[row.key]?.[col] ?? ''}
+                            onChange={(e) =>
+                              setGridValue(row.key, col, row.type === 'number' ? sanitizeAmount(e.target.value) : e.target.value)
+                            }
+                            placeholder={row.type === 'number' ? '0' : undefined}
+                            className={inputClass}
+                          />
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ),
+              )}
             </tbody>
           </table>
         </div>
@@ -359,9 +458,14 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
             <div key={f.key}>
               <label className={labelClass}>{f.label}</label>
               <input
-                type={f.type === 'number' ? 'number' : 'text'}
+                inputMode={f.type === 'number' ? 'numeric' : undefined}
                 value={evangelism[f.key] ?? ''}
-                onChange={(e) => setEvangelism((prev) => ({ ...prev, [f.key]: e.target.value }))}
+                onChange={(e) =>
+                  setEvangelism((prev) => ({
+                    ...prev,
+                    [f.key]: f.type === 'number' ? sanitizeAmount(e.target.value) : e.target.value,
+                  }))
+                }
                 className={inputClass}
               />
             </div>
@@ -369,7 +473,16 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
         </div>
 
         <div className="pt-2 space-y-2">
-          <p className="text-xs font-bold text-slate-600">Names & contacts of those led to Christ</p>
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <p className="text-xs font-bold text-slate-600">Names & contacts of those led to Christ</p>
+            <PhonebookButton
+              onPick={(c) =>
+                setSoulsWon((prev) =>
+                  mergeContacts(prev, c, (r) => !r.name.trim() && !r.contact.trim(), (x) => ({ name: x.name, contact: x.phone })),
+                )
+              }
+            />
+          </div>
           {soulsWon.map((row, i) => (
             <div key={i} className="flex gap-2 items-center">
               <input
@@ -385,8 +498,9 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
                 onChange={(e) =>
                   setSoulsWon((prev) => prev.map((r, idx) => (idx === i ? { ...r, contact: e.target.value } : r)))
                 }
-                placeholder="Contact"
-                className={inputClass}
+                placeholder="024XXXXXXX"
+                type="tel"
+                className={inputClass + phoneClass(row.contact)}
               />
               <button
                 onClick={() => setSoulsWon((prev) => prev.filter((_, idx) => idx !== i))}
@@ -410,7 +524,21 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
       <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
         <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50/70">
           <h4 className="font-display text-sm font-bold text-slate-900">Cell Attendance Sheet</h4>
-          <p className="text-xs text-slate-500">Tick first timers and souls won where they apply.</p>
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <p className="text-xs text-slate-500">Tick first timers and souls won where they apply.</p>
+            <PhonebookButton
+              onPick={(c) =>
+                setCellAttendance((prev) =>
+                  mergeContacts(prev, c, (r) => !r.name.trim() && !r.contact.trim(), (x, b) => ({
+                    firstTimer: b?.firstTimer ?? false,
+                    soulWon: b?.soulWon ?? false,
+                    name: x.name,
+                    contact: x.phone,
+                  })),
+                )
+              }
+            />
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[620px] text-xs">
@@ -447,7 +575,9 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
                           prev.map((r, idx) => (idx === i ? { ...r, contact: e.target.value } : r)),
                         )
                       }
-                      className={inputClass}
+                      type="tel"
+                      placeholder="024XXXXXXX"
+                      className={inputClass + phoneClass(row.contact)}
                     />
                   </td>
                   <td className="px-2 py-1.5 text-center">
@@ -504,7 +634,21 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
       <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
         <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50/70">
           <h4 className="font-display text-sm font-bold text-slate-900">Sunday Service Register</h4>
-          <p className="text-xs text-slate-500">Members present and absentees for the Sunday service.</p>
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <p className="text-xs text-slate-500">Members present and absentees for the Sunday service.</p>
+            <PhonebookButton
+              onPick={(c) =>
+                setSundayRegister((prev) =>
+                  mergeContacts(prev, c, (r) => !r.present.trim() && !r.contact.trim(), (x, b) => ({
+                    absentee: b?.absentee ?? '',
+                    absenteeContact: b?.absenteeContact ?? '',
+                    present: x.name,
+                    contact: x.phone,
+                  })),
+                )
+              }
+            />
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-xs">
@@ -512,7 +656,7 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
               <tr className="border-b border-slate-100">
                 <th className="text-left font-bold text-slate-500 px-4 py-2.5 w-10">#</th>
                 <th className="text-left font-bold text-slate-500 px-2 py-2.5">Members present</th>
-                <th className="text-left font-bold text-slate-500 px-2 py-2.5">Contact / signature</th>
+                <th className="text-left font-bold text-slate-500 px-2 py-2.5">Contact</th>
                 <th className="text-left font-bold text-slate-500 px-2 py-2.5">Absentees</th>
                 <th className="text-left font-bold text-slate-500 px-2 py-2.5">Absentee contact</th>
                 <th className="px-2 py-2.5 w-10" />
@@ -531,7 +675,11 @@ export const CellReportForm: React.FC<CellReportFormProps> = ({ churchOptions, l
                             prev.map((r, idx) => (idx === i ? { ...r, [field]: e.target.value } : r)),
                           )
                         }
-                        className={inputClass}
+                        type={field === 'contact' || field === 'absenteeContact' ? 'tel' : 'text'}
+                        className={
+                          inputClass +
+                          (field === 'contact' || field === 'absenteeContact' ? phoneClass(row[field]) : '')
+                        }
                       />
                     </td>
                   ))}
