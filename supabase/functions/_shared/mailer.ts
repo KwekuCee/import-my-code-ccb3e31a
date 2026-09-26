@@ -19,6 +19,11 @@ export interface SendMailResult {
 }
 
 const MAIL_FROM = 'CE Korle Bu <support@gcycattendance.online>';
+export const MAIL_LOGO_URL = 'https://gcycattendance.online/icon-512.png';
+const LOGO_HEADER = `<div style="text-align:center;padding:16px 0"><img src="${MAIL_LOGO_URL}" alt="CE Korle Bu" width="72" height="72" style="display:inline-block;border:0" /></div>`;
+function withLogo(html: string) {
+  return html.includes(MAIL_LOGO_URL) ? html : LOGO_HEADER + html;
+}
 
 async function sendResend(opts: SendMailOptions): Promise<SendMailResult> {
   const key = Deno.env.get('RESEND_API_KEY');
@@ -65,6 +70,7 @@ async function sendResend(opts: SendMailOptions): Promise<SendMailResult> {
 
 /** Sends an email through Resend, falling back to the connected Gmail account. */
 export async function sendMail(opts: SendMailOptions): Promise<SendMailResult> {
+  opts = { ...opts, html: withLogo(opts.html) };
   const resend = await sendResend(opts);
   if (resend.ok) return resend;
 

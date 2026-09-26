@@ -8,6 +8,7 @@ import {
   Container,
   Head,
   Heading,
+  Img,
   Html,
   Link,
   Preview,
@@ -34,6 +35,7 @@ export const SignupEmail = ({
     <Preview>Confirm your email for {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
+        <Img src="https://gcycattendance.online/icon-512.png" alt="CE Korle Bu" width="72" height="72" style={{ margin: '0 auto 16px' }} />
         <Heading style={h1}>Confirm your email</Heading>
         <Text style={text}>
           Thanks for signing up for{' '}

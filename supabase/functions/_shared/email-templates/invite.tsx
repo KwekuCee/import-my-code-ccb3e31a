@@ -8,6 +8,7 @@ import {
   Container,
   Head,
   Heading,
+  Img,
   Html,
   Link,
   Preview,
@@ -32,6 +33,7 @@ export const InviteEmail = ({
     <Preview>You've been invited to join {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
+        <Img src="https://gcycattendance.online/icon-512.png" alt="CE Korle Bu" width="72" height="72" style={{ margin: '0 auto 16px' }} />
         <Heading style={h1}>You've been invited</Heading>
         <Text style={text}>
           You've been invited to join{' '}
