@@ -22,6 +22,7 @@ export async function rateLimit(
   windowSeconds: number,
   headers: Record<string, string>,
   identity?: string,
+  nested = false,
 ): Promise<Response | null> {
   const who = identity ? identity.toLowerCase().slice(0, 120) : clientIp(req);
   const { data, error } = await admin.rpc('consume_rate_limit', {
@@ -39,6 +40,8 @@ export async function rateLimit(
     const mins = Math.ceil(wait / 60);
     return new Response(
       JSON.stringify({
+        [nested ? 'error' : 'error']: nested ? { message: '' } : '',
+      }) && JSON.stringify(nested ? { error: { message: `Too many attempts. Please wait ${wait < 90 ? `${wait} seconds` : `${mins} minutes`} and try again.` } } : {
         error: `Too many attempts. Please wait ${wait < 90 ? `${wait} seconds` : `${mins} minutes`} and try again.`,
       }),
       { status: 429, headers: { ...headers, 'Content-Type': 'application/json', 'Retry-After': String(wait) } },

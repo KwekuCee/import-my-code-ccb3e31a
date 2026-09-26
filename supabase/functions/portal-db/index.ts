@@ -1,3 +1,4 @@
+import { rateLimit } from '../_shared/rate-limit.ts';
 // Server-side data gateway for the CEKB portal.
 //
 // The database tables are locked to the service role, so the browser can never
@@ -360,8 +361,13 @@ Deno.serve(async (req) => {
     switch (body.action) {
       case 'query':
         return await handleQuery(body as QueryRequest, session);
-      case 'login':
+      case 'login': {
+        const limited =
+          (await rateLimit(req, 'login-ip', 20, 600, corsHeaders, undefined, true)) ||
+          (await rateLimit(req, 'login-id', 8, 600, corsHeaders, `id:${String((body as any).identifier || (body as any).email || '')}`, true));
+        if (limited) return limited;
         return await handleLogin(body);
+      }
       case 'logout': {
         const token = req.headers.get('x-portal-session');
         if (token) {

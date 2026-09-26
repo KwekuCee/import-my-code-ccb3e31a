@@ -6,6 +6,7 @@
 // role, so the code check can never be bypassed from the browser.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { rateLimit } from '../_shared/rate-limit.ts';
 import { getPortalSession } from '../_shared/portal-session.ts';
 
 declare const Deno: { env: { get(key: string): string | undefined } };
@@ -46,8 +47,43 @@ function str(value: unknown, max = 255) {
 }
 
 function num(value: unknown) {
-  const n = Number(String(value ?? '').replace(/[^0-9.\-]/g, ''));
-  return Number.isFinite(n) ? n : 0;
+  const n = Number(String(value ?? '').replace(/[^0-9.]/g, ''));
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+const MONEY_KEYS = new Set(['totalOffering']);
+const TEXT_KEYS = new Set(['venue', 'meetingDateTime', 'location', 'type']);
+/** Forces every count to a non-negative whole number (money keeps 2 decimals). */
+function cleanNumbers(obj: Record<string, any>) {
+  for (const [k, v] of Object.entries(obj)) {
+    if (TEXT_KEYS.has(k)) continue;
+    const fix = (x: unknown) => {
+      if (String(x ?? '').trim() === '') return '';
+      const n = num(x);
+      return MONEY_KEYS.has(k) ? String(Math.round(n * 100) / 100) : String(Math.floor(n));
+    };
+    obj[k] = v && typeof v === 'object' ? { cell: fix(v.cell), outreach: fix(v.outreach) } : fix(v);
+  }
+  return obj;
+}
+
+function ghPhone(raw: unknown): string | null {
+  const d = String(raw ?? '').replace(/[\s\-().]/g, '');
+  if (!d) return '';
+  let m = d.match(/^(?:\+?233|00233)(\d{9})$/);
+  if (m) return '0' + m[1];
+  m = d.match(/^0(\d{9})$/);
+  return m ? d : null;
+}
+
+function cleanPhones(list: Array<Record<string, unknown>>, keys: string[]) {
+  for (const row of list) for (const k of keys) {
+    if (!(k in row)) continue;
+    const p = ghPhone(row[k]);
+    if (p === null) throw new Error(`"${row[k]}" is not a valid Ghana phone number.`);
+    row[k] = p;
+  }
+  return list;
 }
 
 function trimList(value: unknown, max = 200) {
@@ -99,6 +135,13 @@ Deno.serve(async (req: Request) => {
     const body = await req.json();
     const action = str(body?.action, 40);
     const session = await getPortalSession(req);
+    if (action === 'verify_code' || action === 'submit') {
+      const limited =
+        action === 'verify_code'
+          ? await rateLimit(req, 'report-code', 15, 600, corsHeaders)
+          : await rateLimit(req, 'report-submit', 20, 3600, corsHeaders);
+      if (limited) return limited;
+    }
 
     // ---- Admin: read the access code(s) they are allowed to see -------------
     if (action === 'list_codes') {
@@ -172,8 +215,16 @@ Deno.serve(async (req: Request) => {
         .maybeSingle();
       if (leaderRow) leaderId = (leaderRow as any).id;
 
-      const grid = trimObject(report?.reportGrid);
-      const evangelism = trimObject(report?.evangelism);
+      const grid = cleanNumbers(trimObject(report?.reportGrid));
+      const evangelism = cleanNumbers(trimObject(report?.evangelism));
+      let soulsList, attendanceList, registerList;
+      try {
+        soulsList = cleanPhones(trimList(report?.soulsWonList), ['contact']);
+        attendanceList = cleanPhones(trimList(report?.cellAttendance), ['contact']);
+        registerList = cleanPhones(trimList(report?.sundayRegister), ['contact', 'absenteeContact']);
+      } catch (e) {
+        return json({ error: (e as Error).message }, 400);
+      }
       const insert = {
         church_id: church?.id ?? null,
         church_name: row.church_name,
@@ -184,9 +235,9 @@ Deno.serve(async (req: Request) => {
         report_date: str(report?.reportDate, 10) || new Date().toISOString().slice(0, 10),
         report_grid: grid,
         evangelism,
-        souls_won_list: trimList(report?.soulsWonList),
-        cell_attendance: trimList(report?.cellAttendance),
-        sunday_register: trimList(report?.sundayRegister),
+        souls_won_list: soulsList,
+        cell_attendance: attendanceList,
+        sunday_register: registerList,
         total_attendance: num((grid as any)?.totalAttendance?.cell),
         total_first_timers: num((grid as any)?.totalFirstTimers?.cell),
         total_souls_won: num((grid as any)?.gotSaved?.cell),

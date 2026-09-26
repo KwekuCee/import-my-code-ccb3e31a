@@ -1,3 +1,4 @@
+import { rateLimit } from '../_shared/rate-limit.ts';
 // Email verification for church branch admin accounts.
 //
 // POST { action: 'send', email, name?, origin? }  -> issues a token and emails a link
@@ -92,6 +93,8 @@ Deno.serve(async (req) => {
     if (!email || !email.includes('@')) {
       return json({ success: false, message: 'Please enter a valid email address.' }, 400);
     }
+    const limited = (await rateLimit(req, 'verify-ip', 10, 900, corsHeaders)) || (await rateLimit(req, 'verify-em', 3, 900, corsHeaders, email));
+    if (limited) return limited;
 
     const { data: profile } = await admin
       .from('user_profiles')

@@ -1,3 +1,4 @@
+import { rateLimit } from '../_shared/rate-limit.ts';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
 const SYSTEM_PROMPT = `You are the CEKB Group Support Assistant, a helpful in-app guide for a
@@ -33,6 +34,10 @@ Answer in short, plain sentences. Use simple words, no technical jargon. Keep an
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
+  }
+  {
+    const limited = await rateLimit(req, 'chat', 30, 600, corsHeaders);
+    if (limited) return limited;
   }
 
   try {

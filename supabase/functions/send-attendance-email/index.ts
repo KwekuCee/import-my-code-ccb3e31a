@@ -1,3 +1,4 @@
+import { rateLimit } from '../_shared/rate-limit.ts';
 // Sends a self-attendance notification email to a church's registered admin.
 // Reads the admin's email from church_admin_accounts (looked up by church name),
 // and sends from the connected Gmail account. Optionally attaches the QR pass PNG.
@@ -25,6 +26,10 @@ interface RequestBody {
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+  {
+    const limited = await rateLimit(req, 'att-mail', 30, 600, corsHeaders);
+    if (limited) return limited;
   }
 
   try {
