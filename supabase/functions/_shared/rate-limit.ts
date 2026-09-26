@@ -38,12 +38,9 @@ export async function rateLimit(
   if (row?.allowed === false) {
     const wait = Math.max(1, Number(row.retry_after_seconds) || windowSeconds);
     const mins = Math.ceil(wait / 60);
+    const message = `Too many attempts. Please wait ${wait < 90 ? `${wait} seconds` : `${mins} minutes`} and try again.`;
     return new Response(
-      JSON.stringify({
-        [nested ? 'error' : 'error']: nested ? { message: '' } : '',
-      }) && JSON.stringify(nested ? { error: { message: `Too many attempts. Please wait ${wait < 90 ? `${wait} seconds` : `${mins} minutes`} and try again.` } } : {
-        error: `Too many attempts. Please wait ${wait < 90 ? `${wait} seconds` : `${mins} minutes`} and try again.`,
-      }),
+      JSON.stringify(nested ? { error: { message } } : { error: message, message }),
       { status: 429, headers: { ...headers, 'Content-Type': 'application/json', 'Retry-After': String(wait) } },
     );
   }
