@@ -1,3 +1,4 @@
+import { rateLimit } from '../_shared/rate-limit.ts';
 // Emails digital attendance QR passes to members or leaders, one message each.
 // Used both for the automatic copy sent after check-in / leader registration and
 // for the bulk "Email codes to all members / all leaders" buttons.
@@ -60,6 +61,10 @@ function passHtml(r: Recipient): string {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
+  }
+  {
+    const limited = await rateLimit(req, 'qr-mail', 30, 600, corsHeaders);
+    if (limited) return limited;
   }
 
   try {

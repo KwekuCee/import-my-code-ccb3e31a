@@ -1,3 +1,4 @@
+import { rateLimit } from '../_shared/rate-limit.ts';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { sendMail as sendGmail } from '../_shared/mailer.ts';
@@ -31,6 +32,8 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => null);
     const action = body?.action;
+    const limited = await rateLimit(req, `pwreset-${action === 'confirm' ? 'c' : 'r'}`, action === 'confirm' ? 10 : 5, 900, corsHeaders);
+    if (limited) return limited;
 
     // ---------- 1. Request a reset link ----------
     if (action === 'request') {

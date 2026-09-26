@@ -12,19 +12,19 @@ const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL || ''}/functions/v1/ce
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
 
 /** Rows of the printed report sheet — each row has a Cell and an Outreach column. */
-export const GRID_ROWS: Array<{ key: string; label: string; type?: 'text' | 'number' | 'datetime' }> = [
+export const GRID_ROWS: Array<{ key: string; label: string; type?: 'text' | 'number' | 'datetime' | 'money' | 'heading' }> = [
   { key: 'venue', label: 'Venue', type: 'text' },
-  { key: 'meetingDateTime', label: 'Date & time of meeting', type: 'text' },
+  { key: 'meetingDateTime', label: 'Date & time of meeting', type: 'datetime' },
   { key: 'totalAttendance', label: 'Total attendance', type: 'number' },
   { key: 'totalFirstTimers', label: 'Total first timers', type: 'number' },
   { key: 'totalLeaders', label: 'Total leaders', type: 'number' },
   { key: 'gotSaved', label: 'Number got saved', type: 'number' },
   { key: 'filledWithSpirit', label: 'Number filled with the Spirit', type: 'number' },
-  { key: 'membersPresent', label: 'Members present', type: 'number' },
+  { key: 'membersPresent', label: 'Members present', type: 'heading' },
   { key: 'midweek', label: 'Midweek service', type: 'number' },
   { key: 'prayerService', label: 'Prayer service', type: 'number' },
   { key: 'sundayService', label: 'Sunday service', type: 'number' },
-  { key: 'totalOffering', label: 'Total offering received', type: 'number' },
+  { key: 'totalOffering', label: 'Total offering received (GH₵)', type: 'money' },
 ];
 
 export const EVANGELISM_FIELDS: Array<{ key: string; label: string; type?: 'text' | 'number' }> = [
@@ -155,4 +155,24 @@ export async function fetchCellReports(): Promise<CellReport[]> {
     .limit(500);
   if (error || !Array.isArray(data)) return [];
   return data.map(mapReport);
+}
+
+/** Normalises Ghana phone numbers to 0XXXXXXXXX. Returns null when invalid. */
+export function normalizeGhanaPhone(raw: string): string | null {
+  const digits = String(raw || '').replace(/[\s\-().]/g, '');
+  let m = digits.match(/^(?:\+?233|00233)(\d{9})$/);
+  if (m) return '0' + m[1];
+  m = digits.match(/^0(\d{9})$/);
+  if (m) return digits;
+  return null;
+}
+
+/** Keeps only digits (and one decimal point when allowed) so values can never go negative. */
+export function sanitizeAmount(value: string, allowDecimal = false): string {
+  let v = String(value || '').replace(allowDecimal ? /[^0-9.]/g : /[^0-9]/g, '');
+  if (allowDecimal) {
+    const [a, ...rest] = v.split('.');
+    v = rest.length ? `${a}.${rest.join('').slice(0, 2)}` : a;
+  }
+  return v;
 }
